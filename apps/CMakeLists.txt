@@ -1,0 +1,2 @@
+add_subdirectory(svgeditor)
+add_subdirectory(viewer)

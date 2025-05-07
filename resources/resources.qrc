@@ -1,0 +1,15 @@
+<RCC>
+    <qresource>
+        <file>icons/move.svg</file>
+        <file>icons/freehand.svg</file>
+        <file>icons/line.svg</file>
+        <file>icons/ellipse.svg</file>
+        <file>icons/rect.svg</file>
+        <file>icons/pentagon.svg</file>
+        <file>icons/hexagon.svg</file>
+        <file>icons/star.svg</file>
+        <file>icons/text.svg</file>
+        <file>icons/zoomout.svg</file>
+        <file>icons/zoomin.svg</file>
+    </qresource>
+</RCC>

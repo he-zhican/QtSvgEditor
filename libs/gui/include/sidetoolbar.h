@@ -5,18 +5,7 @@
 #include <QActionGroup>
 #include <QWidget>
 
-enum class ToolId : unsigned short { 
-    Tool_Move, 
-    Tool_Line,
-    Tool_Freehand,
-    Tool_Rect, 
-    Tool_Ellipse, 
-    Tool_Pentagon, 
-    Tool_Star, 
-    Tool_Text, 
-    Tool_ZoomOut,
-    Tool_ZoomIn, 
-};
+#include "toolid.h"
 
 class SideToolBar : public QToolBar {
     Q_OBJECT

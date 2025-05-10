@@ -1,9 +1,9 @@
 #ifndef SVGPOLYGON_H
 #define SVGPOLYGON_H
 
-#include "svgelement.h"
+#include <Qvector>
 #include <QPointF>
-#include <QPolygonF>
+#include "svgelement.h"
 
 class SvgPolygon : public SvgElement {
     Q_OBJECT
@@ -12,8 +12,17 @@ public:
     QString tagName() const override { return "polygon"; }
 
     // 多边形的顶点集合
-    QPolygonF points() const;
-    void setPoints(const QPolygonF& pts);
+    QVector<QPointF> points() const;
+    void setPoints(const QVector<QPointF>& pts);
+
+    double startX() const;
+    double startY() const;
+    double endX() const;
+    double endY() const;
+    void setStartX(double v);
+    void setStartY(double v);
+    void setEndX(double v);
+    void setEndY(double v);
 
     QDomElement toXml(QDomDocument& doc) const override;
     void fromXml(const QDomElement& elem) override;

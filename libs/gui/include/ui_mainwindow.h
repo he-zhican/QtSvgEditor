@@ -26,7 +26,7 @@ public:
         MainWindow->setMinimumSize(1000, 600);
 
         // 顶部菜单栏
-        menubar = new  MenuBar(MainWindow);
+        menubar = new MenuBar(MainWindow);
         MainWindow->setMenuBar(menubar);
 
         // 左侧工具栏

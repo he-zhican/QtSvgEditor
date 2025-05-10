@@ -1,4 +1,3 @@
-if exist build rmdir /s /q build
 mkdir build
 cd  build
 call "D:\Programmer\VS2019\VC\Auxiliary\Build\vcvarsamd64_x86.bat"

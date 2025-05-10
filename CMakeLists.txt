@@ -33,4 +33,4 @@ find_package(Qt5 COMPONENTS Core Widgets Gui Network Svg Xml Test REQUIRED)
 # 添加子目录
 add_subdirectory(libs)
 add_subdirectory(apps)
-# add_subdirectory(tests)
+add_subdirectory(tests)

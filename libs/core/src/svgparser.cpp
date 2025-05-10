@@ -1,5 +1,4 @@
 #include"svgparser.h"
-#include "svgdocument.h"
 #include "svgelement.h"
 #include "svgrect.h"
 #include "svgellipse.h"
@@ -26,18 +25,29 @@ std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
 
     auto document = std::make_shared<SvgDocument>();
     QDomElement root = dom.documentElement();
-    for (QDomNode node = root.firstChild(); !node.isNull(); node = node.nextSibling()) {
+
+    // 忽略首个背景分组 <g>
+    QDomElement bgGroup = root.firstChildElement("g");
+    // 背景处理（可选）...
+
+    // 下一个分组为绘制元素组
+    QDomElement painterGroup = bgGroup.nextSiblingElement("g");
+    if (painterGroup.isNull()) painterGroup = root; // 若无分组，则直接从 root 解析
+
+    // 遍历绘制组中的所有元素
+    for (QDomNode node = painterGroup.firstChild(); !node.isNull(); node = node.nextSibling()) {
         if (!node.isElement()) continue;
         QDomElement elem = node.toElement();
+
         std::shared_ptr<SvgElement> obj;
         QString tag = elem.tagName();
-        if (tag == "rect")      obj = std::make_shared<SvgRect>();
-        else if (tag == "ellipse") obj = std::make_shared<SvgEllipse>();
-        else if (tag == "line")   obj = std::make_shared<SvgLine>();
-        else if (tag == "polygon")obj = std::make_shared<SvgPolygon>();
-        else if (tag == "path") obj = std::make_shared<SvgFreehand>();
-        else if (tag == "text")   obj = std::make_shared<SvgText>();
-        else continue; // 忽略未知标签
+        if (tag == "rect")        obj = std::make_shared<SvgRect>();
+        else if (tag == "ellipse")  obj = std::make_shared<SvgEllipse>();
+        else if (tag == "line")     obj = std::make_shared<SvgLine>();
+        else if (tag == "polygon")  obj = std::make_shared<SvgPolygon>();
+        else if (tag == "path")     obj = std::make_shared<SvgFreehand>();
+        else if (tag == "text")     obj = std::make_shared<SvgText>();
+        else continue; // 忽略未知标签或其他分组
 
         obj->fromXml(elem);
         document->addElement(obj);

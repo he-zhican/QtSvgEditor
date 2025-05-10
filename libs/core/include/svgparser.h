@@ -1,7 +1,7 @@
 #ifndef SVGPARSER_H
 #define SVGPARSER_H
 
-class SvgDocument;
+#include "svgdocument.h"
 
 class SvgParser
 {

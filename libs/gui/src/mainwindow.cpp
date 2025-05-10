@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget* parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+
+	ui->canvasView->show();
 }
 
 MainWindow::~MainWindow()

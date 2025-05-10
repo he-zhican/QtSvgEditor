@@ -1,5 +1,5 @@
-file(GLOB UTILS_SRC "src/*cpp")
-file(GLOB UTILS_HDR "include/*h")
+file(GLOB UTILS_SRC "src/*.cpp")
+file(GLOB UTILS_HDR "include/*.h")
 
 add_library(utils STATIC ${UTILS_SRC} ${UTILS_HDR})
 

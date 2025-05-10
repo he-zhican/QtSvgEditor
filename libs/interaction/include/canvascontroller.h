@@ -3,22 +3,20 @@
 
 #include <QObject>
 #include <QPointF>
-#include <QMouseEvent>
 #include "toolcontroller.h"
-
-class QGraphicsScene;
-class SvgDocument;
 
 class CanvasController : public QObject {
     Q_OBJECT
 public:
     explicit CanvasController(QObject* parent = nullptr);
+    ~CanvasController();
 
     // 设置当前工具
-    void setCurrentTool(int toolId);
+    void setCurrentTool(ToolId toolId);
 
-    // 关联文档
-    void setDocument(SvgDocument* doc);
+    // 关联场景和文档
+    void setScene(QGraphicsScene* scene);
+    void setDocument(std::shared_ptr<SvgDocument> doc);
 
 public slots:
     // 来自 CanvasView 的事件接口
@@ -32,12 +30,12 @@ signals:
     void shapeCountChanged(int count);
 
 private:
-    QGraphicsScene* scene = nullptr;
-    SvgDocument* document = nullptr;
-    ToolController* currentTool = nullptr;
+    QGraphicsScene* m_scene = nullptr;
+    std::shared_ptr<SvgDocument> m_document;
+    ToolController* m_currentTool = nullptr;
 
     // 工具管理
-    QList<ToolController*> tools;
+    QList<ToolController*> m_tools;
     void initTools();
 };
 

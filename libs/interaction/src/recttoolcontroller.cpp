@@ -1,43 +1,44 @@
+#include <QGraphicsView>
 #include"recttoolcontroller.h"
+#include "commandmanager.h"
 #include "addelementcommand.h"
-#include <QUndoStack>
+#include "svgrect.h"
 
 RectToolController::RectToolController(QObject* parent)
     : ToolController(parent) {}
 
 void RectToolController::onMousePress(QMouseEvent* event) {
-    //startPos = event->pos();
-    //// 在 scene 空间坐标转换
-    //QPointF scenePt = scene->views().first()->mapToScene(startPos.toPoint());
-    //// 创建预览矩形
-    //previewItem = scene->addRect(QRectF(scenePt, QSizeF()), QPen(Qt::DashLine));
+    // 在 scene 空间坐标转换
+    m_startPos = m_scene->views().first()->mapToScene(event->pos());
+    // 创建预览矩形
+    m_previewItem = m_scene->addRect(QRectF(m_startPos, QSizeF()), QPen(Qt::DashLine));
 }
 
 void RectToolController::onMouseMove(QMouseEvent* event) {
-    //if (!previewItem) return;
-    //QPointF current = scene->views().first()->mapToScene(event->pos());
-    //QRectF rect(startPos, event->pos());
-    //previewItem->setRect(QRectF(scene->views().first()->mapToScene(startPos.toPoint()), current));
+    if (!m_previewItem) return;
+    QPointF currentPos = m_scene->views().first()->mapToScene(event->pos());
+    m_previewItem->setRect(QRectF(m_startPos, currentPos));
 }
 
 void RectToolController::onMouseRelease(QMouseEvent* event) {
-    //if (!previewItem) return;
-    //// 最终坐标
-    //QPointF endPt = scene->views().first()->mapToScene(event->pos());
-    //QRectF finalRect(previewItem->rect());
-    //scene->removeItem(previewItem);
-    //delete previewItem;
-    //previewItem = nullptr;
+    if (!m_previewItem) return;
+    // 最终矩形
+    QRectF finalRect(m_previewItem->rect());
 
-    //// 创建 SvgRect 数据模型
-    //SvgRect* rectElem = new SvgRect;
-    //rectElem->setX(finalRect.x());
-    //rectElem->setY(finalRect.y());
-    //rectElem->setWidth(finalRect.width());
-    //rectElem->setHeight(finalRect.height());
+    // 移除预览矩形
+    m_scene->removeItem(m_previewItem);
+    delete m_previewItem;
+    m_previewItem = nullptr;
+
+    // 创建 SvgRect 数据模型
+    auto rectElem = std::make_shared<SvgRect>();
+    rectElem->setX(finalRect.x());
+    rectElem->setY(finalRect.y());
+    rectElem->setWidth(finalRect.width());
+    rectElem->setHeight(finalRect.height());
 
     // 触发命令添加
-    //auto cmd = new AddElementCommand(document, rectElem);
-    //QUndoStack* stack = qobject_cast<QUndoStack*>(parent());
-    //if (stack) stack->push(cmd);
+    auto addCmd = new AddElementCommand(m_document, rectElem);
+    // 执行并入栈
+    CommandManager::instance().execute(addCmd);
 }

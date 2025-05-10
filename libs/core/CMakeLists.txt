@@ -1,5 +1,5 @@
-file(GLOB CORE_SRC "src/*cpp")
-file(GLOB CORE_HDR "include/*h")
+file(GLOB CORE_SRC "src/*.cpp")
+file(GLOB CORE_HDR "include/*.h")
 
 add_library(core SHARED ${CORE_SRC} ${CORE_HDR})
 

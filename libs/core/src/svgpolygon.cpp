@@ -3,8 +3,8 @@
 SvgPolygon::SvgPolygon(QObject* parent)
 	: SvgElement(parent) {}
 
-QPolygonF SvgPolygon::points() const {
-	QPolygonF pts;
+QVector<QPointF> SvgPolygon::points() const {
+	QVector<QPointF> pts;
 	QString data = attribute("points");
 	auto list = data.split(' ', Qt::SkipEmptyParts);
 	for (const QString& pair : list) {
@@ -15,11 +15,51 @@ QPolygonF SvgPolygon::points() const {
 	return pts;
 }
 
-void SvgPolygon::setPoints(const QPolygonF& pts) {
+void SvgPolygon::setPoints(const QVector<QPointF>& pts) {
 	QStringList list;
 	for (auto& p : pts)
 		list << QString("%1,%2").arg(p.x()).arg(p.y());
 	setAttribute("points", list.join(' '));
+}
+
+double SvgPolygon::startX() const
+{
+	return attribute("start-x").toDouble();
+}
+
+double SvgPolygon::startY() const
+{
+	return attribute("start-y").toDouble();
+}
+
+double SvgPolygon::endX() const
+{
+	return attribute("end-x").toDouble();
+}
+
+double SvgPolygon::endY() const
+{
+	return attribute("end-y").toDouble();
+}
+
+void SvgPolygon::setStartX(double v)
+{
+	setAttribute("start-x", QString::number(v));
+}
+
+void SvgPolygon::setStartY(double v)
+{
+	setAttribute("start-y", QString::number(v));
+}
+
+void SvgPolygon::setEndX(double v)
+{
+	setAttribute("end-x", QString::number(v));
+}
+
+void SvgPolygon::setEndY(double v)
+{
+	setAttribute("end-y", QString::number(v));
 }
 
 QDomElement SvgPolygon::toXml(QDomDocument& doc) const {

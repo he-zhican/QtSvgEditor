@@ -14,18 +14,31 @@ void SvgWriter::write(const QString& filePath, const SvgDocument& doc) {
     root.setAttribute("author", "WHUT_Hzc");
     root.setAttribute("width", QString::number(doc.canvasWidth()));
     root.setAttribute("height", QString::number(doc.canvasHeight()));
-    root.setAttribute("fill", doc.fillColor());
 
     dom.appendChild(root);
 
-    // 创建组g
-    QDomElement group = dom.createElement("g");
-    root.appendChild(group);
+    // 创建背景组
+    QDomElement groupBackground = dom.createElement("g");
+    root.appendChild(groupBackground);
+    QDomElement title = dom.createElement("title");
+    title.appendChild(dom.createTextNode("background"));
+    groupBackground.appendChild(title);
+    QDomElement background = dom.createElement("rect");
+    background.setAttribute("fill", doc.canvasFill());
+    background.setAttribute("x", "-1");
+    background.setAttribute("y", "-1");
+    background.setAttribute("width", QString::number(doc.canvasWidth()));
+    background.setAttribute("height", QString::number(doc.canvasHeight()));
+    groupBackground.appendChild(background);
+
+    // 创建绘画组painterGroup
+    QDomElement groupPainter = dom.createElement("g");
+    root.appendChild(groupPainter);
 
     // 遍历所有元素并追加子节点
     for (auto& elemPtr : doc.elements()) {
         QDomElement xml = elemPtr->toXml(dom);
-        group.appendChild(xml);
+        groupPainter.appendChild(xml);
     }
 
     QFile file(filePath);

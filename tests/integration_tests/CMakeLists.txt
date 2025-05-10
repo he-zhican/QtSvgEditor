@@ -19,7 +19,7 @@ target_link_libraries(integration_tests
     commands
     gui
     interaction
-    files
+    file
     utils
     Qt5::Core
     Qt5::Gui

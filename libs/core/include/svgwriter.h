@@ -1,7 +1,6 @@
 #ifndef SVGWRITER_H
 #define SVGWRITER_H
 
-#include <QString>
 #include "svgdocument.h"
 
 class SvgWriter {

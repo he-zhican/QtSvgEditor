@@ -3,8 +3,8 @@
 
 #include "svgelement.h"
 
-class SvgText : public SvgElement
-{
+class SvgText : public SvgElement {
+    Q_OBJECT
 public:
 	explicit SvgText(QObject* parent = nullptr);
 	QString tagName() const override { return "text"; }
@@ -14,11 +14,20 @@ public:
     QString text() const;
     QString fontFamily() const;
     double fontSize() const;
+    double startX() const;
+    double startY() const;
+    double endX() const;
+    double endY() const;
+
     void setX(double v);
     void setY(double v);
     void setText(const QString& t);
     void setFontFamily(const QString& f);
     void setFontSize(double s);
+    void setStartX(double v);
+    void setStartY(double v);
+    void setEndX(double v);
+    void setEndY(double v);
 
     QDomElement toXml(QDomDocument& doc) const override;
     void fromXml(const QDomElement& elem) override;

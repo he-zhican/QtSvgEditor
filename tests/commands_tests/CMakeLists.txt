@@ -1,5 +1,5 @@
 add_executable(commands_tests
-    commadntests.cpp
+    commandtests.cpp
 )
 
 target_include_directories(commands_tests PRIVATE .)

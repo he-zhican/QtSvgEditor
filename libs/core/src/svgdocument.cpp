@@ -7,8 +7,8 @@
 SvgDocument::SvgDocument(QObject* parent)
     : QObject(parent) {}
 
-SvgDocument::SvgDocument(double canvasWidth, double canvasHeight, QString& fillColor, QObject* parent = nullptr)
-    : m_canvasWidth(canvasWidth), m_canvasHeight(canvasHeight), m_fillColor(fillColor), QObject(parent) {
+SvgDocument::SvgDocument(double canvasWidth, double canvasHeight, QString& fill, QObject* parent)
+    : m_canvasWidth(canvasWidth), m_canvasHeight(canvasHeight), m_canvasFill(fill), QObject(parent) {
 
 }
 

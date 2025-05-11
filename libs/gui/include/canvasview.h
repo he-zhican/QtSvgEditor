@@ -2,17 +2,26 @@
 #define CANVASVIEW_H
 
 #include <QGraphicsView>
+#include <QMap>
 #include "canvascontroller.h"
+#include "svgdocument.h"
+
+class GraphicsSvgItem;
 
 class CanvasView : public QGraphicsView {
     Q_OBJECT
 public:
     explicit CanvasView(QWidget* parent = nullptr);
-    // 设置关联的控制器
+    ~CanvasView();
+
     void setController(CanvasController* controller);
+    void setDocument(std::shared_ptr<SvgDocument> doc);
 
 public slots:
     void onToolSelected(ToolId toolId);
+    void onDocumentChanged();
+    void onAddElementChanged(std::shared_ptr<SvgElement> elem);
+    void onRemoveElementChanged(std::shared_ptr<SvgElement> elem);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -24,6 +33,8 @@ protected:
 
 private:
     CanvasController* m_controller = nullptr;
+    std::shared_ptr<SvgDocument> m_document;
+    QMap<std::shared_ptr<SvgElement>, GraphicsSvgItem*> m_itemMap;
 };
 
 #endif // CANVASVIEW_H

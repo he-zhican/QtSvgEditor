@@ -15,17 +15,14 @@ public:
     SvgDocument(double canvasWidth, double canvasHeight, QString& canvasFill, QObject* parent = nullptr);
     ~SvgDocument();
 
-    // 文档操作
     bool loadFromFile(const QString& filePath);
     bool saveToFile(const QString& filePath) const;
 
-    // 元素管理
     void addElement(std::shared_ptr<SvgElement> elem);
     void removeElement(std::shared_ptr<SvgElement> elem);
     QVector<std::shared_ptr<SvgElement>> elements() const;
     int elementCount() const { return m_elements.size(); }
 
-    // 画布管理
     double canvasWidth() const { return m_canvasWidth; }
     double canvasHeight() const { return m_canvasHeight; }
     QString canvasFill() const { return m_canvasFill; }
@@ -34,8 +31,9 @@ public:
     void setCanvasFillColor(const QString& fill) { m_canvasFill = fill; }
 
 signals:
-    // 文档结构或内容变化
     void documentChanged();
+    void addElementChanged(std::shared_ptr<SvgElement> elem);
+    void removeElementChanged(std::shared_ptr<SvgElement> elem);
 
 private:
     QVector<std::shared_ptr<SvgElement>> m_elements;

@@ -2,6 +2,12 @@
 
 SvgRect::SvgRect(QObject* parent) : SvgElement(parent) {}
 
+void SvgRect::move(QPointF& offset)
+{
+	setX(x() + offset.x());
+	setY(y() + offset.y());
+}
+
 double SvgRect::x() const { return attribute("x").toDouble(); }
 
 void SvgRect::setX(double v) { setAttribute("x", QString::number(v)); }

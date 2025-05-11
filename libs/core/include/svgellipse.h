@@ -4,10 +4,10 @@
 #include "svgelement.h"
 
 class SvgEllipse : public SvgElement {
-    Q_OBJECT
 public:
     explicit SvgEllipse(QObject* parent = nullptr);
     QString tagName() const override { return "ellipse"; }
+    void move(QPointF& offset) override;
 
     double centerX() const;  // 中心点横坐标
     double centerY() const;  // 中心点纵坐标

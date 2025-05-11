@@ -3,6 +3,16 @@
 SvgText::SvgText(QObject* parent)
 	: SvgElement(parent) {}
 
+void SvgText::move(QPointF& offset)
+{
+	setStartX(startX() + offset.x());
+	setStartY(startY() + offset.y());
+	setEndX(endX() + offset.x());
+	setEndY(endY() + offset.y());
+	setX(x() + offset.x());
+	setY(y() + offset.y());
+}
+
 double SvgText::x() const { return attribute("x").toDouble(); }
 void SvgText::setX(double v) { setAttribute("x", QString::number(v)); }
 

@@ -8,14 +8,15 @@ PentagonToolController::PentagonToolController(QObject* parent) :ToolController(
 
 void PentagonToolController::onMousePress(QMouseEvent* event)
 {
-	m_startPos = m_scene->views().first()->mapToScene(event->pos());
-	m_previewItem = m_scene->addPolygon(QPolygonF(), QPen(Qt::DashLine));
+	m_startPos = event->pos();
+	m_startPos = m_view->mapToScene(m_startPos.toPoint());
+	m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
 }
 
 void PentagonToolController::onMouseMove(QMouseEvent* event)
 {
 	if (!m_previewItem) return;
-	m_endPos = m_scene->views().first()->mapToScene(event->pos());
+	m_endPos = m_view->mapToScene(event->pos());
 	// 实时计算顶点位置
 	calculatePoints();
 	m_previewItem->setPolygon(QPolygonF(m_points));
@@ -27,7 +28,7 @@ void PentagonToolController::onMouseRelease(QMouseEvent* event)
 	QPolygonF finalPolygon = m_previewItem->polygon();
 
 	// 移除预览
-	m_scene->removeItem(m_previewItem);
+	m_view->scene()->removeItem(m_previewItem);
 	delete m_previewItem;
 	m_previewItem = nullptr;
 
@@ -44,12 +45,27 @@ void PentagonToolController::onMouseRelease(QMouseEvent* event)
 
 void PentagonToolController::calculatePoints()
 {
-	QPointF p1(m_startPos.x(), (m_startPos.y() + m_endPos.y()) / 2);
-	QPointF p2((m_startPos.x() + m_endPos.x()) / 2, m_startPos.y());
-	QPointF p3(m_endPos.x(), (m_startPos.y() + m_endPos.y()) / 2);
-	QPointF p4((m_startPos.x() + m_endPos.x()) / 3, m_endPos.y());
-	QPointF p5((m_startPos.x() + m_endPos.x()) / 3 * 2, m_endPos.y());
-
 	m_points.clear();
-	m_points << p1 << p2 << p3 << p4 << p5;
+
+	const double PI = 3.14159;
+
+	// 计算中心点和半径
+	double cx = (m_startPos.x() + m_endPos.x()) / 2.0;
+	double cy = (m_startPos.y() + m_endPos.y()) / 2.0;
+	double width = m_endPos.x() - m_startPos.x();
+	double height = m_endPos.y() - m_startPos.y();
+	double R = std::min(width, height) / 2.0;
+
+	// 生成五边形顶点
+	for (int i = 0; i < 5; ++i) {
+		double angle = (-90 + i * 72) * PI / 180.0;
+		double x = cx + R * cos(angle);
+		double y = cy + R * sin(angle);
+
+		// 适配非正方形矩形
+		x = cx + (x - cx) * (width / (2 * R));
+		y = cy + (y - cy) * (height / (2 * R));
+
+		m_points << QPointF(x, y);
+	}
 }

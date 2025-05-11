@@ -8,16 +8,15 @@ LineToolController::LineToolController(QObject* parent) :ToolController(parent) 
 
 void LineToolController::onMousePress(QMouseEvent* event)
 {
-	m_startPos = event->pos();
-	QPointF scenePos = m_scene->views().first()->mapToScene(m_startPos.toPoint());
-	m_previewItem = m_scene->addLine(QLineF(scenePos, scenePos), QPen(Qt::DashLine));
+	m_startPos = m_view->mapToScene(event->pos());
+	m_previewItem = m_view->scene()->addLine(QLineF(m_startPos, m_startPos), QPen(Qt::DashLine));
 }
 
 void LineToolController::onMouseMove(QMouseEvent* event)
 {
 	if (!m_previewItem) return;
-	QPointF startPos = m_scene->views().first()->mapToScene(m_startPos.toPoint());
-	QPointF currentPos = m_scene->views().first()->mapToScene(event->pos());
+	QPointF startPos = m_view->mapToScene(m_startPos.toPoint());
+	QPointF currentPos = m_view->mapToScene(event->pos());
 	m_previewItem->setLine(QLineF(startPos, currentPos));
 }
 
@@ -27,7 +26,7 @@ void LineToolController::onMouseRelease(QMouseEvent* event)
 	QLineF finalLine = m_previewItem->line();
 
 	// ÒÆ³ýÔ¤ÀÀ
-	m_scene->removeItem(m_previewItem);
+	m_view->scene()->removeItem(m_previewItem);
 	delete m_previewItem;
 	m_previewItem = nullptr;
 

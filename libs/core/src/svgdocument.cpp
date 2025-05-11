@@ -44,12 +44,12 @@ bool SvgDocument::saveToFile(const QString& filePath) const {
 
 void SvgDocument::addElement(std::shared_ptr<SvgElement> elem) {
     m_elements.append(elem);
-    emit documentChanged();
+    emit addElementChanged(elem);
 }
 
 void SvgDocument::removeElement(std::shared_ptr<SvgElement> elem) {
     m_elements.removeAll(elem);
-    emit documentChanged();
+    emit removeElementChanged(elem);
 }
 
 QVector<std::shared_ptr<SvgElement>> SvgDocument::elements() const {

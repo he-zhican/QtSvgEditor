@@ -9,8 +9,7 @@ GraphicsSvgItem::GraphicsSvgItem(std::shared_ptr<SvgElement> element)
 	updateStyle();
 	updateGeometry();
 
-	//connect(m_element.get(), &SvgElement::attributeChanged, this, &GraphicsSvgItem::onAttributeChanged);
-	connect(m_element.get(), SIGNAL(attributeChanged(QString&, QString&)), this, SLOT(onAttributeChanged(QString&, QString&)));
+	connect(m_element.get(), &SvgElement::attributeChanged, this, &GraphicsSvgItem::onAttributeChanged);
 }
 
 GraphicsSvgItem::~GraphicsSvgItem() {
@@ -54,17 +53,13 @@ void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* /*
 void GraphicsSvgItem::onAttributeChanged(const QString& name, const QString& value)
 {
 	Q_UNUSED(value)
-	//QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", };
-	//if (name == "x" || name == "y" ||
-	//	name == "width" || name == "height" ||
-	//	name == "rx" || name == "ry") {
-	//	updateGeometry();
-	//}
-	//if (name == "stroke" || name == "stroke-width" || name == "fill" || name == "stroke-dasharray") {
-	//	updateStyle();
-	//}
-	updateGeometry();
-	updateStyle();
+	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry"};
+	if (geometryNames.contains(name)) {
+		updateGeometry();
+	}
+	if (name == "stroke" || name == "stroke-width" || name == "fill" || name == "stroke-dasharray") {
+		updateStyle();
+	}
 	// 请求重绘
 	update();
 }
@@ -91,13 +86,17 @@ void GraphicsSvgItem::updateStyle()
 void GraphicsSvgItem::updateGeometry()
 {
 	const QString tag = m_element->tagName();
-	// 根据属性设置 m_bounds，示例以 rect 为准
+	// 根据属性设置 m_bounds
 	if (tag == "line") {
 		double x1 = m_element->attribute("x1").toDouble();
 		double y1 = m_element->attribute("y1").toDouble();
 		double x2 = m_element->attribute("x2").toDouble();
 		double y2 = m_element->attribute("y2").toDouble();
-		m_boundingRect = QRectF(x1, y1, x2 - x1, y2 - y1);
+		m_boundingRect = QRectF(
+			std::min(x1, x2),
+			std::min(y1, y2),
+			fabs(x2 - x1),
+			fabs(y2 - y1));
 	}
 	else if (tag == "rect") {
 		double x = m_element->attribute("x").toDouble();
@@ -107,16 +106,20 @@ void GraphicsSvgItem::updateGeometry()
 		m_boundingRect = QRectF(x, y, w, h);
 	}
 	else if (tag == "ellipse" || tag == "polygon" || tag == "text") {
-		double startX = m_element->attribute("start-x").toDouble();
-		double startY = m_element->attribute("start-y").toDouble();
-		double endX = m_element->attribute("end-x").toDouble();
-		double endY = m_element->attribute("end-Y").toDouble();
-		m_boundingRect = QRectF(startX, startY, endX - startX, endY - startY);
+		double x1 = m_element->attribute("start-x").toDouble();
+		double y1 = m_element->attribute("start-y").toDouble();
+		double x2 = m_element->attribute("end-x").toDouble();
+		double y2 = m_element->attribute("end-y").toDouble();
+
+		m_boundingRect = QRectF(
+			std::min(x1, x2),
+			std::min(y1, y2),
+			fabs(x2 - x1),
+			fabs(y2 - y1));
 	}
 	else if (tag == "path") {
 		QPainterPath path = std::dynamic_pointer_cast<SvgFreehand>(m_element)->path();
 		m_boundingRect = path.boundingRect();
 	}
-
-	setPos(m_boundingRect.topLeft());
+	setPos(0, 0);
 }

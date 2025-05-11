@@ -6,6 +6,7 @@ SvgElement::SvgElement(QObject* parent)
 	setAttribute("stroke","#000000");     // 边框颜色：黑色
 	setAttribute("stroke-width", "2");    // 边框宽度：2像素
 	setAttribute("fill", "#ffffff");      // 填充颜色：白色
+	//setAttribute("fill", "none");
 	setAttribute("stroke-dasharray", ""); // 边框样式
 }
 

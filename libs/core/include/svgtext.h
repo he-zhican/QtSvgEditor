@@ -4,10 +4,10 @@
 #include "svgelement.h"
 
 class SvgText : public SvgElement {
-    Q_OBJECT
 public:
 	explicit SvgText(QObject* parent = nullptr);
 	QString tagName() const override { return "text"; }
+    void move(QPointF& offset) override;
 
     double x() const;
     double y() const;

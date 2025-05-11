@@ -3,6 +3,20 @@
 SvgPolygon::SvgPolygon(QObject* parent)
 	: SvgElement(parent) {}
 
+void SvgPolygon::move(QPointF& offset)
+{
+	QVector<QPointF> originPoints = points();
+	for (QPointF& p : originPoints) {
+		p = p + offset;
+	}
+	setPoints(originPoints);
+
+	setStartX(startX() + offset.x());
+	setStartY(startY() + offset.y());
+	setEndX(endX() + offset.x());
+	setEndY(endY() + offset.y());
+}
+
 QVector<QPointF> SvgPolygon::points() const {
 	QVector<QPointF> pts;
 	QString data = attribute("points");

@@ -9,8 +9,9 @@
 #include "texttoolcontroller.h"
 #include "movetoolcontroller.h"
 #include "zoomtoolcontroller.h"
+#include <QDebug>
 
-CanvasController::CanvasController(QObject* parent):QObject(parent)
+CanvasController::CanvasController(QObject* parent) : QObject(parent)
 {
 	initTools();
 	setCurrentTool(ToolId::Tool_Move);
@@ -19,7 +20,7 @@ CanvasController::CanvasController(QObject* parent):QObject(parent)
 CanvasController::~CanvasController() {
 	qDeleteAll(m_tools);
 	m_tools.clear();
-	delete m_scene;
+	delete m_view;
 }
 
 void CanvasController::initTools()
@@ -46,11 +47,11 @@ void CanvasController::setCurrentTool(ToolId toolId)
 	}
 }
 
-void CanvasController::setScene(QGraphicsScene* scene)
+void CanvasController::setView(QGraphicsView* view)
 {
 	// 为每种工具都设置场景
 	for (auto t : m_tools) {
-		t->setScene(scene);
+		t->setView(view);
 	}
 }
 
@@ -90,4 +91,8 @@ void CanvasController::keyPressEvent(QKeyEvent* event)
 {
 	if (m_currentTool)
 		m_currentTool->onKeyPress(event);
+}
+
+void CanvasController::mouseDoubleClickEvent(QMouseEvent* event)
+{
 }

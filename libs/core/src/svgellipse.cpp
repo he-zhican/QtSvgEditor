@@ -2,6 +2,16 @@
 
 SvgEllipse::SvgEllipse(QObject* parent) : SvgElement(parent) {}
 
+void SvgEllipse::move(QPointF& offset)
+{
+	setStartX(startX() + offset.x());
+	setStartY(startY() + offset.y());
+	setEndX(endX() + offset.x());
+	setEndY(endY() + offset.y());
+	setCenterX(centerX() + offset.x());
+	setCenterY(centerY() + offset.y());
+}
+
 double SvgEllipse::centerX() const { return attribute("cx").toDouble(); }
 
 void SvgEllipse::setCenterX(double v) { setAttribute("cx", QString::number(v)); }

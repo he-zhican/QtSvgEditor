@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPointF>
+#include <QGraphicsView>
 #include "toolcontroller.h"
 
 class CanvasController : public QObject {
@@ -14,23 +15,23 @@ public:
     // 设置当前工具
     void setCurrentTool(ToolId toolId);
 
-    // 关联场景和文档
-    void setScene(QGraphicsScene* scene);
+    // 关联视图和文档
+    void setView(QGraphicsView* scene);
     void setDocument(std::shared_ptr<SvgDocument> doc);
 
-public slots:
     // 来自 CanvasView 的事件接口
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent* event);
+    void mouseDoubleClickEvent(QMouseEvent* event);
 
 signals:
     void requestRepaint();  // 请求 CanvasView 重绘
     void shapeCountChanged(int count);
 
 private:
-    QGraphicsScene* m_scene = nullptr;
+    QGraphicsView* m_view = nullptr;
     std::shared_ptr<SvgDocument> m_document;
     ToolController* m_currentTool = nullptr;
 

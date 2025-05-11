@@ -6,10 +6,10 @@
 #include "svgelement.h"
 
 class SvgPolygon : public SvgElement {
-    Q_OBJECT
 public:
     explicit SvgPolygon(QObject* parent = nullptr);
     QString tagName() const override { return "polygon"; }
+    void move(QPointF& offset) override;
 
     // 多边形的顶点集合
     QVector<QPointF> points() const;

@@ -5,10 +5,10 @@
 #include "svgelement.h"
 
 class SvgFreehand : public SvgElement {
-    Q_OBJECT
 public:
 	explicit SvgFreehand(QObject* parent = nullptr);
 	QString tagName() const override { return "path"; }
+    void move(QPointF& offset) override;
 
     // ÊÖ»æÂ·¾¶
     QPainterPath path() const;

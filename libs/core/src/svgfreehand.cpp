@@ -4,6 +4,13 @@
 SvgFreehand::SvgFreehand(QObject* parent)
     : SvgElement(parent) {}
 
+void SvgFreehand::move(QPointF& offset)
+{
+    QPainterPath& originPath = path();
+    originPath.translate(offset);
+    setPath(originPath);
+}
+
 QPainterPath SvgFreehand::path() const {
     // 从 "d" 属性解析路径
     QString d = attribute("d");

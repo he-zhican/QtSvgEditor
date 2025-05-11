@@ -4,10 +4,10 @@
 #include "svgelement.h"
 
 class SvgLine : public SvgElement {
-	Q_OBJECT
 public:
 	explicit SvgLine(QObject* parent = nullptr);
 	QString tagName() const override { return "line"; }
+	void move(QPointF& offset) override;
 
 	double x1() const;
 	double y1() const;

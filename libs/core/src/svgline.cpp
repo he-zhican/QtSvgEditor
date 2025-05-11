@@ -2,6 +2,14 @@
 
 SvgLine::SvgLine(QObject* parent) : SvgElement(parent) {}
 
+void SvgLine::move(QPointF& offset)
+{
+	setX1(x1() + offset.x());
+	setY1(y1() + offset.y());
+	setX2(x2() + offset.x());
+	setY2(y2() + offset.y());
+}
+
 double SvgLine::x1() const { return attribute("x1").toDouble(); }
 
 double SvgLine::y1() const { return attribute("y1").toDouble(); }

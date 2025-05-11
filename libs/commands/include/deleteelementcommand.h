@@ -12,24 +12,24 @@ public:
         std::shared_ptr<SvgElement> elem,
         QUndoCommand* parent = nullptr)
         : Command("Delete Element", parent)
-        , document(doc)
-        , element(elem)
-        , backup(elem) {}
+        , m_document(doc)
+        , m_element(elem)
+        , m_backup(elem) {}
 
 protected:
     void execute() override {
-        document->removeElement(element);
-        element.reset();  // 释放对象
+        m_document->removeElement(m_element);
+        m_element.reset();  // 释放对象
     }
     void undoImpl() override {
-        element = backup; // 恢复对象
-        document->addElement(element);
+        m_element = m_backup; // 恢复对象
+        m_document->addElement(m_element);
     }
 
 private:
-    std::shared_ptr<SvgDocument> document;
-    std::shared_ptr<SvgElement> element;
-    std::shared_ptr<SvgElement> backup; // 元素备份
+    std::shared_ptr<SvgDocument> m_document;
+    std::shared_ptr<SvgElement> m_element;
+    std::shared_ptr<SvgElement> m_backup; // 元素备份
 };
 
 #endif // !DELETEELEMENTCOMMAND_H

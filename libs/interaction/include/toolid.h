@@ -8,6 +8,7 @@ enum class ToolId : unsigned short {
     Tool_Rect,
     Tool_Ellipse,
     Tool_Pentagon,
+    Tool_Hexagon,
     Tool_Star,
     Tool_Text,
     Tool_ZoomOut,

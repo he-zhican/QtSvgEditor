@@ -55,3 +55,18 @@ void SvgDocument::removeElement(std::shared_ptr<SvgElement> elem) {
 QVector<std::shared_ptr<SvgElement>> SvgDocument::elements() const {
     return m_elements;
 }
+
+void SvgDocument::setCanvasWidth(const double width) { 
+    m_canvasWidth = width; 
+    emit documentAttributeChanged("width");
+}
+
+void SvgDocument::setCanvasHeight(const double height) { 
+    m_canvasHeight = height; 
+    emit documentAttributeChanged("height");
+}
+
+void SvgDocument::setCanvasFillColor(const QString& fill) { 
+    m_canvasFill = fill; 
+    emit documentAttributeChanged("fill");
+}

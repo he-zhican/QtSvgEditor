@@ -11,7 +11,7 @@ class QDomDocument;
 class SvgDocument : public QObject {
     Q_OBJECT
 public:
-    SvgDocument(QObject* parent = nullptr);
+    explicit SvgDocument(QObject* parent = nullptr);
     SvgDocument(double canvasWidth, double canvasHeight, QString& canvasFill, QObject* parent = nullptr);
     ~SvgDocument();
 
@@ -26,20 +26,21 @@ public:
     double canvasWidth() const { return m_canvasWidth; }
     double canvasHeight() const { return m_canvasHeight; }
     QString canvasFill() const { return m_canvasFill; }
-    void setCanvasWidth(const double width) { m_canvasWidth = width; }
-    void setCanvasHeight(const double height) { m_canvasHeight = height; }
-    void setCanvasFillColor(const QString& fill) { m_canvasFill = fill; }
+    void setCanvasWidth(const double width);
+    void setCanvasHeight(const double height);
+    void setCanvasFillColor(const QString& fill);
 
 signals:
     void documentChanged();
+    void documentAttributeChanged(const QString& name);
     void addElementChanged(std::shared_ptr<SvgElement> elem);
     void removeElementChanged(std::shared_ptr<SvgElement> elem);
 
 private:
     QVector<std::shared_ptr<SvgElement>> m_elements;
-    double m_canvasWidth = 600;
-    double m_canvasHeight = 400;
-    QString m_canvasFill = "";
+    double m_canvasWidth = 750;
+    double m_canvasHeight = 500;
+    QString m_canvasFill = "white";
 };
 
 #endif // SVGDOCUMENT_H

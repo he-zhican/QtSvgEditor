@@ -4,11 +4,13 @@
 #include "menubar.h"
 #include "sidetoolbar.h"
 #include "canvasview.h"
+#include "propertypanel.h"
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QDockWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -18,6 +20,7 @@ public:
     SideToolBar* sideToolBar;
     QScrollArea* scrollArea;
     CanvasView* canvasView;
+    PropertyPanel* propertyPanel;
 
     void setupUi(QMainWindow* MainWindow) {
         if (MainWindow->objectName().isEmpty())
@@ -41,6 +44,14 @@ public:
         scrollArea->setWidgetResizable(false);
         scrollArea->setAlignment(Qt::AlignCenter);
         MainWindow->setCentralWidget(scrollArea);
+        
+        // ÓÒ²àÊôÐÔÃæ°å
+        auto* dock = new QDockWidget(MainWindow);
+        dock->setTitleBarWidget(new QWidget(dock));
+        propertyPanel = new PropertyPanel(canvasView->document(), dock);
+        dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+        dock->setWidget(propertyPanel);
+        MainWindow->addDockWidget(Qt::RightDockWidgetArea, dock);
         
         retranslateUi(MainWindow);
 

@@ -10,7 +10,7 @@ EllipseToolController::EllipseToolController(QObject* parent)
 void EllipseToolController::onMousePress(QMouseEvent* event)
 {
 	m_startPos = m_view->mapToScene(event->pos());
-	m_previewItem = m_view->scene()->addEllipse(QRectF(m_startPos, QSizeF()), QPen(Qt::DashLine));
+	m_previewItem = m_view->scene()->addEllipse(QRectF(m_startPos.x(), m_startPos.y(), 0, 0), QPen(Qt::DashLine));
 }
 
 void EllipseToolController::onMouseMove(QMouseEvent* event)
@@ -32,6 +32,8 @@ void EllipseToolController::onMouseRelease(QMouseEvent* event)
 	m_view->scene()->removeItem(m_previewItem);
 	delete m_previewItem;
 	m_previewItem = nullptr;
+
+	if (isSameEndPosStartPos(finalRect.topLeft(), finalRect.bottomRight())) return;
 
 	auto ellipseElem = std::make_shared<SvgEllipse>();
 	ellipseElem->setCenterX(finalRect.center().x());

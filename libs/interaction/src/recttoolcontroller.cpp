@@ -34,6 +34,8 @@ void RectToolController::onMouseRelease(QMouseEvent* event) {
     delete m_previewItem;
     m_previewItem = nullptr;
 
+    if (isSameEndPosStartPos(finalRect.topLeft(), finalRect.bottomRight())) return;
+
     // 创建 SvgRect 数据模型
     auto rectElem = std::make_shared<SvgRect>();
     rectElem->setX(finalRect.x());

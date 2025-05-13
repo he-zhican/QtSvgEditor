@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QUndoStack>
 #include <memory>
+#include "command_global.h"
 
-// 单例模式-命令管理器
-class CommandManager : public QObject {
+class COMMANDS_API CommandManager : public QObject {
 	Q_OBJECT
 public:
 	static CommandManager& instance() {
@@ -26,6 +26,7 @@ public:
 		return m_undoStack.canRedo();
 	}
 
+public slots:
 	void undo() {
 		if (m_undoStack.canUndo()) {
 			m_undoStack.undo();
@@ -48,6 +49,9 @@ private:
 		connect(&m_undoStack, &QUndoStack::canUndoChanged, this, &CommandManager::canUndoChanged);
 		connect(&m_undoStack, &QUndoStack::canRedoChanged, this, &CommandManager::canRedoChanged);
 	}
+
+	CommandManager(const CommandManager& other) = delete;
+	CommandManager& operator=(const CommandManager& other) = delete;
 
 	QUndoStack m_undoStack;
 };

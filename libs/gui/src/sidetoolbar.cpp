@@ -3,8 +3,8 @@
 #include <QIcon>
 
 SideToolBar::SideToolBar(QWidget* parent)
-    : QToolBar(parent), actionGroup(new QActionGroup(this)) {
-    actionGroup->setExclusive(true);    // 仅能单选
+    : QToolBar(parent), m_actionGroup(new QActionGroup(this)) {
+    m_actionGroup->setExclusive(true);    // 仅能单选
     this->setMovable(false);
     //this->setFloatable(false);
     this->setOrientation(Qt::Vertical);
@@ -12,7 +12,7 @@ SideToolBar::SideToolBar(QWidget* parent)
 }
 
 SideToolBar::~SideToolBar() {
-    delete actionGroup;
+
 }
 
 void SideToolBar::initTools() {
@@ -23,6 +23,7 @@ void SideToolBar::initTools() {
         {ToolId::Tool_Ellipse,  ":/icons/ellipse.svg",   "Ellipse"},
         {ToolId::Tool_Rect,     ":/icons/rect.svg",      "Rectangle"},
         {ToolId::Tool_Pentagon, ":/icons/pentagon.svg",  "pentagon"},
+        {ToolId::Tool_Hexagon, ":/icons/hexagon.svg",  "pentagon"},
         {ToolId::Tool_Star,     ":/icons/star.svg",      "Star"},
         {ToolId::Tool_Text,     ":/icons/text.svg",      "Text"},
         {ToolId::Tool_ZoomOut,  ":/icons/zoomout.svg",   "Zoom Out"},
@@ -33,7 +34,7 @@ void SideToolBar::initTools() {
         QAction* act = addAction(QIcon(info.icon), tr(info.text));
         act->setCheckable(true);
         act->setData(static_cast<int>(info.id));
-        actionGroup->addAction(act);
+        m_actionGroup->addAction(act);
         connect(act, &QAction::triggered, this, [this, act]{
             ToolId id = static_cast<ToolId>(act->data().toInt());
             emit toolSelected(id);
@@ -41,5 +42,9 @@ void SideToolBar::initTools() {
     }
 
     // 默认选中移动工具
-    actionGroup->actions().first()->trigger();
+    m_actionGroup->actions().first()->trigger();
+}
+
+void SideToolBar::onChangeToMoveTool(){
+    m_actionGroup->actions().first()->trigger();
 }

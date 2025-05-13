@@ -1,6 +1,7 @@
 #include "menubar.h"
 #include <QAction>
 #include <QMenu>
+#include "commandmanager.h"
 
 MenuBar::MenuBar(QWidget* parent)
 	: QMenuBar(parent)
@@ -24,6 +25,25 @@ void MenuBar::initMenus()
     fileMenu->addSeparator(); // 添加分隔线
     QAction* exportAction = fileMenu->addAction("导出为PNG");
 
+    QMenu* editorMenu = this->addMenu("编辑");
+    QAction* undoAction = editorMenu->addAction("撤销 Ctrl+Z");
+    QAction* redoAction = editorMenu->addAction("重做 Ctrl+Shift+Z");
+    editorMenu->addSeparator(); // 添加分隔线
+    QAction* cutAction = editorMenu->addAction("剪切 Ctrl+X");
+    QAction* copyAction = editorMenu->addAction("复制 Ctrl+C");
+    QAction* pasteAction = editorMenu->addAction("粘贴 Ctrl+V");
+    QAction* deleteAction = editorMenu->addAction("删除 delete");
+
     // 连接动作的信号
-    connect(exportAction, &QAction::triggered, this, [] {});
+    //connect(exportAction, &QAction::triggered, this, [] {});
+
+    connect(undoAction, &QAction::triggered, &CommandManager::instance(), &CommandManager::undo);
+    connect(redoAction, &QAction::triggered, &CommandManager::instance(), &CommandManager::redo);
+
+    connect(&CommandManager::instance(), &CommandManager::canUndoChanged, undoAction, &QAction::setEnabled);
+    connect(&CommandManager::instance(), &CommandManager::canRedoChanged, redoAction, &QAction::setEnabled);
+
+    // 3) 初始时根据当前状态设一下
+    undoAction->setEnabled(CommandManager::instance().canUndo());
+    redoAction->setEnabled(CommandManager::instance().canRedo());
 }

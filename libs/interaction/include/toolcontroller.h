@@ -13,7 +13,7 @@ class ToolController : public QObject {
     Q_OBJECT
 public:
     explicit ToolController(QObject* parent = nullptr) : QObject(parent) {}
-    virtual ~ToolController() { delete m_view; }
+    virtual ~ToolController() {}
 
     // 唯一标识，返回对应 ToolId
     virtual ToolId id() const = 0;
@@ -27,6 +27,13 @@ public:
     virtual void onMouseMove(QMouseEvent* event) = 0;
     virtual void onMouseRelease(QMouseEvent* event) = 0;
     virtual void onKeyPress(QKeyEvent* event) { Q_UNUSED(event); }
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) {};
+
+    // 画图时，判断终点坐标和起始坐标是否一样
+    bool isSameEndPosStartPos(QPointF& start, QPointF& end) {
+        QPointF delta = end - start;
+        return (qFuzzyIsNull(delta.x()) && qFuzzyIsNull(delta.y()));
+    }
 
 protected:
     QGraphicsView* m_view = nullptr;

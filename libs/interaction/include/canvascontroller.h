@@ -26,9 +26,13 @@ public:
     void keyPressEvent(QKeyEvent* event);
     void mouseDoubleClickEvent(QMouseEvent* event);
 
+public slots:
+    void onEndWrite();
+
 signals:
     void requestRepaint();  // «Î«Û CanvasView ÷ÿªÊ
     void shapeCountChanged(int count);
+    void endTextTool();
 
 private:
     QGraphicsView* m_view = nullptr;

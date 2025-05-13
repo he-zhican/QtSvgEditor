@@ -1,14 +1,7 @@
 #include"svgelement.h"
 
 SvgElement::SvgElement(QObject* parent)
-	: QObject(parent) {
-	// 初始化时默认添加样式属性
-	setAttribute("stroke","#000000");     // 边框颜色：黑色
-	setAttribute("stroke-width", "2");    // 边框宽度：2像素
-	setAttribute("fill", "#ffffff");      // 填充颜色：白色
-	//setAttribute("fill", "none");
-	setAttribute("stroke-dasharray", ""); // 边框样式
-}
+	: QObject(parent) {}
 
 SvgElement::~SvgElement() {}
 

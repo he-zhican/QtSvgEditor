@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 	connect(ui->sideToolBar, &SideToolBar::toolSelected, ui->canvasView, &CanvasView::onToolSelected);
+	connect(ui->canvasView, &CanvasView::changeToMoveTool, ui->sideToolBar, &SideToolBar::onChangeToMoveTool);
 	ui->canvasView->show();
 }
 

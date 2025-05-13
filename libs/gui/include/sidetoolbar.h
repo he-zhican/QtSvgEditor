@@ -12,10 +12,14 @@ class SideToolBar : public QToolBar {
 public:
     explicit SideToolBar(QWidget* parent = nullptr);
     ~SideToolBar();
+
+public slots:
+    void onChangeToMoveTool();
+
 signals:
     void toolSelected(ToolId id);
 private:
-    QActionGroup* actionGroup;
+    QActionGroup* m_actionGroup;
     void initTools();
 };
 

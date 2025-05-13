@@ -4,11 +4,13 @@
 #include "ellipsetoolcontroller.h"
 #include "linetoolcontroller.h"
 #include "pentagontoolcontroller.h"
+#include "hexagontoolcontroller.h"
 #include "freehandtoolcontroller.h"
 #include "startoolcontroller.h"
 #include "texttoolcontroller.h"
 #include "movetoolcontroller.h"
-#include "zoomtoolcontroller.h"
+#include "zoomouttoolcontroller.h"
+#include "zoomintoolcontroller.h"
 #include <QDebug>
 
 CanvasController::CanvasController(QObject* parent) : QObject(parent)
@@ -18,23 +20,25 @@ CanvasController::CanvasController(QObject* parent) : QObject(parent)
 }
 
 CanvasController::~CanvasController() {
-	qDeleteAll(m_tools);
-	m_tools.clear();
-	delete m_view;
+
 }
 
 void CanvasController::initTools()
 {
-	//m_tools << new MoveToolController(this)
-	m_tools << new RectToolController(this)
+	m_tools << new MoveToolController(this)
+		<< new RectToolController(this)
 		<< new EllipseToolController(this)
 		<< new LineToolController(this)
 		<< new PentagonToolController(this)
-		//<< new FreehandToolController(this)
+		<< new HexagonToolController(this)
+		<< new FreehandToolController(this)
 		<< new StarToolController(this)
-		//<< new TextToolController(this)
-		//<< new ZoomToolController(this)
-		;
+		<< new ZoomOutToolController(this)
+		<< new ZoomInToolController(this);
+
+	TextToolController* textTool = new TextToolController(this);
+	m_tools << textTool;
+	connect(textTool, &TextToolController::endWrite, this, &CanvasController::onEndWrite);
 }
 
 void CanvasController::setCurrentTool(ToolId toolId)
@@ -49,7 +53,6 @@ void CanvasController::setCurrentTool(ToolId toolId)
 
 void CanvasController::setView(QGraphicsView* view)
 {
-	// 为每种工具都设置场景
 	for (auto t : m_tools) {
 		t->setView(view);
 	}
@@ -80,9 +83,9 @@ void CanvasController::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (m_currentTool) {
 		m_currentTool->onMouseRelease(event);
-		// 更新当前形状数量
+
 		emit shapeCountChanged(m_document ? m_document->elementCount() : 0);
-		// 请求重绘
+
 		emit requestRepaint();
 	}
 }
@@ -95,4 +98,10 @@ void CanvasController::keyPressEvent(QKeyEvent* event)
 
 void CanvasController::mouseDoubleClickEvent(QMouseEvent* event)
 {
+	if (m_currentTool)
+		m_currentTool->mouseDoubleClickEvent(event);
+}
+
+void CanvasController::onEndWrite() {
+	emit endTextTool();
 }

@@ -30,6 +30,8 @@ void LineToolController::onMouseRelease(QMouseEvent* event)
 	delete m_previewItem;
 	m_previewItem = nullptr;
 
+	if (isSameEndPosStartPos(finalLine.p1(), finalLine.p2())) return;
+
 	auto lineElem = std::make_shared<SvgLine>();
 	lineElem->setX1(finalLine.x1());
 	lineElem->setY1(finalLine.y1());

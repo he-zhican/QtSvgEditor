@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 if(MSVC)
 	add_compile_options(/Zc:__cplusplus)
+	add_compile_options(/utf-8)
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

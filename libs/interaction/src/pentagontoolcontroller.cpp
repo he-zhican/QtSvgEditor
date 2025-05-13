@@ -1,4 +1,5 @@
 #include <QGraphicsView>
+#include <cmath>
 #include"pentagontoolcontroller.h"
 #include "commandmanager.h"
 #include "addelementcommand.h"
@@ -24,13 +25,18 @@ void PentagonToolController::onMouseMove(QMouseEvent* event)
 
 void PentagonToolController::onMouseRelease(QMouseEvent* event)
 {
-	if (!m_previewItem) return;
+    if (!m_previewItem) return;
+
+    m_endPos = m_view->mapToScene(event->pos());
+
 	QPolygonF finalPolygon = m_previewItem->polygon();
 
 	// 移除预览
 	m_view->scene()->removeItem(m_previewItem);
 	delete m_previewItem;
 	m_previewItem = nullptr;
+
+    if (isSameEndPosStartPos(m_startPos, m_endPos)) return;
 
 	auto polygonElem = std::make_shared<SvgPolygon>();
 	polygonElem->setPoints(m_points);
@@ -45,27 +51,45 @@ void PentagonToolController::onMouseRelease(QMouseEvent* event)
 
 void PentagonToolController::calculatePoints()
 {
-	m_points.clear();
+    m_points.clear();
 
-	const double PI = 3.14159;
+    const double PI = 3.14159265358979323846;
+    // 矩形中心和半宽高
+    double cx = (m_startPos.x() + m_endPos.x()) * 0.5;
+    double cy = (m_startPos.y() + m_endPos.y()) * 0.5;
+    double halfW = qAbs(m_endPos.x() - m_startPos.x()) * 0.5;
+    double halfH = qAbs(m_endPos.y() - m_startPos.y()) * 0.5;
 
-	// 计算中心点和半径
-	double cx = (m_startPos.x() + m_endPos.x()) / 2.0;
-	double cy = (m_startPos.y() + m_endPos.y()) / 2.0;
-	double width = m_endPos.x() - m_startPos.x();
-	double height = m_endPos.y() - m_startPos.y();
-	double R = std::min(width, height) / 2.0;
+    // 单位正五边形顶点方向，从顶部开始顺时针
+    QVector<QPointF> unitDirs;
+    unitDirs.reserve(5);
+    for (int i = 0; i < 5; ++i) {
+        double angle = (90.0 - i * 72.0) * PI / 180.0;  // 90°, 18°, -54°, -126°, -198°
+        unitDirs.append(QPointF(cos(angle), sin(angle)));
+    }
 
-	// 生成五边形顶点
-	for (int i = 0; i < 5; ++i) {
-		double angle = (-90 + i * 72) * PI / 180.0;
-		double x = cx + R * cos(angle);
-		double y = cy + R * sin(angle);
+    // 按顶点方向分别伸长到矩形边界
+    for (const QPointF& d : unitDirs) {
+        double ux = d.x();
+        double uy = d.y();
+        double t = std::numeric_limits<double>::infinity();
 
-		// 适配非正方形矩形
-		x = cx + (x - cx) * (width / (2 * R));
-		y = cy + (y - cy) * (height / (2 * R));
+        // 如果有水平方向分量，计算到左右边界的缩放
+        if (!qFuzzyIsNull(ux)) {
+            double tx = halfW / qAbs(ux);
+            t = qMin(t, tx);
+        }
+        // 如果有垂直方向分量，计算到上下边界的缩放
+        if (!qFuzzyIsNull(uy)) {
+            double ty = halfH / qAbs(uy);
+            t = qMin(t, ty);
+        }
 
-		m_points << QPointF(x, y);
-	}
+        // 最小缩放系数使该点贴边
+        if (t < std::numeric_limits<double>::infinity()) {
+            double x = cx + ux * t;
+            double y = cy + uy * t;
+            m_points.append(QPointF(x, y));
+        }
+    }
 }

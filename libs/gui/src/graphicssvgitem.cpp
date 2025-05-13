@@ -1,13 +1,18 @@
 #include <QDomElement>
 #include <QPainter>
+#include <QStyleOptionGraphicsItem>
 #include"graphicssvgitem.h"
 #include "svgpolygon.h"
 #include "svgfreehand.h"
+#include <svgtext.h>
+#include <QDebug>
 
 GraphicsSvgItem::GraphicsSvgItem(std::shared_ptr<SvgElement> element)
 	: m_element(element) {
 	updateStyle();
 	updateGeometry();
+
+	setFlags(ItemIsSelectable | ItemIsMovable);
 
 	connect(m_element.get(), &SvgElement::attributeChanged, this, &GraphicsSvgItem::onAttributeChanged);
 }
@@ -20,11 +25,11 @@ QRectF GraphicsSvgItem::boundingRect() const {
 	return m_boundingRect;
 }
 
-void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/) {
+void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* option, QWidget* /*widget*/) {
 	if (!m_element) return;
 	painter->setPen(m_pen);
 	painter->setBrush(m_brush);
-
+	
 	const QString tag = m_element->tagName();
 	if (tag == "line") {
 		QPointF p1(m_element->attribute("x1").toDouble(), m_element->attribute("y1").toDouble());
@@ -46,14 +51,37 @@ void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* /*
 		painter->drawPath(path);
 	}
 	else if (tag == "text") {
-		painter->drawText(m_boundingRect.topLeft(), m_element->attribute("text"));
+		auto textElem = std::dynamic_pointer_cast<SvgText>(m_element);
+		QFont font;
+		font.setFamily(textElem->fontFamily());
+		font.setPointSize(textElem->fontSize());
+		// 2. 将字体设置到 painter
+		painter->setFont(font);
+		painter->drawText(m_boundingRect, Qt::AlignCenter, textElem->text());
 	}
+
+	// 如果 item 被选中，就在外面套一层蓝色边框
+	if (option->state & QStyle::State_Selected) {
+		QPen selPen(Qt::blue);
+		selPen.setWidthF(1.0);
+		selPen.setStyle(Qt::DashLine);
+		painter->setPen(selPen);
+		painter->setBrush(Qt::NoBrush);
+		painter->drawRect(boundingRect());
+	}
+}
+
+std::shared_ptr<SvgElement> GraphicsSvgItem::element()
+{
+	return m_element;
 }
 
 void GraphicsSvgItem::onAttributeChanged(const QString& name, const QString& value)
 {
+	if(!isVisible()) setVisible(true);
 	Q_UNUSED(value)
-	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry"};
+	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry",
+		"start-x", "start-y", "end-x", "end-y", "d"};
 	if (geometryNames.contains(name)) {
 		updateGeometry();
 	}
@@ -79,8 +107,13 @@ void GraphicsSvgItem::updateStyle()
 		}
 		m_pen.setDashPattern(dashPattern);
 	}
-	m_brush.setColor(QColor(m_element->attribute("fill")));
-	m_brush.setStyle(Qt::SolidPattern);
+	if (m_element->hasAttribute("fill")) {
+		m_brush.setColor(QColor(m_element->attribute("fill")));
+		m_brush.setStyle(Qt::SolidPattern);
+	}
+	else {
+		m_brush = Qt::NoBrush;  // 不填充
+	}
 }
 
 void GraphicsSvgItem::updateGeometry()

@@ -2,11 +2,16 @@
 #include <QtNumeric>
 
 SvgFreehand::SvgFreehand(QObject* parent)
-    : SvgElement(parent) {}
+    : SvgElement(parent) {
+    // 初始化时默认添加样式属性
+    setAttribute("stroke", "#000000");     // 边框颜色：黑色
+    setAttribute("stroke-width", "2");    // 边框宽度：2像素
+    setAttribute("stroke-dasharray", ""); // 边框样式
+}
 
 void SvgFreehand::move(QPointF& offset)
 {
-    QPainterPath& originPath = path();
+    QPainterPath originPath = path();
     originPath.translate(offset);
     setPath(originPath);
 }

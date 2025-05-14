@@ -21,7 +21,7 @@ private:
 	QPointF m_startPos;
 	QGraphicsTextItem* m_editItem = nullptr;
 	std::shared_ptr<SvgText> m_textElem;
-	bool m_isMove = false;
+	bool m_isMovable = false;
 };
 
 #endif // !MOVETOOLCONTROLLER_H

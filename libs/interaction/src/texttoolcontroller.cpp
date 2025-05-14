@@ -1,4 +1,4 @@
-#include"texttoolcontroller.h"
+ï»¿#include"texttoolcontroller.h"
 #include "svgtext.h"
 #include "addelementcommand.h"
 #include "commandmanager.h"
@@ -24,8 +24,8 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
     if (!m_previewItem) {
         QPointF scenePos = m_view->mapToScene(event->pos());
 
-        // ´´½¨¿É±à¼­µÄÁÙÊ±ÎÄ±¾¿ò
-        m_previewItem = new QGraphicsTextItem(QString::fromUtf8("please input text"));
+        // åˆ›å»ºå¯ç¼–è¾‘çš„ä¸´æ—¶æ–‡æœ¬æ¡†
+        m_previewItem = new QGraphicsTextItem(tr("è¯·è¾“å…¥æ–‡æœ¬"));
         m_previewItem->setFont(QFont("Arial", 16));
         m_previewItem->setDefaultTextColor(Qt::black);
         m_previewItem->setTextInteractionFlags(Qt::TextEditorInteraction);

@@ -2,40 +2,57 @@
 #include "svgdocument.h"
 #include "commandmanager.h"
 #include "changedocattributecommand.h"
+#include "propertypanelfactory.h"
 #include <QColorDialog>
+#include <QIntValidator>
 
 CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent)
 	: m_document(doc), QWidget(parent)
 {
-	auto* form = new QFormLayout(this);
-	form->setLabelAlignment(Qt::AlignLeft);
-	form->setFormAlignment(Qt::AlignTop);
-	setStyleSheet("QSpinBox { font-size: 18px; color: #4A90E2; }"
-		"QLabel { color: #000000; }"
-		"QPushButton#bgColorBtn { background: #FFFFFF; border: 1px solid #555; }");
+    QStringList names;
+    QVector<QWidget*> editors;
 
-	m_widthSpin = new QSpinBox;
-	m_widthSpin->setRange(10, 10000);
-	m_widthSpin->setValue(m_document->canvasWidth());
-	form->addRow(tr("画布宽度"), m_widthSpin);
-	connect(m_widthSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CanvasPropertyPanel::onWidthChanged);
+    // 宽度输入框
+    m_widthEdit = new QLineEdit();
+    m_widthEdit->setText(QString::number(m_document->canvasWidth()));
+    m_widthEdit->setValidator(new QIntValidator(100, 2500, m_widthEdit));  // 限制范围 100-2500
+    m_widthEdit->setAlignment(Qt::AlignHCenter);
+    connect(m_widthEdit, &QLineEdit::textChanged, this, [=](const QString& text) {
+        bool ok;
+        int value = text.toInt(&ok);
+        if (ok)
+            onWidthChanged(value);
+        });
+    names.append(tr("宽度"));
+    editors.append(m_widthEdit);
 
-	m_heightSpin = new QSpinBox;
-	m_heightSpin->setRange(10, 10000);
-	m_heightSpin->setValue(m_document->canvasHeight());
-	form->addRow(tr("画布高度"), m_heightSpin);
-	connect(m_heightSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &CanvasPropertyPanel::onHeightChanged);
+    // 高度输入框
+    m_heightEdit = new QLineEdit;
+    m_heightEdit->setText(QString::number(m_document->canvasHeight()));
+    m_heightEdit->setAlignment(Qt::AlignHCenter);
+    m_heightEdit->setValidator(new QIntValidator(50, 2000, m_heightEdit));  // 限制范围 50-2000
+    connect(m_heightEdit, &QLineEdit::textChanged, this, [=](const QString& text) {
+        bool ok;
+        int value = text.toInt(&ok);
+        if (ok)
+            onHeightChanged(value);
+        });
+    names.append(tr("高度"));
+    editors.append(m_heightEdit);
 
-	m_bgColorBtn = new QPushButton;
-	m_bgColorBtn->setObjectName("bgColorBtn");
-	m_bgColor = m_document->canvasFill();
-	form->addRow(tr("画布颜色"), m_bgColorBtn);
-	QPalette pal = m_bgColorBtn->palette();
-	pal.setColor(QPalette::Button, m_bgColor);
-	m_bgColorBtn->setAutoFillBackground(true);
-	m_bgColorBtn->setPalette(pal);
-	m_bgColorBtn->update();
-	connect(m_bgColorBtn, &QPushButton::clicked, this, &CanvasPropertyPanel::onBgColorClicked);
+    // 画布背景颜色
+    m_bgColorBtn = new QPushButton;
+    //m_bgColorBtn->setFixedSize(55, 40);
+    m_bgColorBtn->setObjectName("colorBtn");
+    m_bgColor = QColor(m_document->canvasFill());
+    m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
+    connect(m_bgColorBtn, &QPushButton::clicked, this, &CanvasPropertyPanel::onBgColorClicked);
+    names.append(tr("背景"));
+    editors.append(m_bgColorBtn);
+
+    PropertyPanelFactory::makePropertyPanel(this, "画布", names, editors);
+
+    connect(doc.get(), &SvgDocument::documentAttributeChanged, this, &CanvasPropertyPanel::onDocAttributeChanged);
 }
 
 void CanvasPropertyPanel::onWidthChanged(int v)
@@ -55,10 +72,15 @@ void CanvasPropertyPanel::onBgColorClicked()
 	QColor c = QColorDialog::getColor(m_bgColor, this, tr("选择背景颜色"));
 	if (!c.isValid()) return;
 	m_bgColor = c;
-	QPalette pal = m_bgColorBtn->palette();
-	pal.setColor(QPalette::Button, m_bgColor);
-	m_bgColorBtn->setPalette(pal);
-	m_bgColorBtn->update();
+    m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
 	auto cmd = new ChangeDocAttributeCommand(m_document, "fill", m_bgColor.name());
 	CommandManager::instance().execute(cmd);
+}
+
+void CanvasPropertyPanel::onDocAttributeChanged(const QString& name)
+{
+    if (name == "fill") {
+        m_bgColor = QColor(m_document->canvasFill());
+        m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
+    }
 }

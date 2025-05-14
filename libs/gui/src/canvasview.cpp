@@ -1,4 +1,4 @@
-#include"canvasview.h"
+ï»¿#include"canvasview.h"
 #include "graphicssvgitem.h"
 #include "selectionmanager.h"
 #include <QTextCursor>
@@ -9,7 +9,7 @@ CanvasView::CanvasView(QWidget* parent)
     : QGraphicsView(parent){
 
     QGraphicsScene* scene = new QGraphicsScene(this);
-    scene->setSceneRect(0, 0, 750, 500);
+    //scene->setSceneRect(0, 0, 750, 500);
     setScene(scene);
     auto doc = std::make_shared<SvgDocument>();
     setDocument(doc);
@@ -18,15 +18,14 @@ CanvasView::CanvasView(QWidget* parent)
     setDragMode(QGraphicsView::RubberBandDrag);
     setMouseTracking(true);
     setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-    setStyleSheet("background-color: white");
     setMinimumSize(100, 60);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-    // ¹Ø±Õ QGraphicsView ×Ô´øµÄ¹ö¶¯Ìõ
+    // å…³é—­ QGraphicsView è‡ªå¸¦çš„æ»šåŠ¨æ¡
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    // ÔÚ CanvasView ¹¹Ôìº¯ÊıÀï£¨»ò³õÊ¼»¯Ê±£©£º
+    // åœ¨ CanvasView æ„é€ å‡½æ•°é‡Œï¼ˆæˆ–åˆå§‹åŒ–æ—¶ï¼‰ï¼š
     connect(scene, &QGraphicsScene::selectionChanged, this, &CanvasView::onSceneSelectionChanged);
 
     setController(new CanvasController(this));
@@ -55,6 +54,15 @@ void CanvasView::setDocument(std::shared_ptr<SvgDocument> doc)
     connect(m_document.get(), &SvgDocument::removeElementChanged, this, &CanvasView::onRemoveElementChanged);
     connect(m_document.get(), &SvgDocument::documentAttributeChanged, this, &CanvasView::onDocumentAttributeChanged);
     onDocumentChanged();
+
+    double w = m_document->canvasWidth();
+    double h = m_document->canvasHeight();
+    QString color = m_document->canvasFill();
+
+    scene()->setSceneRect(0, 0, w, h);
+
+    setFixedSize(w, h);
+    setBackgroundBrush(QColor(color));
 }
 
 std::shared_ptr<SvgDocument> CanvasView::document()
@@ -93,24 +101,24 @@ void CanvasView::onDocumentAttributeChanged(const QString& name)
     double w = m_document->canvasWidth();
     double h = m_document->canvasHeight();
 
-    // 1) ÈÃ³¡¾°ÖªµÀĞÂµÄ»­²¼·¶Î§
+    // 1) è®©åœºæ™¯çŸ¥é“æ–°çš„ç”»å¸ƒèŒƒå›´
     scene()->setSceneRect(0, 0, w, h);
 
-    // 2) °Ñ CanvasView µÄ´óĞ¡Ò²Í¬²½µ½Õâ¸ö³ß´ç
-    //    ÕâÑùÒòÎª scrollArea.setWidgetResizable(false)£¬Ëü¾Í»á×Ô¶¯³öÏÖ¹ö¶¯Ìõ
+    // 2) æŠŠ CanvasView çš„å¤§å°ä¹ŸåŒæ­¥åˆ°è¿™ä¸ªå°ºå¯¸
+    //    è¿™æ ·å› ä¸º scrollArea.setWidgetResizable(false)ï¼Œå®ƒå°±ä¼šè‡ªåŠ¨å‡ºç°æ»šåŠ¨æ¡
     setFixedSize(w, h);
 
     if (name == "fill") {
-        setBackgroundBrush(QBrush(QColor(m_document->canvasFill())));
+        setBackgroundBrush(QColor(m_document->canvasFill()));
     }
 }
 
 void CanvasView::onSceneSelectionChanged()
 {
-    // ÏÈÇå¿Õ
+    // å…ˆæ¸…ç©º
     SelectionManager::instance().clearSelection();
 
-    // ±éÀúµ±Ç°Ñ¡ÖĞµÄ GraphicsSvgItem
+    // éå†å½“å‰é€‰ä¸­çš„ GraphicsSvgItem
     for (auto* gi : scene()->selectedItems()) {
         if (auto* svg = dynamic_cast<GraphicsSvgItem*>(gi)) {
             SelectionManager::instance().addToSelection(svg->element());
@@ -138,7 +146,7 @@ void CanvasView::onToolSelected(ToolId toolId) {
 void CanvasView::mousePressEvent(QMouseEvent* event) {
 
     if (m_toolId != ToolId::Tool_Move) {
-        // ÉèÖÃÆäËûÍ¼ÔªÎªÎ´Ñ¡ÖĞ×´Ì¬
+        // è®¾ç½®å…¶ä»–å›¾å…ƒä¸ºæœªé€‰ä¸­çŠ¶æ€
         for (auto item : scene()->items()) {
             item->setSelected(false);
         }
@@ -173,13 +181,13 @@ void CanvasView::keyPressEvent(QKeyEvent* event) {
 
 // CanvasView.cpp (snippet)
 void CanvasView::wheelEvent(QWheelEvent* event) {
-    // Ctrl+¹öÂÖ£ºËõ·Å
+    // Ctrl+æ»šè½®ï¼šç¼©æ”¾
     if (event->modifiers() & Qt::ControlModifier) {
-        // ×¼±¸ºÃ±¾´ÎµÄËõ·ÅÒò×Ó
+        // å‡†å¤‡å¥½æœ¬æ¬¡çš„ç¼©æ”¾å› å­
         double deltaF = event->angleDelta().y() > 0 ? 1.1 : (1.0 / 1.1);
         double nextScale = m_currentScale * deltaF;
 
-        // Èç¹ûÒÑµ½¼«ÏŞ£¬¾Í²»ÔÙËõ·Å
+        // å¦‚æœå·²åˆ°æé™ï¼Œå°±ä¸å†ç¼©æ”¾
         if (nextScale < m_minScale || nextScale > m_maxScale) {
             event->accept();
             return;
@@ -188,7 +196,7 @@ void CanvasView::wheelEvent(QWheelEvent* event) {
         scale(deltaF, deltaF);
         m_currentScale = nextScale;
 
-        // Í¬²½ CanvasView ´óĞ¡µ½ sceneRect
+        // åŒæ­¥ CanvasView å¤§å°åˆ° sceneRect
         resizeSceneToView();
 
         event->accept();
@@ -199,17 +207,18 @@ void CanvasView::wheelEvent(QWheelEvent* event) {
 void CanvasView::mouseDoubleClickEvent(QMouseEvent* event) {
 
     if (m_toolId != ToolId::Tool_Move) {
-        if (m_controller) m_controller->mousePressEvent(event);
         return;
     }
 
-    QGraphicsView::mouseDoubleClickEvent(event);
+    //QGraphicsView::mouseDoubleClickEvent(event);
 
     auto items = scene()->selectedItems();
     if (!items.isEmpty()) {
         auto* svgItem = dynamic_cast<GraphicsSvgItem*>(items.first());
         if (svgItem->element()->tagName() == "text") {
-            svgItem->setVisible(false);
+            //svgItem->setVisible(false);
+            // è®¾ç½®svgItemä¸ºå®Œå…¨é€æ˜ï¼Œå› ä¸ºsetVisible(false)ä¼šå¯¼è‡´å…¶ä»é€‰åŒºç§»é™¤ï¼Œå½±å“åç»­é€»è¾‘
+            svgItem->setOpacity(0.0);
         }
     }
 
@@ -218,12 +227,12 @@ void CanvasView::mouseDoubleClickEvent(QMouseEvent* event) {
 
 void CanvasView::resizeSceneToView()
 {
-    // ÄÃµ½Î´Ëõ·ÅÇ° scene µÄ´óĞ¡
+    // æ‹¿åˆ°æœªç¼©æ”¾å‰ scene çš„å¤§å°
     QRectF sr = scene()->sceneRect();
-    // ¼ÆËãËõ·ÅºóµÄ¾ØĞÎÔÚ¸¸²¼¾ÖÖĞÕ¼¶à´ó
+    // è®¡ç®—ç¼©æ”¾åçš„çŸ©å½¢åœ¨çˆ¶å¸ƒå±€ä¸­å å¤šå¤§
     QRectF mapped = transform().mapRect(sr);
     QSize newSize = mapped.size().toSize();
 
-    // Ç¿ÖÆ°Ñ widget µÄ´óĞ¡Éè³ÉÕâ¸öÖµ
+    // å¼ºåˆ¶æŠŠ widget çš„å¤§å°è®¾æˆè¿™ä¸ªå€¼
     setFixedSize(newSize);
 }

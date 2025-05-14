@@ -2,11 +2,11 @@
 #define CANVASPROPERTYPANEL_H
 
 #include <QWidget>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QFormLayout>
 #include <QColor>
+#include "propertypanelfactory.h"
 
 class SvgDocument;
 
@@ -15,17 +15,15 @@ class CanvasPropertyPanel : public QWidget {
 public:
     explicit CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent = nullptr);
 
-signals:
-    void attributeChanged(const QString& name, const QString& value);
-
 private slots:
     void onWidthChanged(int v);
     void onHeightChanged(int v);
     void onBgColorClicked();
 
+    void onDocAttributeChanged(const QString& name);
 private:
-    QSpinBox* m_widthSpin;
-    QSpinBox* m_heightSpin;
+    QLineEdit* m_widthEdit;
+    QLineEdit* m_heightEdit;
     QPushButton* m_bgColorBtn;
     QColor m_bgColor;
 

@@ -1,0 +1,37 @@
+QLineEdit {
+    font-size: 16px;
+    color: #4F80FF;
+    border: none;
+}
+
+/* 边框颜色按钮 */
+QPushButton#strokeColorBtn{
+    width: 30px;
+    height: 24px;
+}
+
+/* 填充颜色按钮 */
+QPushButton#colorBtn{
+    border: 1px solid #000;
+    width: 30px;
+    height: 24px;
+}
+
+QLabel{
+    font-size: 14px;
+    color: #000;
+}
+
+/* 属性面板标题栏 */
+QLabel#propertyPanelTitleLable {
+    font-size: 16px; 
+    font-weight: bold; 
+    color: #000;
+}
+
+/* 属性面板中包裹单个属性的矩形框 */
+QWidget#propertyBox {
+    background-color: white; 
+    border: none; 
+    border-radius: 4px;
+}

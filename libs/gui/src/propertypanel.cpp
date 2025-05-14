@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include "svgpolygon.h"
 #include "svgdocument.h"
+#include "selectionmanager.h"
 
 #include "canvaspropertypanel.h"
 #include "rectpropertypanel.h"
@@ -23,18 +24,20 @@ PropertyPanel::PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent)
 {
     m_stack = new QStackedWidget(this);
     m_canvasPropertyPanel = new CanvasPropertyPanel(doc, this);
-    //m_rectPanel = new RectPanel;
-    //m_ellipsePanel = new EllipsePanel;
-    //m_linePanel = new LinePanel;
-    //m_pathPanel = new PathPanel;
-    //m_multiPanel = new MultiPanel;
+    m_rectPropertyPanel = new RectPropertyPanel(this);
+    m_ellipsePropertyPanel = new EllipsePropertyPanel(this);
+    //m_linePropertyPanel = new LinePropertyPanel(this);
+    //m_pathPropertyPanel = new PathPropertyPanel(this);
+    //m_textPropertyPanel = new TextPropertyPanel(this);
+    //m_multiPropertyPanel = new MultiPropertyPanel(this);
 
     m_stack->addWidget(m_canvasPropertyPanel);  // index 0
-    //m_stack->addWidget(m_rectPanel);    // 1
-    //m_stack->addWidget(m_ellipsePanel); // 2
-    //m_stack->addWidget(m_linePanel);    // 3
-    //m_stack->addWidget(m_pathPanel);    // 4
-    //m_stack->addWidget(m_multiPanel);   // 5
+    m_stack->addWidget(m_rectPropertyPanel);    // 1
+    m_stack->addWidget(m_ellipsePropertyPanel); // 2
+    //m_stack->addWidget(m_linePropertyPanel);    // 3
+    //m_stack->addWidget(m_pathPropertyPanel);    // 4
+    //m_stack->addWidget(m_textPropertyPanel);    // 5
+    //m_stack->addWidget(m_multiPropertyPanel);   // 6
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_stack);
@@ -51,30 +54,30 @@ void PropertyPanel::onSelectionChanged(const QVector<std::shared_ptr<SvgElement>
     if (count == 0) {
         m_stack->setCurrentWidget(m_canvasPropertyPanel);
     }
-    //else if (count == 1) {
-    //    auto elem = sel.first();
-    //    QString tag = elem->tagName();
-    //    if (tag == QLatin1String("rect")) {
-    //        m_stack->setCurrentWidget(m_rectPropertyPanel);
-    //        m_rectPropertyPanel->loadElement(elem);
-    //    }
-    //    else if (tag == QLatin1String("ellipse")) {
-    //        m_stack->setCurrentWidget(m_ellipsePropertyPanel);
-    //        m_ellipsePropertyPanel->loadElement(elem);
-    //    }
-    //    else if (tag == QLatin1String("line")) {
-    //        m_stack->setCurrentWidget(m_linePropertyPanel);
-    //        m_linePropertyPanel->loadElement(elem);
-    //    }
-    //    else if (tag == QLatin1String("polygon") || tag == QLatin1String("path")) {
-    //        m_stack->setCurrentWidget(m_pathPropertyPanel);
-    //        m_pathPropertyPanel->loadElement(elem);
-    //    }
-    //    else {
-    //        m_stack->setCurrentWidget(m_multiPanel);
-    //        m_multiPanel->loadElements(sel);
-    //    }
-    //}
+    else if (count == 1) {
+        auto elem = sel.first();
+        QString tag = elem->tagName();
+        if (tag == QLatin1String("rect")) {
+            m_stack->setCurrentWidget(m_rectPropertyPanel);
+            m_rectPropertyPanel->loadElement(elem);
+        }
+        else if (tag == QLatin1String("ellipse")) {
+            m_stack->setCurrentWidget(m_ellipsePropertyPanel);
+            m_ellipsePropertyPanel->loadElement(elem);
+        }
+        //else if (tag == QLatin1String("line")) {
+        //    m_stack->setCurrentWidget(m_linePropertyPanel);
+        //    m_linePropertyPanel->loadElement(elem);
+        //}
+        //else if (tag == QLatin1String("polygon") || tag == QLatin1String("path")) {
+        //    m_stack->setCurrentWidget(m_pathPropertyPanel);
+        //    m_pathPropertyPanel->loadElement(elem);
+        //}
+        //else {
+        //    m_stack->setCurrentWidget(m_multiPanel);
+        //    m_multiPanel->loadElements(sel);
+        //}
+    }
     //else {
     //    m_stack->setCurrentWidget(m_multiPanel);
     //    m_multiPanel->loadElements(sel);

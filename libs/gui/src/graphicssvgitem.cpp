@@ -78,7 +78,10 @@ std::shared_ptr<SvgElement> GraphicsSvgItem::element()
 
 void GraphicsSvgItem::onAttributeChanged(const QString& name, const QString& value)
 {
-	if(!isVisible()) setVisible(true);
+	if (name == "text") {
+		// 恢复文本为不透明状态
+		setOpacity(1.0);
+	}
 	Q_UNUSED(value)
 	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry",
 		"start-x", "start-y", "end-x", "end-y", "d"};
@@ -97,7 +100,7 @@ void GraphicsSvgItem::updateStyle()
 	m_pen.setColor(QColor(m_element->attribute("stroke")));
 	m_pen.setWidthF(m_element->attribute("stroke-width").toDouble());
 
-	QString& dasharray = m_element->attribute("stroke-dasharray");
+	QString dasharray = m_element->attribute("stroke-dasharray");
 	if (!dasharray.isEmpty()) {
 		m_pen.setStyle(Qt::CustomDashLine);
 		QVector<qreal> dashPattern;
@@ -107,6 +110,10 @@ void GraphicsSvgItem::updateStyle()
 		}
 		m_pen.setDashPattern(dashPattern);
 	}
+	else {
+		m_pen.setStyle(Qt::SolidLine);
+	}
+
 	if (m_element->hasAttribute("fill")) {
 		m_brush.setColor(QColor(m_element->attribute("fill")));
 		m_brush.setStyle(Qt::SolidPattern);

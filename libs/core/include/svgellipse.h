@@ -28,6 +28,8 @@ public:
 
     QDomElement toXml(QDomDocument& doc) const override;
     void fromXml(const QDomElement& elem) override;
+private:
+
 };
 
 #endif // !SVGELLIPSE_H

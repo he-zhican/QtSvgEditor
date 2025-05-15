@@ -6,12 +6,13 @@
 
 class MenuBar : public QMenuBar
 {
-	Q_OBJECT
-public:
-	explicit MenuBar(QWidget* parent = nullptr);
-	~MenuBar();
-private:
-	void initMenus();
+    Q_OBJECT
+  public:
+    explicit MenuBar(QWidget *parent = nullptr);
+    ~MenuBar();
+
+  private:
+    void initMenus();
 };
 
 #endif // MENUBAR_H

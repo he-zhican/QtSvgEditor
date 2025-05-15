@@ -3,9 +3,10 @@
 
 #include "svgdocument.h"
 
-class SvgWriter {
-public:
-    void write(const QString& filePath, const SvgDocument& doc);
+class SvgWriter
+{
+  public:
+    void write(const QString &filePath, const SvgDocument &doc);
 };
 
 #endif // !SVGWRITER_H

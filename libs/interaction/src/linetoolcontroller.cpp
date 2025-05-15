@@ -1,4 +1,4 @@
-#include <QGraphicsView>
+ï»¿#include <QGraphicsView>
 #include"linetoolcontroller.h"
 #include "commandmanager.h"
 #include "addelementcommand.h"
@@ -25,12 +25,15 @@ void LineToolController::onMouseRelease(QMouseEvent* event)
 	if (!m_previewItem) return;
 	QLineF finalLine = m_previewItem->line();
 
-	// ÒÆ³ýÔ¤ÀÀ
+	// ç§»é™¤é¢„è§ˆ
 	m_view->scene()->removeItem(m_previewItem);
 	delete m_previewItem;
 	m_previewItem = nullptr;
 
-	if (isSameEndPosStartPos(finalLine.p1(), finalLine.p2())) return;
+	if (isSameEndPosStartPos(finalLine.p1(), finalLine.p2())) {
+		emit endCurrentTool();
+		return;
+	}
 
 	auto lineElem = std::make_shared<SvgLine>();
 	lineElem->setX1(finalLine.x1());

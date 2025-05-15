@@ -1,6 +1,6 @@
 #include <QGraphicsView>
 #include <cmath>
-#include"pentagontoolcontroller.h"
+#include "pentagontoolcontroller.h"
 #include "commandmanager.h"
 #include "addelementcommand.h"
 #include "svgpolygon.h"
@@ -9,18 +9,18 @@ PentagonToolController::PentagonToolController(QObject* parent) :ToolController(
 
 void PentagonToolController::onMousePress(QMouseEvent* event)
 {
-	m_startPos = event->pos();
-	m_startPos = m_view->mapToScene(m_startPos.toPoint());
-	m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
+    m_startPos = event->pos();
+    m_startPos = m_view->mapToScene(m_startPos.toPoint());
+    m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
 }
 
 void PentagonToolController::onMouseMove(QMouseEvent* event)
 {
-	if (!m_previewItem) return;
-	m_endPos = m_view->mapToScene(event->pos());
-	// 实时计算顶点位置
-	calculatePoints();
-	m_previewItem->setPolygon(QPolygonF(m_points));
+    if (!m_previewItem) return;
+    m_endPos = m_view->mapToScene(event->pos());
+    // 实时计算顶点位置
+    calculatePoints();
+    m_previewItem->setPolygon(QPolygonF(m_points));
 }
 
 void PentagonToolController::onMouseRelease(QMouseEvent* event)
@@ -29,31 +29,34 @@ void PentagonToolController::onMouseRelease(QMouseEvent* event)
 
     m_endPos = m_view->mapToScene(event->pos());
 
-	QPolygonF finalPolygon = m_previewItem->polygon();
+    QPolygonF finalPolygon = m_previewItem->polygon();
 
-	// 移除预览
-	m_view->scene()->removeItem(m_previewItem);
-	delete m_previewItem;
-	m_previewItem = nullptr;
+    // 移除预览
+    m_view->scene()->removeItem(m_previewItem);
+    delete m_previewItem;
+    m_previewItem = nullptr;
 
-    if (isSameEndPosStartPos(m_startPos, m_endPos)) return;
+    if (isSameEndPosStartPos(m_startPos, m_endPos)) {
+        emit endCurrentTool();
+        return;
+    }
 
-	auto polygonElem = std::make_shared<SvgPolygon>();
-	polygonElem->setPoints(m_points);
-	polygonElem->setStartX(m_startPos.x());
-	polygonElem->setStartY(m_startPos.y());
-	polygonElem->setEndX(m_endPos.x());
-	polygonElem->setEndY(m_endPos.y());
+    auto polygonElem = std::make_shared<SvgPolygon>();
+    polygonElem->setPoints(m_points);
+    polygonElem->setStartX(m_startPos.x());
+    polygonElem->setStartY(m_startPos.y());
+    polygonElem->setEndX(m_endPos.x());
+    polygonElem->setEndY(m_endPos.y());
 
-	auto addCmd = new AddElementCommand(m_document, polygonElem);
-	CommandManager::instance().execute(addCmd);
+    auto addCmd = new AddElementCommand(m_document, polygonElem);
+    CommandManager::instance().execute(addCmd);
 }
 
 void PentagonToolController::calculatePoints()
 {
     m_points.clear();
 
-    const double PI = 3.14159265358979323846;
+    const double PI = 3.1415926;
     // 矩形中心和半宽高
     double cx = (m_startPos.x() + m_endPos.x()) * 0.5;
     double cy = (m_startPos.y() + m_endPos.y()) * 0.5;

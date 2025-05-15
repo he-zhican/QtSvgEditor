@@ -1,4 +1,4 @@
-#ifndef SVGEXCEPTION_H
+Ôªø#ifndef SVGEXCEPTION_H
 #define SVGEXCEPTION_H
 
 #include <stdexcept>
@@ -10,7 +10,6 @@ public:
         : std::runtime_error(message.toStdString()),
         m_message(message) {}
 
-    // ªÒ»° Qt ∏Ò Ωµƒ¥ÌŒÛ–≈œ¢
     QString whatQ() const { return m_message; }
 private:
     QString m_message;

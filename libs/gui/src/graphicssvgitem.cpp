@@ -51,13 +51,8 @@ void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* op
 		painter->drawPath(path);
 	}
 	else if (tag == "text") {
-		auto textElem = std::dynamic_pointer_cast<SvgText>(m_element);
-		QFont font;
-		font.setFamily(textElem->fontFamily());
-		font.setPointSize(textElem->fontSize());
-		// 2. 将字体设置到 painter
-		painter->setFont(font);
-		painter->drawText(m_boundingRect, Qt::AlignCenter, textElem->text());
+		painter->setFont(m_font);
+		painter->drawText(m_boundingRect, Qt::AlignCenter, m_element->attribute("text"));
 	}
 
 	// 如果 item 被选中，就在外面套一层蓝色边框
@@ -83,14 +78,16 @@ void GraphicsSvgItem::onAttributeChanged(const QString& name, const QString& val
 		setOpacity(1.0);
 	}
 	Q_UNUSED(value)
-	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry",
-		"start-x", "start-y", "end-x", "end-y", "d"};
-	if (geometryNames.contains(name)) {
-		updateGeometry();
-	}
-	if (name == "stroke" || name == "stroke-width" || name == "fill" || name == "stroke-dasharray") {
-		updateStyle();
-	}
+	//QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry",
+	//	"start-x", "start-y", "end-x", "end-y", "d"};
+	//if (geometryNames.contains(name)) {
+	//	updateGeometry();
+	//}
+	//else {
+	//	updateStyle();
+	//}
+	updateGeometry();
+	updateStyle();
 	// 请求重绘
 	update();
 }
@@ -115,11 +112,25 @@ void GraphicsSvgItem::updateStyle()
 	}
 
 	if (m_element->hasAttribute("fill")) {
-		m_brush.setColor(QColor(m_element->attribute("fill")));
-		m_brush.setStyle(Qt::SolidPattern);
+		QString color = m_element->attribute("fill");
+		if (!color.isEmpty()) {
+			m_brush.setColor(QColor(m_element->attribute("fill")));
+			m_brush.setStyle(Qt::SolidPattern);
+		}
+		else {
+			m_brush = Qt::NoBrush;  // 不填充
+		}
 	}
 	else {
-		m_brush = Qt::NoBrush;  // 不填充
+		m_brush = Qt::NoBrush;
+	}
+
+	if (m_element->tagName() == "text") {
+		m_font.setBold(m_element->attribute("font-weight") == "bold");
+		m_font.setItalic(m_element->attribute("font-style") == "italic");
+		m_font.setUnderline(m_element->attribute("text-decoration") == "underline");
+		m_font.setPointSize(m_element->attribute("font-size").toInt());
+		m_font.setFamily(m_element->attribute("font-family"));
 	}
 }
 
@@ -145,7 +156,14 @@ void GraphicsSvgItem::updateGeometry()
 		double h = m_element->attribute("height").toDouble();
 		m_boundingRect = QRectF(x, y, w, h);
 	}
-	else if (tag == "ellipse" || tag == "polygon" || tag == "text") {
+	else if(tag == "ellipse") {
+		double cx = m_element->attribute("cx").toDouble();
+		double cy = m_element->attribute("cy").toDouble();
+		double rx = m_element->attribute("rx").toDouble();
+		double ry = m_element->attribute("ry").toDouble();
+		m_boundingRect = QRectF(cx - rx, cy - ry, rx * 2.0, ry * 2.0);
+	}
+	else if (tag == "polygon") {
 		double x1 = m_element->attribute("start-x").toDouble();
 		double y1 = m_element->attribute("start-y").toDouble();
 		double x2 = m_element->attribute("end-x").toDouble();
@@ -156,6 +174,12 @@ void GraphicsSvgItem::updateGeometry()
 			std::min(y1, y2),
 			fabs(x2 - x1),
 			fabs(y2 - y1));
+	}
+	else if (tag == "text") {
+		double x = m_element->attribute("x").toDouble();
+		double y = m_element->attribute("y").toDouble();
+		QFontMetricsF fontMetrics(m_font);
+		m_boundingRect = QRectF(x, y, fontMetrics.horizontalAdvance(m_element->attribute("text")) + 5, fontMetrics.height());
 	}
 	else if (tag == "path") {
 		QPainterPath path = std::dynamic_pointer_cast<SvgFreehand>(m_element)->path();

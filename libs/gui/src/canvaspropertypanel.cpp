@@ -1,4 +1,4 @@
-﻿#include"canvaspropertypanel.h"
+﻿#include "canvaspropertypanel.h"
 #include "svgdocument.h"
 #include "commandmanager.h"
 #include "changedocattributecommand.h"
@@ -7,13 +7,13 @@
 #include <QIntValidator>
 
 CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent)
-	: m_document(doc), QWidget(parent)
+    : m_document(doc), QWidget(parent)
 {
     QStringList names;
     QVector<QWidget*> editors;
 
     // 宽度输入框
-    m_widthEdit = new QLineEdit();
+    m_widthEdit = new QLineEdit(this);
     m_widthEdit->setText(QString::number(m_document->canvasWidth()));
     m_widthEdit->setValidator(new QIntValidator(100, 2500, m_widthEdit));  // 限制范围 100-2500
     m_widthEdit->setAlignment(Qt::AlignHCenter);
@@ -27,7 +27,7 @@ CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidg
     editors.append(m_widthEdit);
 
     // 高度输入框
-    m_heightEdit = new QLineEdit;
+    m_heightEdit = new QLineEdit(this);
     m_heightEdit->setText(QString::number(m_document->canvasHeight()));
     m_heightEdit->setAlignment(Qt::AlignHCenter);
     m_heightEdit->setValidator(new QIntValidator(50, 2000, m_heightEdit));  // 限制范围 50-2000
@@ -41,13 +41,12 @@ CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidg
     editors.append(m_heightEdit);
 
     // 画布背景颜色
-    m_bgColorBtn = new QPushButton;
-    //m_bgColorBtn->setFixedSize(55, 40);
+    m_bgColorBtn = new QPushButton(this);
     m_bgColorBtn->setObjectName("colorBtn");
     m_bgColor = QColor(m_document->canvasFill());
     m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
     connect(m_bgColorBtn, &QPushButton::clicked, this, &CanvasPropertyPanel::onBgColorClicked);
-    names.append(tr("背景"));
+    names.append(tr("背景颜色"));
     editors.append(m_bgColorBtn);
 
     PropertyPanelFactory::makePropertyPanel(this, "画布", names, editors);
@@ -57,24 +56,24 @@ CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidg
 
 void CanvasPropertyPanel::onWidthChanged(int v)
 {
-	auto cmd = new ChangeDocAttributeCommand(m_document, "width", QString::number(v));
-	CommandManager::instance().execute(cmd);
+    auto cmd = new ChangeDocAttributeCommand(m_document, "width", QString::number(v));
+    CommandManager::instance().execute(cmd);
 }
 
 void CanvasPropertyPanel::onHeightChanged(int v)
 {
-	auto cmd = new ChangeDocAttributeCommand(m_document, "height", QString::number(v));
-	CommandManager::instance().execute(cmd);
+    auto cmd = new ChangeDocAttributeCommand(m_document, "height", QString::number(v));
+    CommandManager::instance().execute(cmd);
 }
 
 void CanvasPropertyPanel::onBgColorClicked()
 {
-	QColor c = QColorDialog::getColor(m_bgColor, this, tr("选择背景颜色"));
-	if (!c.isValid()) return;
-	m_bgColor = c;
+    QColor c = QColorDialog::getColor(m_bgColor, this, tr("选择背景颜色"));
+    if (!c.isValid()) return;
+    m_bgColor = c;
     m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
-	auto cmd = new ChangeDocAttributeCommand(m_document, "fill", m_bgColor.name());
-	CommandManager::instance().execute(cmd);
+    auto cmd = new ChangeDocAttributeCommand(m_document, "fill", m_bgColor.name());
+    CommandManager::instance().execute(cmd);
 }
 
 void CanvasPropertyPanel::onDocAttributeChanged(const QString& name)

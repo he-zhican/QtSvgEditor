@@ -15,71 +15,68 @@ RectPropertyPanel::RectPropertyPanel(QWidget* parent)
     QVector<QWidget*> editors;
 
     // X
-    m_xEdit = new QLineEdit();
+    m_xEdit = new QLineEdit(this);
     m_xEdit->setValidator(new QIntValidator(0, 1000, m_xEdit));
     m_xEdit->setAlignment(Qt::AlignHCenter);
     names << tr("X");
     editors << m_xEdit;
 
     // Y
-    m_yEdit = new QLineEdit();
+    m_yEdit = new QLineEdit(this);
     m_yEdit->setValidator(new QIntValidator(0, 1000, m_yEdit));
     m_yEdit->setAlignment(Qt::AlignHCenter);
     names << tr("Y");
     editors << m_yEdit;
 
     // Width
-    m_wEdit = new QLineEdit();
+    m_wEdit = new QLineEdit(this);
     m_wEdit->setValidator(new QIntValidator(1, 1000, m_wEdit));
     m_wEdit->setAlignment(Qt::AlignHCenter);
     names << tr("宽度");
     editors << m_wEdit;
 
     // Height
-    m_hEdit = new QLineEdit();
+    m_hEdit = new QLineEdit(this);
     m_hEdit->setValidator(new QIntValidator(1, 1000, m_hEdit));
     m_hEdit->setAlignment(Qt::AlignHCenter);
     names << tr("高度");
     editors << m_hEdit;
 
     // Stroke width
-    m_swEdit = new QLineEdit();
+    m_swEdit = new QLineEdit(this);
     m_swEdit->setValidator(new QIntValidator(0, 20, m_swEdit));
     m_swEdit->setAlignment(Qt::AlignHCenter);
     names << tr("边框宽度");
     editors << m_swEdit;
 
     // Stroke style
-    m_styleCombo = new QComboBox;
+    m_styleCombo = new QComboBox(this);
     m_styleCombo->addItems({ tr("实线"), tr("虚线"), tr("点线"), tr("虚点") });
     m_styleCombo->setCurrentIndex(0);
     names << tr("边框样式");
     editors << m_styleCombo;
 
     // Stroke color
-    m_strokeColorBtn = new QPushButton;
+    m_strokeColorBtn = new QPushButton(this);
     m_strokeColorBtn->setObjectName("colorBtn");
     names << tr("边框颜色");
     editors << m_strokeColorBtn;
 
-    m_fillColorBtn = new QPushButton;
+    m_fillColorBtn = new QPushButton(this);
     m_fillColorBtn->setObjectName("colorBtn");
     names << tr("填充颜色");
     editors << m_fillColorBtn;
 
     // 绑定槽函数
-    connect(m_xEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onXChanged(toInt(t));});
-    connect(m_yEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onYChanged(toInt(t));});
-    connect(m_wEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onWidthChanged(toInt(t));});
-    connect(m_hEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onHeightChanged(toInt(t));});
-    connect(m_swEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onStrokeWidthChanged(toInt(t));});
+    connect(m_xEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onXChanged(toInt(t)); });
+    connect(m_yEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onYChanged(toInt(t)); });
+    connect(m_wEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onWidthChanged(toInt(t)); });
+    connect(m_hEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onHeightChanged(toInt(t)); });
+    connect(m_swEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onStrokeWidthChanged(toInt(t)); });
     connect(m_styleCombo, &QComboBox::currentTextChanged, this, &RectPropertyPanel::onStrokeStyleChanged);
     connect(m_strokeColorBtn, &QPushButton::clicked, this, &RectPropertyPanel::onStrokeColorClicked);
     connect(m_fillColorBtn, &QPushButton::clicked, this, &RectPropertyPanel::onFillColorClicked);
 
-    // 绑定元素属性变化信号
-
-    
     // 构建面板
     PropertyPanelFactory::makePropertyPanel(this, tr("矩形"), names, editors);
 }

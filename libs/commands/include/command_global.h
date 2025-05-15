@@ -4,9 +4,9 @@
 #include <QtCore/qglobal.h>
 
 #ifdef COMMANDS_LIBRARY
-#  define COMMANDS_API Q_DECL_EXPORT
+#define COMMANDS_API Q_DECL_EXPORT
 #else
-#  define COMMANDS_API Q_DECL_IMPORT
+#define COMMANDS_API Q_DECL_IMPORT
 #endif
 
 #endif // COMMANDGLOBAL_H

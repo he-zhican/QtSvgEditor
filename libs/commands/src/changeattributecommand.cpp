@@ -1,1 +1,1 @@
-#include"changeattributecommand.h"
+#include "changeattributecommand.h"

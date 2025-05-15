@@ -1,4 +1,4 @@
-#ifndef TOOLCONTROLLER_H
+ï»¿#ifndef TOOLCONTROLLER_H
 #define TOOLCONTROLLER_H
 
 #include <QObject>
@@ -15,25 +15,28 @@ public:
     explicit ToolController(QObject* parent = nullptr) : QObject(parent) {}
     virtual ~ToolController() {}
 
-    // Î¨Ò»±êÊ¶£¬·µ»Ø¶ÔÓ¦ ToolId
+    // å”¯ä¸€æ ‡è¯†ï¼Œè¿”å›å¯¹åº” ToolId
     virtual ToolId id() const = 0;
 
-    // ÉèÖÃ³¡¾°ÓëÎÄµµ
+    // è®¾ç½®åœºæ™¯ä¸æ–‡æ¡£
     void setView(QGraphicsView* s) { m_view = s; }
     void setDocument(std::shared_ptr<SvgDocument> doc) { m_document = doc; }
 
-    // ÊÂ¼ş½Ó¿Ú
+    // äº‹ä»¶æ¥å£
     virtual void onMousePress(QMouseEvent* event) = 0;
     virtual void onMouseMove(QMouseEvent* event) = 0;
     virtual void onMouseRelease(QMouseEvent* event) = 0;
     virtual void onKeyPress(QKeyEvent* event) { Q_UNUSED(event); }
     virtual void mouseDoubleClickEvent(QMouseEvent* event) {};
 
-    // »­Í¼Ê±£¬ÅĞ¶ÏÖÕµã×ø±êºÍÆğÊ¼×ø±êÊÇ·ñÒ»Ñù
+    // ç”»å›¾æ—¶ï¼Œåˆ¤æ–­ç»ˆç‚¹åæ ‡å’Œèµ·å§‹åæ ‡æ˜¯å¦ä¸€æ ·
     bool isSameEndPosStartPos(QPointF& start, QPointF& end) {
         QPointF delta = end - start;
         return (qFuzzyIsNull(delta.x()) && qFuzzyIsNull(delta.y()));
     }
+
+signals:
+    void endCurrentTool();
 
 protected:
     QGraphicsView* m_view = nullptr;

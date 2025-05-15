@@ -13,18 +13,11 @@ public:
     double centerY() const;  // 中心点纵坐标
     double radiusX() const;  // x轴方向的半径
     double radiusY() const;  // y轴方向的半径
-    double startX() const;
-    double startY() const;
-    double endX() const;
-    double endY() const;
+
     void setCenterX(double v);
     void setCenterY(double v);
     void setRadiusX(double v);
     void setRadiusY(double v);
-    void setStartX(double v);
-    void setStartY(double v);
-    void setEndX(double v);
-    void setEndY(double v);
 
     QDomElement toXml(QDomDocument& doc) const override;
     void fromXml(const QDomElement& elem) override;

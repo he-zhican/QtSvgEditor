@@ -7,6 +7,7 @@ SvgFreehand::SvgFreehand(QObject* parent)
     setAttribute("stroke", "#000000");     // 边框颜色：黑色
     setAttribute("stroke-width", "2");    // 边框宽度：2像素
     setAttribute("stroke-dasharray", ""); // 边框样式
+    setAttribute("fill", ""); // 边框样式
 }
 
 void SvgFreehand::move(QPointF& offset)

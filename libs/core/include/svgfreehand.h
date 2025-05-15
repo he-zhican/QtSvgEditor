@@ -1,4 +1,4 @@
-#ifndef SVGFREEHAND_H
+ï»¿#ifndef SVGFREEHAND_H
 #define SVGFREEHAND_H
 
 #include <QPainterPath>
@@ -6,15 +6,13 @@
 
 class SvgFreehand : public SvgElement {
 public:
-	explicit SvgFreehand(QObject* parent = nullptr);
-	QString tagName() const override { return "path"; }
+    explicit SvgFreehand(QObject* parent = nullptr);
+    QString tagName() const override { return "path"; }
     void move(QPointF& offset) override;
 
-    // ÊÖ»æÂ·¾¶
     QPainterPath path() const;
     void setPath(const QPainterPath& p);
 
-    // ÊÇ·ñ±ÕºÏ
     bool isClosed() const;
 
     QDomElement toXml(QDomDocument& doc) const override;

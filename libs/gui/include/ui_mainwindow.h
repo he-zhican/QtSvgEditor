@@ -34,7 +34,7 @@ public:
 
         // 左侧工具栏
         sideToolBar = new SideToolBar(MainWindow);
-        MainWindow->addToolBar(Qt::LeftToolBarArea ,sideToolBar);
+        MainWindow->addToolBar(Qt::LeftToolBarArea, sideToolBar);
 
         // 中间画图区域
         scrollArea = new QScrollArea(MainWindow);
@@ -44,7 +44,7 @@ public:
         scrollArea->setWidgetResizable(false);
         scrollArea->setAlignment(Qt::AlignCenter);
         MainWindow->setCentralWidget(scrollArea);
-        
+
         // 右侧属性面板
         auto* dock = new QDockWidget(MainWindow);
         dock->setTitleBarWidget(new QWidget(dock));
@@ -52,7 +52,7 @@ public:
         dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
         dock->setWidget(propertyPanel);
         MainWindow->addDockWidget(Qt::RightDockWidgetArea, dock);
-        
+
         retranslateUi(MainWindow);
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -64,7 +64,7 @@ public:
 };
 
 namespace Ui {
-class MainWindow : public Ui_MainWindow {};
+    class MainWindow : public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

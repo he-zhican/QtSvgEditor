@@ -4,7 +4,7 @@
 #include "svgfreehand.h"
 
 FreehandToolController::FreehandToolController(QObject* parent)
-    : ToolController(parent){}
+    : ToolController(parent) {}
 
 void FreehandToolController::onMousePress(QMouseEvent* event)
 {
@@ -48,7 +48,10 @@ void FreehandToolController::onMouseRelease(QMouseEvent* event)
     delete m_previewItem;
     m_previewItem = nullptr;
 
-    if (!m_isMoved) return;
+    if (!m_isMoved) {
+        emit endCurrentTool();
+        return;
+    }
 
     // 创建 SvgFreehand 模型
     auto freeElem = std::make_shared<SvgFreehand>();

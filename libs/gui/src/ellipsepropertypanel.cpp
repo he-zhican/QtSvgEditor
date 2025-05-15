@@ -1,4 +1,4 @@
-﻿#include"ellipsepropertypanel.h"
+﻿#include "ellipsepropertypanel.h"
 #include "propertypanelfactory.h"
 #include "changeattributecommand.h"
 #include "commandmanager.h"
@@ -14,24 +14,24 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
     QStringList names;
     QVector<QWidget*> editors;
 
-    // X (start-x)
-    m_xEdit = new QLineEdit;
-    m_xEdit->setValidator(new QIntValidator(0, 1000, m_xEdit));
+    // X
+    m_xEdit = new QLineEdit(this);
+    m_xEdit->setValidator(new QIntValidator(0, 2000, m_xEdit));
     m_xEdit->setAlignment(Qt::AlignHCenter);
     connect(m_xEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onXChanged(toInt(t)); });
     names << tr("X");
     editors << m_xEdit;
 
-    // Y (start-y)
-    m_yEdit = new QLineEdit;
-    m_yEdit->setValidator(new QIntValidator(0, 1000, m_yEdit));
+    // Y
+    m_yEdit = new QLineEdit(this);
+    m_yEdit->setValidator(new QIntValidator(0, 2000, m_yEdit));
     m_yEdit->setAlignment(Qt::AlignHCenter);
     connect(m_yEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onYChanged(toInt(t)); });
     names << tr("Y");
     editors << m_yEdit;
 
     // Rx
-    m_rxEdit = new QLineEdit;
+    m_rxEdit = new QLineEdit(this);
     m_rxEdit->setValidator(new QIntValidator(1, 1000, m_rxEdit));
     m_rxEdit->setAlignment(Qt::AlignHCenter);
     connect(m_rxEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onRxChanged(toInt(t)); });
@@ -39,15 +39,15 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
     editors << m_rxEdit;
 
     // Ry
-    m_ryEdit = new QLineEdit;
-    m_ryEdit->setValidator(new QIntValidator(1, 5000, m_ryEdit));
+    m_ryEdit = new QLineEdit(this);
+    m_ryEdit->setValidator(new QIntValidator(1, 500, m_ryEdit));
     m_ryEdit->setAlignment(Qt::AlignHCenter);
     connect(m_ryEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onRyChanged(toInt(t)); });
     names << tr("半径Y");
     editors << m_ryEdit;
 
     // Stroke width
-    m_swEdit = new QLineEdit;
+    m_swEdit = new QLineEdit(this);
     m_swEdit->setValidator(new QIntValidator(0, 50, m_swEdit));
     m_swEdit->setAlignment(Qt::AlignHCenter);
     connect(m_swEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onStrokeWidthChanged(toInt(t)); });
@@ -55,21 +55,21 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
     editors << m_swEdit;
 
     // Stroke style
-    m_styleCombo = new QComboBox;
+    m_styleCombo = new QComboBox(this);
     m_styleCombo->addItems({ tr("实线"), tr("虚线"), tr("点线"), tr("虚点") });
     connect(m_styleCombo, &QComboBox::currentTextChanged, this, &EllipsePropertyPanel::onStrokeStyleChanged);
     names << tr("边框样式");
     editors << m_styleCombo;
 
     // Stroke color
-    m_strokeColorBtn = new QPushButton;
+    m_strokeColorBtn = new QPushButton(this);
     m_strokeColorBtn->setObjectName("colorBtn");
     connect(m_strokeColorBtn, &QPushButton::clicked, this, &EllipsePropertyPanel::onStrokeColorClicked);
     names << tr("边框颜色");
     editors << m_strokeColorBtn;
 
     // Fill color
-    m_fillColorBtn = new QPushButton;
+    m_fillColorBtn = new QPushButton(this);
     m_fillColorBtn->setObjectName("colorBtn");
     connect(m_fillColorBtn, &QPushButton::clicked, this, &EllipsePropertyPanel::onFillColorClicked);
     names << tr("填充颜色");
@@ -99,13 +99,20 @@ void EllipsePropertyPanel::updateControls()
         b4(m_ryEdit), b5(m_swEdit), b6(m_styleCombo),
         b7(m_strokeColorBtn), b8(m_fillColorBtn);
 
+    int cx = static_cast<int>(m_element->attribute("cx").toDouble());
+    int cy = static_cast<int>(m_element->attribute("cy").toInt());
+    int rx = static_cast<int>(m_element->attribute("rx").toInt());
+    int ry = static_cast<int>(m_element->attribute("ry").toInt());
+
+    qDebug() << cx << "," << cy << "," << rx << "," << ry;
+
     // start-x, start-y
-    m_xEdit->setText(QString::number(m_element->attribute("start-x").toInt()));
-    m_yEdit->setText(QString::number(m_element->attribute("start-y").toInt()));
+    m_xEdit->setText(QString::number(cx - rx));
+    m_yEdit->setText(QString::number(cy - ry));
 
     // rx, ry
-    m_rxEdit->setText(QString::number(int(m_element->attribute("rx").toDouble())));
-    m_ryEdit->setText(QString::number(int(m_element->attribute("rx").toDouble())));
+    m_rxEdit->setText(QString::number(rx));
+    m_ryEdit->setText(QString::number(ry));
 
     // stroke-width
     m_swEdit->setText(m_element->attribute("stroke-width"));
@@ -130,12 +137,13 @@ void EllipsePropertyPanel::updateControls()
 }
 
 // ---- slots ----
+
 void EllipsePropertyPanel::onXChanged(int v) {
-    auto cmd = new ChangeAttributeCommand(m_element, "start-x", QString::number(v));
+    auto cmd = new ChangeAttributeCommand(m_element, "cx", QString::number(v + m_element->attribute("rx").toDouble()));
     CommandManager::instance().execute(cmd);
 }
 void EllipsePropertyPanel::onYChanged(int v) {
-    auto cmd = new ChangeAttributeCommand(m_element, "start-y", QString::number(v));
+    auto cmd = new ChangeAttributeCommand(m_element, "cy", QString::number(v + m_element->attribute("ry").toDouble()));
     CommandManager::instance().execute(cmd);
 }
 void EllipsePropertyPanel::onRxChanged(int v) {

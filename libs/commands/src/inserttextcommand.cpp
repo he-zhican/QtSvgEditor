@@ -1,1 +1,1 @@
-#include"inserttextcommand.h"
+#include "inserttextcommand.h"

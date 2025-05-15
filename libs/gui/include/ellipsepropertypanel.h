@@ -1,4 +1,4 @@
-#ifndef ELLIPSEPROPERTYPANEL_H
+ï»¿#ifndef ELLIPSEPROPERTYPANEL_H
 #define ELLIPSEPROPERTYPANEL_H
 
 #include <QWidget>
@@ -15,7 +15,6 @@ class EllipsePropertyPanel : public QWidget {
 public:
     explicit EllipsePropertyPanel(QWidget* parent = nullptr);
 
-    /// ÇÐ»»µ½ÐÂµÄ <ellipse> ÔªËØÊ±µ÷ÓÃ
     void loadElement(std::shared_ptr<SvgElement> elem);
 
 private slots:
@@ -30,9 +29,9 @@ private slots:
 
 private:
     std::shared_ptr<SvgElement> m_element;
-    QLineEdit* m_xEdit, *m_yEdit, *m_rxEdit, *m_ryEdit, *m_swEdit;
+    QLineEdit* m_xEdit, * m_yEdit, * m_rxEdit, * m_ryEdit, * m_swEdit;
     QComboBox* m_styleCombo;
-    QPushButton* m_strokeColorBtn, *m_fillColorBtn;
+    QPushButton* m_strokeColorBtn, * m_fillColorBtn;
     QColor m_strokeColor, m_fillColor;
 
     int toInt(const QString& txt) const {

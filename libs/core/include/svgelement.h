@@ -1,4 +1,4 @@
-#ifndef SVGELEMENT_H
+ï»¿#ifndef SVGELEMENT_H
 #define SVGELEMENT_H
 
 #include <QObject>
@@ -14,8 +14,7 @@ public:
 	virtual ~SvgElement();
 
 	virtual QString tagName() const = 0;
-	virtual void move(QPointF& offset) = 0; // ÒÆ¶¯
-	//virtual void resize() = 0; // ±ä»»
+	virtual void move(QPointF& offset) = 0;
 
 	void setAttribute(const QString& name, const QString& value);
 	QString attribute(const QString& name) const;

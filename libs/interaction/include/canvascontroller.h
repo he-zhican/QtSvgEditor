@@ -27,12 +27,10 @@ public:
     void mouseDoubleClickEvent(QMouseEvent* event);
 
 public slots:
-    void onEndWrite();
+    void onEndCurrentTool();
 
 signals:
-    void requestRepaint();  // «Î«Û CanvasView ÷ÿªÊ
-    void shapeCountChanged(int count);
-    void endTextTool();
+    void changeTool();
 
 private:
     QGraphicsView* m_view = nullptr;

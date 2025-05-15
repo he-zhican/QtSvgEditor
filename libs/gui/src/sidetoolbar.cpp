@@ -30,21 +30,21 @@ void SideToolBar::initTools() {
         {ToolId::Tool_ZoomIn,   ":/icons/zoomin.svg",    "Zoom In"},
     };
 
-    for (auto &info : tools) {
+    for (auto& info : tools) {
         QAction* act = addAction(QIcon(info.icon), tr(info.text));
         act->setCheckable(true);
         act->setData(static_cast<int>(info.id));
         m_actionGroup->addAction(act);
-        connect(act, &QAction::triggered, this, [this, act]{
+        connect(act, &QAction::triggered, this, [this, act] {
             ToolId id = static_cast<ToolId>(act->data().toInt());
             emit toolSelected(id);
-        });
+            });
     }
 
     // 默认选中移动工具
     m_actionGroup->actions().first()->trigger();
 }
 
-void SideToolBar::onChangeToMoveTool(){
+void SideToolBar::onChangeToMoveTool() {
     m_actionGroup->actions().first()->trigger();
 }

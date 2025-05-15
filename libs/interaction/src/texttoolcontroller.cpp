@@ -1,4 +1,4 @@
-﻿#include"texttoolcontroller.h"
+﻿#include "texttoolcontroller.h"
 #include "svgtext.h"
 #include "addelementcommand.h"
 #include "commandmanager.h"
@@ -7,7 +7,7 @@
 #include <QDebug>
 
 TextToolController::TextToolController(QObject* parent)
-	: ToolController(parent){
+    : ToolController(parent) {
 
 }
 
@@ -26,7 +26,7 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
 
         // 创建可编辑的临时文本框
         m_previewItem = new QGraphicsTextItem(tr("请输入文本"));
-        m_previewItem->setFont(QFont("Arial", 16));
+        m_previewItem->setFont(QFont("Microsoft YaHei", 16));
         m_previewItem->setDefaultTextColor(Qt::black);
         m_previewItem->setTextInteractionFlags(Qt::TextEditorInteraction);
         m_previewItem->setPos(scenePos);
@@ -56,10 +56,6 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
 
             QRectF boundRect = m_previewItem->boundingRect();
 
-            textElem->setStartX(scenePos.x());
-            textElem->setStartY(scenePos.y());
-            textElem->setEndX(scenePos.x() + boundRect.bottomRight().x());
-            textElem->setEndY(scenePos.y() + boundRect.bottomRight().y());
 
             auto cmd = new AddElementCommand(m_document, textElem);
             CommandManager::instance().execute(cmd);
@@ -69,7 +65,7 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
         delete m_previewItem;
         m_previewItem = nullptr;
 
-        emit endWrite();
+        emit endCurrentTool();
     }
 }
 
@@ -79,7 +75,7 @@ bool TextToolController::eventFilter(QObject* obj, QEvent* event)
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
-                
+
                 QString text = textItem->toPlainText().trimmed();
                 QPointF scenePos = textItem->pos();
                 m_view->scene()->removeItem(textItem);
@@ -89,15 +85,10 @@ bool TextToolController::eventFilter(QObject* obj, QEvent* event)
                     textElem->setText(text);
                     textElem->setX(scenePos.x());
                     textElem->setY(scenePos.y());
-                    textElem->setFontFamily("Arial");
+                    textElem->setFontFamily("Microsoft YaHei");
                     textElem->setFontSize(16);
 
                     QRectF boundRect = textItem->boundingRect();
-
-                    textElem->setStartX(scenePos.x());
-                    textElem->setStartY(scenePos.y());
-                    textElem->setEndX(scenePos.x() + boundRect.bottomRight().x());
-                    textElem->setEndY(scenePos.y() + boundRect.bottomRight().y());
 
                     auto cmd = new AddElementCommand(m_document, textElem);
                     CommandManager::instance().execute(cmd);
@@ -108,7 +99,7 @@ bool TextToolController::eventFilter(QObject* obj, QEvent* event)
                 textItem = nullptr;
                 m_previewItem = nullptr;
 
-                emit endWrite();
+                emit endCurrentTool();
 
                 return true;
             }

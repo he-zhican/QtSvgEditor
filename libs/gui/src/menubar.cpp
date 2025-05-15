@@ -4,9 +4,9 @@
 #include "commandmanager.h"
 
 MenuBar::MenuBar(QWidget* parent)
-	: QMenuBar(parent)
+    : QMenuBar(parent)
 {
-	initMenus();
+    initMenus();
 }
 
 MenuBar::~MenuBar()

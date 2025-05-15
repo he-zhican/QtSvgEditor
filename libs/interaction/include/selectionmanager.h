@@ -27,7 +27,7 @@ signals:
 private:
     SelectionManager() = default;
     ~SelectionManager() override = default;
-    
+
     SelectionManager(const SelectionManager& other) = delete;
     SelectionManager& operator=(const SelectionManager& other) = delete;
 

@@ -1,4 +1,4 @@
-#include"svgelement.h"
+Ôªø#include"svgelement.h"
 
 SvgElement::SvgElement(QObject* parent)
 	: QObject(parent) {}
@@ -31,7 +31,6 @@ QDomElement SvgElement::toXml(QDomDocument& doc) const {
 }
 
 void SvgElement::fromXml(const QDomElement& elem) {
-	// ∂¡»°À˘”– Ù–‘
 	QDomNamedNodeMap map = elem.attributes();
 	for (int i = 0; i < map.count(); ++i) {
 		QDomAttr attr = map.item(i).toAttr();

@@ -1,4 +1,4 @@
-﻿#include"canvasview.h"
+﻿#include "canvasview.h"
 #include "graphicssvgitem.h"
 #include "selectionmanager.h"
 #include <QTextCursor>
@@ -6,7 +6,7 @@
 #include <QDebug>
 
 CanvasView::CanvasView(QWidget* parent)
-    : QGraphicsView(parent){
+    : QGraphicsView(parent) {
 
     QGraphicsScene* scene = new QGraphicsScene(this);
     //scene->setSceneRect(0, 0, 750, 500);
@@ -17,7 +17,7 @@ CanvasView::CanvasView(QWidget* parent)
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::RubberBandDrag);
     setMouseTracking(true);
-    setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setMinimumSize(100, 60);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
@@ -40,7 +40,7 @@ void CanvasView::setController(CanvasController* ctrl) {
     //connect(m_controller, &CanvasController::requestRepaint,
     //    this, QOverload<>::of(&QWidget::update));
 
-    connect(m_controller, &CanvasController::endTextTool, this, &CanvasView::onEndTextTool);
+    connect(m_controller, &CanvasController::changeTool, this, &CanvasView::onChangeTool);
 
     m_controller->setView(this);
     m_controller->setDocument(m_document);
@@ -126,7 +126,7 @@ void CanvasView::onSceneSelectionChanged()
     }
 }
 
-void CanvasView::onEndTextTool()
+void CanvasView::onChangeTool()
 {
     emit changeToMoveTool();
 }

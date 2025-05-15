@@ -3,17 +3,20 @@
 
 #include "toolcontroller.h"
 
-class ZoomInToolController : public ToolController {
-public:
-    explicit ZoomInToolController(QObject* parent = nullptr);
-    ToolId id() const override { return ToolId::Tool_ZoomIn; }
+class ZoomInToolController : public ToolController
+{
+  public:
+    explicit ZoomInToolController(QObject *parent = nullptr);
+    ToolId id() const override
+    {
+        return ToolId::Tool_ZoomIn;
+    }
 
-    void onMousePress(QMouseEvent* event) override;
-    void onMouseMove(QMouseEvent* event) override;
-    void onMouseRelease(QMouseEvent* event) override;
+    void onMousePress(QMouseEvent *event) override;
+    void onMouseMove(QMouseEvent *event) override;
+    void onMouseRelease(QMouseEvent *event) override;
 
-private:
-
+  private:
 };
 
 #endif // !ZOOMINTOOLCONTROLLER_H

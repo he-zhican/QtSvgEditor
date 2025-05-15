@@ -1,4 +1,4 @@
-#ifndef SVGPOLYGON_H
+ï»¿#ifndef SVGPOLYGON_H
 #define SVGPOLYGON_H
 
 #include <Qvector>
@@ -11,7 +11,6 @@ public:
     QString tagName() const override { return "polygon"; }
     void move(QPointF& offset) override;
 
-    // ¶à±ßÐÎµÄ¶¥µã¼¯ºÏ
     QVector<QPointF> points() const;
     void setPoints(const QVector<QPointF>& pts);
 

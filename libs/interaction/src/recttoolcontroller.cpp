@@ -1,5 +1,5 @@
 #include <QGraphicsView>
-#include"recttoolcontroller.h"
+#include "recttoolcontroller.h"
 #include "commandmanager.h"
 #include "addelementcommand.h"
 #include "svgrect.h"
@@ -34,7 +34,10 @@ void RectToolController::onMouseRelease(QMouseEvent* event) {
     delete m_previewItem;
     m_previewItem = nullptr;
 
-    if (isSameEndPosStartPos(finalRect.topLeft(), finalRect.bottomRight())) return;
+    if (isSameEndPosStartPos(finalRect.topLeft(), finalRect.bottomRight())) {
+        emit endCurrentTool();
+        return;
+    }
 
     // 创建 SvgRect 数据模型
     auto rectElem = std::make_shared<SvgRect>();

@@ -1,1 +1,1 @@
-#include"resizeelementcommand.h"
+#include "resizeelementcommand.h"

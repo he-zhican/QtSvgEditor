@@ -1,30 +1,37 @@
 #ifndef MOVEELEMENTSCOMMAND_H
 #define MOVEELEMENTSCOMMAND_H
 
-#include <QPointF>
-#include <QVector>
 #include "command.h"
 #include "svgelement.h"
+#include <QPointF>
+#include <QVector>
 
-class MoveElementsCommand : public Command {
-public:
-    MoveElementsCommand(QVector<std::shared_ptr<SvgElement>> elems, QPointF& offset, QUndoCommand* parent = nullptr)
-        : Command("Move Element", parent), m_elements(elems), m_offset(offset) {}
+class MoveElementsCommand : public Command
+{
+  public:
+    MoveElementsCommand(QVector<std::shared_ptr<SvgElement>> elems, QPointF &offset, QUndoCommand *parent = nullptr)
+        : Command("Move Element", parent), m_elements(elems), m_offset(offset)
+    {
+    }
 
-protected:
-    void execute() override {
-        for (auto elem : m_elements) {
+  protected:
+    void execute() override
+    {
+        for (auto elem : m_elements)
+        {
             elem->move(m_offset);
         }
     }
-    void undoImpl() override {
+    void undoImpl() override
+    {
         QPointF backOffset = QPointF(0, 0) - m_offset;
-        for (auto elem : m_elements) {
+        for (auto elem : m_elements)
+        {
             elem->move(backOffset);
         }
     }
 
-private:
+  private:
     QVector<std::shared_ptr<SvgElement>> m_elements;
     QPointF m_offset;
 };

@@ -1,1 +1,1 @@
-#include"pluginmanager.h"
+#include "pluginmanager.h"

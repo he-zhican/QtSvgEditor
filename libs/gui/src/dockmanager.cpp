@@ -1,1 +1,1 @@
-#include"dockmanager.h"
+#include "dockmanager.h"

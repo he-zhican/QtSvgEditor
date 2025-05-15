@@ -1,107 +1,106 @@
 #include "canvascontroller.h"
-#include "svgdocument.h"
-#include "recttoolcontroller.h"
 #include "ellipsetoolcontroller.h"
-#include "linetoolcontroller.h"
-#include "pentagontoolcontroller.h"
-#include "hexagontoolcontroller.h"
 #include "freehandtoolcontroller.h"
-#include "startoolcontroller.h"
-#include "texttoolcontroller.h"
+#include "hexagontoolcontroller.h"
+#include "linetoolcontroller.h"
 #include "movetoolcontroller.h"
-#include "zoomouttoolcontroller.h"
+#include "pentagontoolcontroller.h"
+#include "recttoolcontroller.h"
+#include "startoolcontroller.h"
+#include "svgdocument.h"
+#include "texttoolcontroller.h"
 #include "zoomintoolcontroller.h"
+#include "zoomouttoolcontroller.h"
 #include <QDebug>
 
-CanvasController::CanvasController(QObject* parent) : QObject(parent)
+CanvasController::CanvasController(QObject *parent) : QObject(parent)
 {
-	initTools();
-	setCurrentTool(ToolId::Tool_Move);
+    initTools();
+    setCurrentTool(ToolId::Tool_Move);
 }
 
-CanvasController::~CanvasController() {
-
+CanvasController::~CanvasController()
+{
 }
 
 void CanvasController::initTools()
 {
-	m_tools << new MoveToolController(this)
-		<< new RectToolController(this)
-		<< new EllipseToolController(this)
-		<< new LineToolController(this)
-		<< new PentagonToolController(this)
-		<< new HexagonToolController(this)
-		<< new FreehandToolController(this)
-		<< new StarToolController(this)
-		<< new ZoomOutToolController(this)
-		<< new ZoomInToolController(this);
+    m_tools << new MoveToolController(this) << new RectToolController(this) << new EllipseToolController(this)
+            << new LineToolController(this) << new PentagonToolController(this) << new HexagonToolController(this)
+            << new FreehandToolController(this) << new StarToolController(this) << new TextToolController(this)
+            << new ZoomOutToolController(this) << new ZoomInToolController(this);
 
-	TextToolController* textTool = new TextToolController(this);
-	m_tools << textTool;
-	connect(textTool, &TextToolController::endWrite, this, &CanvasController::onEndWrite);
+    for (auto tool : m_tools)
+    {
+        connect(tool, &ToolController::endCurrentTool, this, &CanvasController::onEndCurrentTool);
+    }
 }
 
 void CanvasController::setCurrentTool(ToolId toolId)
 {
-	for (auto t : m_tools) {
-		if (t->id() == toolId) {
-			m_currentTool = t;
-			break;
-		}
-	}
+    for (auto t : m_tools)
+    {
+        if (t->id() == toolId)
+        {
+            m_currentTool = t;
+            break;
+        }
+    }
 }
 
-void CanvasController::setView(QGraphicsView* view)
+void CanvasController::setView(QGraphicsView *view)
 {
-	for (auto t : m_tools) {
-		t->setView(view);
-	}
+    for (auto t : m_tools)
+    {
+        t->setView(view);
+    }
 }
 
 void CanvasController::setDocument(std::shared_ptr<SvgDocument> doc)
 {
-	for (auto t : m_tools) {
-		t->setDocument(doc);
-	}
+    for (auto t : m_tools)
+    {
+        t->setDocument(doc);
+    }
 }
 
-void CanvasController::mousePressEvent(QMouseEvent* event)
+void CanvasController::mousePressEvent(QMouseEvent *event)
 {
-	if (m_currentTool) {
-		m_currentTool->onMousePress(event);
-	}
+    if (m_currentTool)
+    {
+        m_currentTool->onMousePress(event);
+    }
 }
 
-void CanvasController::mouseMoveEvent(QMouseEvent* event)
+void CanvasController::mouseMoveEvent(QMouseEvent *event)
 {
-	if (m_currentTool){
-		m_currentTool->onMouseMove(event);
-	}
+    if (m_currentTool)
+    {
+        m_currentTool->onMouseMove(event);
+    }
 }
 
-void CanvasController::mouseReleaseEvent(QMouseEvent* event)
+void CanvasController::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (m_currentTool) {
-		m_currentTool->onMouseRelease(event);
-
-		emit shapeCountChanged(m_document ? m_document->elementCount() : 0);
-
-		emit requestRepaint();
-	}
+    if (m_currentTool)
+    {
+        m_currentTool->onMouseRelease(event);
+    }
 }
 
-void CanvasController::keyPressEvent(QKeyEvent* event)
+void CanvasController::keyPressEvent(QKeyEvent *event)
 {
-	if (m_currentTool)
-		m_currentTool->onKeyPress(event);
+    if (m_currentTool)
+        m_currentTool->onKeyPress(event);
 }
 
-void CanvasController::mouseDoubleClickEvent(QMouseEvent* event)
+void CanvasController::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	if (m_currentTool)
-		m_currentTool->mouseDoubleClickEvent(event);
+    if (m_currentTool)
+        m_currentTool->mouseDoubleClickEvent(event);
 }
 
-void CanvasController::onEndWrite() {
-	emit endTextTool();
+void CanvasController::onEndCurrentTool()
+{
+    emit changeTool();
 }

@@ -28,10 +28,10 @@ public slots:
     void onDocumentAttributeChanged(const QString& name);
 
     void onSceneSelectionChanged();
-    void onEndTextTool();
-    
+    void onChangeTool();
+
 signals:
-    void changeToMoveTool(); // 当文本工具失去焦点时，恢复到移动工具
+    void changeToMoveTool(); // 恢复到移动工具
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;

@@ -9,17 +9,17 @@ StarToolController::StarToolController(QObject* parent) :ToolController(parent) 
 
 void StarToolController::onMousePress(QMouseEvent* event)
 {
-	m_startPos = m_view->mapToScene(event->pos());
-	m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
+    m_startPos = m_view->mapToScene(event->pos());
+    m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
 }
 
 void StarToolController::onMouseMove(QMouseEvent* event)
 {
-	if (!m_previewItem) return;
-	m_endPos = m_view->mapToScene(event->pos());
-	// 实时计算顶点位置
-	calculatePoints();
-	m_previewItem->setPolygon(QPolygonF(m_points));
+    if (!m_previewItem) return;
+    m_endPos = m_view->mapToScene(event->pos());
+    // 实时计算顶点位置
+    calculatePoints();
+    m_previewItem->setPolygon(QPolygonF(m_points));
 }
 
 void StarToolController::onMouseRelease(QMouseEvent* event)
@@ -28,24 +28,27 @@ void StarToolController::onMouseRelease(QMouseEvent* event)
 
     m_endPos = m_view->mapToScene(event->pos());
 
-	QPolygonF finalPolygon = m_previewItem->polygon();
+    QPolygonF finalPolygon = m_previewItem->polygon();
 
-	// 移除预览
-	m_view->scene()->removeItem(m_previewItem);
-	delete m_previewItem;
-	m_previewItem = nullptr;
+    // 移除预览
+    m_view->scene()->removeItem(m_previewItem);
+    delete m_previewItem;
+    m_previewItem = nullptr;
 
-    if (isSameEndPosStartPos(m_startPos, m_endPos)) return;
+    if (isSameEndPosStartPos(m_startPos, m_endPos)) {
+        emit endCurrentTool();
+        return;
+    }
 
-	auto polygonElem = std::make_shared<SvgPolygon>();
-	polygonElem->setPoints(m_points);
+    auto polygonElem = std::make_shared<SvgPolygon>();
+    polygonElem->setPoints(m_points);
     polygonElem->setStartX(m_startPos.x());
     polygonElem->setStartY(m_startPos.y());
     polygonElem->setEndX(m_endPos.x());
     polygonElem->setEndY(m_endPos.y());
 
-	auto addCmd = new AddElementCommand(m_document, polygonElem);
-	CommandManager::instance().execute(addCmd);
+    auto addCmd = new AddElementCommand(m_document, polygonElem);
+    CommandManager::instance().execute(addCmd);
 }
 
 void StarToolController::calculatePoints()

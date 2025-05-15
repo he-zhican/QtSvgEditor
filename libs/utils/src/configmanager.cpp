@@ -1,1 +1,1 @@
-#include"configmanager.h"
+#include "configmanager.h"

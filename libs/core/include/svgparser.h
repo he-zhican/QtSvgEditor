@@ -5,8 +5,8 @@
 
 class SvgParser
 {
-public:
-	std::shared_ptr<SvgDocument> parse(const QString& filePath);
+  public:
+    std::shared_ptr<SvgDocument> parse(const QString &filePath);
 };
 
 #endif // !SVGPARSER_H

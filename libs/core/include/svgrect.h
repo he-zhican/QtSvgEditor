@@ -3,11 +3,15 @@
 
 #include "svgelement.h"
 
-class SvgRect : public SvgElement {
-public:
-    explicit SvgRect(QObject* parent = nullptr);
-    QString tagName() const override { return "rect"; }
-    void move(QPointF& offset) override;
+class SvgRect : public SvgElement
+{
+  public:
+    explicit SvgRect(QObject *parent = nullptr);
+    QString tagName() const override
+    {
+        return "rect";
+    }
+    void move(QPointF &offset) override;
 
     // 方便访问的属性接口
     double x() const;

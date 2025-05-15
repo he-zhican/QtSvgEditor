@@ -3,17 +3,17 @@
 SvgText::SvgText(QObject* parent)
 	: SvgElement(parent) {
 	// 初始化时默认添加样式属性
-	setAttribute("stroke", "#000000");     // 边框颜色：黑色
-	setAttribute("stroke-width", "2");    // 边框宽度：2像素
-	setAttribute("stroke-dasharray", ""); // 边框样式
+	setAttribute("stoke", "#000000");     // 字体颜色：黑色
+	//setAttribute("stroke-width", "2");    // 边框宽度：2像素
+	setAttribute("font-weight", "normal");  // 粗体/正常
+	setAttribute("font-style", "normal");  // 斜体/正常
+	setAttribute("text-decoration", "none");  // 下划线/无
+	setAttribute("font-size", "16");  // 下划线/无
+	setAttribute("font-family", "Microsoft YaHei"); // 字体样式：默认微软雅黑
 }
 
 void SvgText::move(QPointF& offset)
 {
-	setStartX(startX() + offset.x());
-	setStartY(startY() + offset.y());
-	setEndX(endX() + offset.x());
-	setEndY(endY() + offset.y());
 	setX(x() + offset.x());
 	setY(y() + offset.y());
 }
@@ -32,46 +32,6 @@ void SvgText::setFontFamily(const QString& f) { setAttribute("font-family", f); 
 
 double SvgText::fontSize() const { return attribute("font-size").toDouble(); }
 void SvgText::setFontSize(double s) { setAttribute("font-size", QString::number(s)); }
-
-double SvgText::startX() const
-{
-	return attribute("start-x").toDouble();
-}
-
-double SvgText::startY() const
-{
-	return attribute("start-y").toDouble();
-}
-
-double SvgText::endX() const
-{
-	return attribute("end-x").toDouble();
-}
-
-double SvgText::endY() const
-{
-	return attribute("end-y").toDouble();
-}
-
-void SvgText::setStartX(double v)
-{
-	setAttribute("start-x", QString::number(v));
-}
-
-void SvgText::setStartY(double v)
-{
-	setAttribute("start-y", QString::number(v));
-}
-
-void SvgText::setEndX(double v)
-{
-	setAttribute("end-x", QString::number(v));
-}
-
-void SvgText::setEndY(double v)
-{
-	setAttribute("end-y", QString::number(v));
-}
 
 QDomElement SvgText::toXml(QDomDocument& doc) const {
 	QDomElement elem = SvgElement::toXml(doc);

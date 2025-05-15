@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
     // 应用全局样式表
     QFile qssFile(":/styles/style.qss");
     if (qssFile.open(QFile::ReadOnly)) {
+   
         a.setStyleSheet(qssFile.readAll());
     }
 

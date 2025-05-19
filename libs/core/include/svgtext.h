@@ -11,7 +11,8 @@ class SvgText : public SvgElement
     {
         return "text";
     }
-    void move(QPointF &offset) override;
+    void move(const QPointF& offset) override;
+    std::shared_ptr<SvgElement> clone() const override;
 
     double x() const;
     double y() const;

@@ -28,6 +28,8 @@ public:
         MainWindow->resize(1000, 600);
         MainWindow->setMinimumSize(1000, 600);
 
+        MainWindow->setWindowIcon(QIcon(":/icons/SVG.png"));
+
         // ¶¥²¿²Ëµ¥À¸
         menubar = new MenuBar(MainWindow);
         MainWindow->setMenuBar(menubar);

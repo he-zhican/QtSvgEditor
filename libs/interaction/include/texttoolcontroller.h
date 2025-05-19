@@ -11,7 +11,7 @@ class TextToolController : public ToolController
     explicit TextToolController(QObject *parent = nullptr);
     ToolId id() const override
     {
-        return ToolId::Tool_Text;
+        return ToolId::Text;
     }
 
     void onMousePress(QMouseEvent *event) override;

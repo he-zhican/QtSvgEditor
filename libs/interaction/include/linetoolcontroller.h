@@ -11,7 +11,7 @@ class LineToolController : public ToolController
     explicit LineToolController(QObject *parent = nullptr);
     ToolId id() const override
     {
-        return ToolId::Tool_Line;
+        return ToolId::Line;
     }
 
     void onMousePress(QMouseEvent *event) override;

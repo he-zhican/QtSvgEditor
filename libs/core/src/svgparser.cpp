@@ -26,15 +26,25 @@ std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
     auto document = std::make_shared<SvgDocument>();
     QDomElement root = dom.documentElement();
 
-    // ºöÂÔÊ×¸ö±³¾°·Ö×é <g>
+    if (!root.hasAttribute("author") || root.attribute("author") != "WHUT_HZC")
+        return nullptr;
+
     QDomElement bgGroup = root.firstChildElement("g");
-    // ±³¾°´¦Àí£¨¿ÉÑ¡£©...
+    QDomNode bgNode = bgGroup.lastChild(); // çŸ©å½¢èƒŒæ™¯æ¡†
+    if (!bgNode.isNull() && bgNode.isElement()) {
+        QDomElement elem = bgNode.toElement();
+        if (elem.tagName() == "rect") {
+            document->setCanvasWidth(elem.attribute("width").toDouble());
+            document->setCanvasHeight(elem.attribute("height").toDouble());
+            document->setCanvasFillColor(elem.attribute("fill"));
+        }
+    }
 
-    // ÏÂÒ»¸ö·Ö×éÎª»æÖÆÔªËØ×é
     QDomElement painterGroup = bgGroup.nextSiblingElement("g");
-    if (painterGroup.isNull()) painterGroup = root; // ÈôÎŞ·Ö×é£¬ÔòÖ±½Ó´Ó root ½âÎö
+    if (painterGroup.isNull()) painterGroup = root;
 
-    // ±éÀú»æÖÆ×éÖĞµÄËùÓĞÔªËØ
+    QVector<std::shared_ptr<SvgElement>> elements;
+    // åŠ è½½å›¾å½¢å…ƒç´ 
     for (QDomNode node = painterGroup.firstChild(); !node.isNull(); node = node.nextSibling()) {
         if (!node.isElement()) continue;
         QDomElement elem = node.toElement();
@@ -47,10 +57,11 @@ std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
         else if (tag == "polygon")  obj = std::make_shared<SvgPolygon>();
         else if (tag == "path")     obj = std::make_shared<SvgFreehand>();
         else if (tag == "text")     obj = std::make_shared<SvgText>();
-        else continue; // ºöÂÔÎ´Öª±êÇ©»òÆäËû·Ö×é
+        else continue; // å¿½ç•¥å…¶ä»–å…ƒç´ 
 
         obj->fromXml(elem);
-        document->addElement(obj);
+        elements << obj;
     }
+    document->addElements(elements);
     return document;
 }

@@ -6,7 +6,6 @@
 #include <QIntValidator>
 #include <QColorDialog>
 #include <QSignalBlocker>
-#include <QDebug>
 
 RectPropertyPanel::RectPropertyPanel(QWidget* parent)
     : QWidget(parent)

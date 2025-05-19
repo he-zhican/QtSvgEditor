@@ -10,7 +10,7 @@ class RectToolController : public ToolController
     explicit RectToolController(QObject *parent = nullptr);
     ToolId id() const override
     {
-        return ToolId::Tool_Rect;
+        return ToolId::Rectangle;
     }
 
     void onMousePress(QMouseEvent *event) override;

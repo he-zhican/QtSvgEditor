@@ -22,6 +22,9 @@ class GraphicsSvgItem : public QGraphicsObject
   public slots:
     void onAttributeChanged(const QString &name, const QString &value);
 
+protected:
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+
   private:
     std::shared_ptr<SvgElement> m_element;
     QRectF m_boundingRect;

@@ -108,7 +108,7 @@ void TextPropertyPanel::updateControls()
     m_sizeSpin->setValue(size);
 
     // 颜色
-    m_textColor = QColor(m_element->attribute("stroke"));
+    m_textColor = QColor(m_element->attribute("fill"));
     m_colorBtn->setStyleSheet(
         QString("background-color:%1;").arg(m_textColor.name()));
 }
@@ -148,6 +148,6 @@ void TextPropertyPanel::onColorClicked() {
     m_textColor = c;
     m_colorBtn->setStyleSheet(
         QString("background-color:%1;").arg(c.name()));
-    auto cmd = new ChangeAttributeCommand(m_element, "stroke", c.name());
+    auto cmd = new ChangeAttributeCommand(m_element, "fill", c.name());
     CommandManager::instance().execute(cmd);
 }

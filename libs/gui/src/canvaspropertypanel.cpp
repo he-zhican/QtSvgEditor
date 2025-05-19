@@ -5,6 +5,7 @@
 #include "propertypanelfactory.h"
 #include <QColorDialog>
 #include <QIntValidator>
+#include <QSignalBlocker>
 
 CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent)
     : m_document(doc), QWidget(parent)
@@ -40,6 +41,14 @@ CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidg
     names.append(tr("高度"));
     editors.append(m_heightEdit);
 
+    // 缩放比例显示框
+    m_scaleEdit = new QLineEdit(this);
+    m_scaleEdit->setText(QString::number(static_cast<int>((m_document->scale() * 100))));
+    m_scaleEdit->setAlignment(Qt::AlignHCenter);
+    m_scaleEdit->setEnabled(false);
+    names.append(tr("缩放比例"));
+    editors.append(m_scaleEdit);
+
     // 画布背景颜色
     m_bgColorBtn = new QPushButton(this);
     m_bgColorBtn->setObjectName("colorBtn");
@@ -60,6 +69,15 @@ void CanvasPropertyPanel::onWidthChanged(int v)
     CommandManager::instance().execute(cmd);
 }
 
+void CanvasPropertyPanel::setDocument(std::shared_ptr<SvgDocument> doc)
+{
+    m_document = doc;
+    m_widthEdit->setText(QString::number(m_document->canvasWidth()));
+    m_heightEdit->setText(QString::number(m_document->canvasHeight()));
+    m_bgColor = QColor(m_document->canvasFill());
+    m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
+}
+
 void CanvasPropertyPanel::onHeightChanged(int v)
 {
     auto cmd = new ChangeDocAttributeCommand(m_document, "height", QString::number(v));
@@ -78,8 +96,10 @@ void CanvasPropertyPanel::onBgColorClicked()
 
 void CanvasPropertyPanel::onDocAttributeChanged(const QString& name)
 {
-    if (name == "fill") {
-        m_bgColor = QColor(m_document->canvasFill());
-        m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
-    }
+    QSignalBlocker b1(m_widthEdit), b2(m_heightEdit), b3(m_scaleEdit);
+    m_widthEdit->setText(QString::number(m_document->canvasWidth()));
+    m_heightEdit->setText(QString::number(m_document->canvasHeight()));
+    m_scaleEdit->setText(QString::number(static_cast<int>((m_document->scale() * 100))));
+    m_bgColor = QColor(m_document->canvasFill());
+    m_bgColorBtn->setStyleSheet("background-color:" + m_bgColor.name());
 }

@@ -5,6 +5,10 @@ SvgElement::SvgElement(QObject* parent)
 
 SvgElement::~SvgElement() {}
 
+void SvgElement::resize(const Handle handle, qreal dx, qreal dy)
+{
+}
+
 void SvgElement::setAttribute(const QString& name, const QString& value) {
 	m_attributes[name] = value;
 	emit attributeChanged(name, value);

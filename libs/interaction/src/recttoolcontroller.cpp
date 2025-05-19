@@ -1,9 +1,8 @@
 #include <QGraphicsView>
 #include "recttoolcontroller.h"
 #include "commandmanager.h"
-#include "addelementcommand.h"
+#include "addelementscommand.h"
 #include "svgrect.h"
-#include <QDebug>
 
 RectToolController::RectToolController(QObject* parent)
     : ToolController(parent) {}
@@ -47,7 +46,7 @@ void RectToolController::onMouseRelease(QMouseEvent* event) {
     rectElem->setHeight(finalRect.height());
 
     // 触发命令添加
-    auto addCmd = new AddElementCommand(m_document, rectElem);
+    auto addCmd = new AddElementsCommand(m_document, rectElem);
     // 执行并入栈
     CommandManager::instance().execute(addCmd);
 }

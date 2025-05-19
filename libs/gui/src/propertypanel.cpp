@@ -95,3 +95,8 @@ void PropertyPanel::onSelectionChanged(const QVector<std::shared_ptr<SvgElement>
         m_multiPropertyPanel->loadElements(sel);
     }
 }
+
+void PropertyPanel::setDocument(std::shared_ptr<SvgDocument> doc)
+{
+    m_canvasPropertyPanel->setDocument(doc);
+}

@@ -1,4 +1,3 @@
-// TextPropertyPanel.h
 #ifndef TEXTPROPERTYPANEL_H
 #define TEXTPROPERTYPANEL_H
 

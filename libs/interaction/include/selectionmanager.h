@@ -6,13 +6,12 @@
 #include <memory>
 #include "svgelement.h"
 
-// µ¥Àı¹ÜÀíµ±Ç°Ñ¡ÖĞÔªËØ
+// é€‰åŒºç®¡ç†ï¼šå•ä¾‹æ¨¡å¼
 class SelectionManager : public QObject {
     Q_OBJECT
 public:
     static SelectionManager& instance();
 
-    // Ìí¼Ó/ÒÆ³ı/Çå¿ÕÑ¡Çø
     void addToSelection(const std::shared_ptr<SvgElement>& elem);
 
     void removeFromSelection(const std::shared_ptr<SvgElement>& elem);

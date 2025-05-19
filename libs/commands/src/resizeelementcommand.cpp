@@ -1,1 +1,0 @@
-#include "resizeelementcommand.h"

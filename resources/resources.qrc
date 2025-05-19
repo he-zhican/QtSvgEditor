@@ -1,5 +1,6 @@
 <RCC>
     <qresource>
+        <file>icons/SVG.png</file>
         <file>icons/move.svg</file>
         <file>icons/freehand.svg</file>
         <file>icons/line.svg</file>
@@ -8,9 +9,14 @@
         <file>icons/pentagon.svg</file>
         <file>icons/hexagon.svg</file>
         <file>icons/star.svg</file>
+        <file>icons/trapezium.svg</file>
+        <file>icons/triangle.svg</file>
+        <file>icons/parallelogram.svg</file>
         <file>icons/text.svg</file>
         <file>icons/zoomout.svg</file>
         <file>icons/zoomin.svg</file>
+        <file>icons/pen.png</file>
+        <file>icons/zoom.png</file>
         <file>styles/style.qss</file>
     </qresource>
 </RCC>

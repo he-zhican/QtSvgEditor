@@ -1,22 +1,18 @@
 #include "canvascontroller.h"
 #include "ellipsetoolcontroller.h"
 #include "freehandtoolcontroller.h"
-#include "hexagontoolcontroller.h"
 #include "linetoolcontroller.h"
 #include "movetoolcontroller.h"
-#include "pentagontoolcontroller.h"
+#include "polygontoolcontroller.h"
 #include "recttoolcontroller.h"
-#include "startoolcontroller.h"
 #include "svgdocument.h"
 #include "texttoolcontroller.h"
-#include "zoomintoolcontroller.h"
-#include "zoomouttoolcontroller.h"
-#include <QDebug>
+#include "zoomtoolcontroller.h"
 
 CanvasController::CanvasController(QObject *parent) : QObject(parent)
 {
     initTools();
-    setCurrentTool(ToolId::Tool_Move);
+    setCurrentTool(ToolId::Move);
 }
 
 CanvasController::~CanvasController()
@@ -26,9 +22,8 @@ CanvasController::~CanvasController()
 void CanvasController::initTools()
 {
     m_tools << new MoveToolController(this) << new RectToolController(this) << new EllipseToolController(this)
-            << new LineToolController(this) << new PentagonToolController(this) << new HexagonToolController(this)
-            << new FreehandToolController(this) << new StarToolController(this) << new TextToolController(this)
-            << new ZoomOutToolController(this) << new ZoomInToolController(this);
+        << new LineToolController(this) << new PolygonToolController(this) << new FreehandToolController(this)
+        <<  new TextToolController(this) << new ZoomToolController(this);
 
     for (auto tool : m_tools)
     {
@@ -40,6 +35,7 @@ void CanvasController::setCurrentTool(ToolId toolId)
 {
     for (auto t : m_tools)
     {
+        t->setId(toolId); // 只有多边形和缩放工具实现了该函数
         if (t->id() == toolId)
         {
             m_currentTool = t;
@@ -86,12 +82,6 @@ void CanvasController::mouseReleaseEvent(QMouseEvent *event)
     {
         m_currentTool->onMouseRelease(event);
     }
-}
-
-void CanvasController::keyPressEvent(QKeyEvent *event)
-{
-    if (m_currentTool)
-        m_currentTool->onKeyPress(event);
 }
 
 void CanvasController::mouseDoubleClickEvent(QMouseEvent *event)

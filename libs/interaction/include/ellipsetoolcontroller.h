@@ -10,7 +10,7 @@ class EllipseToolController : public ToolController
     explicit EllipseToolController(QObject *parent);
     ToolId id() const override
     {
-        return ToolId::Tool_Ellipse;
+        return ToolId::Ellipse;
     }
 
     void onMousePress(QMouseEvent *event) override;

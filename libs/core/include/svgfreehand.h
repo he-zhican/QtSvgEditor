@@ -8,7 +8,9 @@ class SvgFreehand : public SvgElement {
 public:
     explicit SvgFreehand(QObject* parent = nullptr);
     QString tagName() const override { return "path"; }
-    void move(QPointF& offset) override;
+    void move(const QPointF& offset) override;
+    void resize(const Handle handle, const qreal dx, const qreal dy) override;
+    std::shared_ptr<SvgElement> clone() const override;
 
     QPainterPath path() const;
     void setPath(const QPainterPath& p);

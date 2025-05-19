@@ -1,11 +1,12 @@
 #include <QDomElement>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include"graphicssvgitem.h"
+#include "graphicssvgitem.h"
 #include "svgpolygon.h"
 #include "svgfreehand.h"
+#include "selectionmanager.h"
 #include <svgtext.h>
-#include <QDebug>
+#include <QGraphicsSceneHoverEvent>
 
 GraphicsSvgItem::GraphicsSvgItem(std::shared_ptr<SvgElement> element)
 	: m_element(element) {
@@ -13,7 +14,6 @@ GraphicsSvgItem::GraphicsSvgItem(std::shared_ptr<SvgElement> element)
 	updateGeometry();
 
 	setFlags(ItemIsSelectable | ItemIsMovable);
-
 	connect(m_element.get(), &SvgElement::attributeChanged, this, &GraphicsSvgItem::onAttributeChanged);
 }
 
@@ -58,7 +58,7 @@ void GraphicsSvgItem::paint(QPainter* painter,const QStyleOptionGraphicsItem* op
 	// 如果 item 被选中，就在外面套一层蓝色边框
 	if (option->state & QStyle::State_Selected) {
 		QPen selPen(Qt::blue);
-		selPen.setWidthF(1.0);
+		selPen.setWidthF(2.0);
 		selPen.setStyle(Qt::DashLine);
 		painter->setPen(selPen);
 		painter->setBrush(Qt::NoBrush);
@@ -78,16 +78,15 @@ void GraphicsSvgItem::onAttributeChanged(const QString& name, const QString& val
 		setOpacity(1.0);
 	}
 	Q_UNUSED(value)
-	//QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry",
-	//	"start-x", "start-y", "end-x", "end-y", "d"};
-	//if (geometryNames.contains(name)) {
-	//	updateGeometry();
-	//}
-	//else {
-	//	updateStyle();
-	//}
-	updateGeometry();
-	updateStyle();
+	QStringList geometryNames = {"x", "y", "width", "height", "x1", "y1", "x2", "y2", "rx", "ry","cx","cy",
+		"start-x", "start-y", "end-x", "end-y", "d"};
+	if (geometryNames.contains(name)) {
+		updateGeometry();
+	}
+	else {
+		updateStyle();
+	}
+
 	// 请求重绘
 	update();
 }
@@ -113,7 +112,7 @@ void GraphicsSvgItem::updateStyle()
 
 	if (m_element->hasAttribute("fill")) {
 		QString color = m_element->attribute("fill");
-		if (!color.isEmpty()) {
+		if (!color.isEmpty() && color != "none") {
 			m_brush.setColor(QColor(m_element->attribute("fill")));
 			m_brush.setStyle(Qt::SolidPattern);
 		}
@@ -126,11 +125,13 @@ void GraphicsSvgItem::updateStyle()
 	}
 
 	if (m_element->tagName() == "text") {
+		m_pen.setColor(QColor(m_element->attribute("fill")));
 		m_font.setBold(m_element->attribute("font-weight") == "bold");
 		m_font.setItalic(m_element->attribute("font-style") == "italic");
 		m_font.setUnderline(m_element->attribute("text-decoration") == "underline");
 		m_font.setPointSize(m_element->attribute("font-size").toInt());
 		m_font.setFamily(m_element->attribute("font-family"));
+		updateGeometry();
 	}
 }
 
@@ -186,4 +187,51 @@ void GraphicsSvgItem::updateGeometry()
 		m_boundingRect = path.boundingRect();
 	}
 	setPos(0, 0);
+}
+
+void GraphicsSvgItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+	// 未被选中，正常箭头鼠标
+	if (!isSelected()) {
+		setCursor(Qt::ArrowCursor);
+		return;
+	}
+
+	// 当选区有多个元素时，不能拉伸
+	if (SelectionManager::instance().selectedElements().size() > 1) {
+		setCursor(Qt::SizeAllCursor);
+		return;
+	}
+
+	// 文本，仅能移动
+	if (m_element->tagName() == "text") {
+		setCursor(Qt::SizeAllCursor);
+		return;
+	}
+
+	QPointF p = mapFromScene(event->scenePos());
+	QRectF r = boundingRect();
+	constexpr qreal MARGIN = 6; // 识别范围
+	// 四条边
+	bool atLeft = qAbs(p.x() - r.left()) < MARGIN;
+	bool atRight = qAbs(p.x() - r.right()) < MARGIN;
+	bool atTop = qAbs(p.y() - r.top()) < MARGIN;
+	bool atBottom = qAbs(p.y() - r.bottom()) < MARGIN;
+
+	if ((atLeft && atTop) || (atRight && atBottom)) {
+		setCursor(Qt::SizeFDiagCursor);
+	}
+	else if ((atLeft && atBottom) || (atRight && atTop)) {
+		setCursor(Qt::SizeBDiagCursor);
+	}
+	else if (atLeft || atRight) {
+		setCursor(Qt::SizeHorCursor);
+	}
+	else if (atTop || atBottom) {
+		setCursor(Qt::SizeVerCursor);
+	}
+	else {
+		setCursor(Qt::SizeAllCursor);
+	}
+	QGraphicsItem::hoverMoveEvent(event);
 }

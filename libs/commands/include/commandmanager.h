@@ -31,6 +31,10 @@ class COMMANDS_API CommandManager : public QObject
         return m_undoStack.canRedo();
     }
 
+    void clear() {
+        m_undoStack.clear();
+    }
+
   public slots:
     void undo()
     {

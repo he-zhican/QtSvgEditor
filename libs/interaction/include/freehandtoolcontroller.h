@@ -12,7 +12,7 @@ class FreehandToolController : public ToolController
     explicit FreehandToolController(QObject *parent = nullptr);
     ToolId id() const override
     {
-        return ToolId::Tool_Freehand;
+        return ToolId::Freehand;
     }
 
     void onMousePress(QMouseEvent *event) override;
@@ -21,8 +21,7 @@ class FreehandToolController : public ToolController
 
   private:
     QPainterPath m_path;
-    QGraphicsPathItem *m_previewItem = nullptr;
-    bool m_isMoved = false;
+    QGraphicsPathItem* m_previewItem = nullptr;
 };
 
 #endif // !FREEHANDTOOLCONTROLLER_H

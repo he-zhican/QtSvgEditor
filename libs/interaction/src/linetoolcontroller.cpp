@@ -1,7 +1,7 @@
 ﻿#include <QGraphicsView>
 #include"linetoolcontroller.h"
 #include "commandmanager.h"
-#include "addelementcommand.h"
+#include "addelementscommand.h"
 #include "svgline.h"
 
 LineToolController::LineToolController(QObject* parent) :ToolController(parent) {}
@@ -9,15 +9,14 @@ LineToolController::LineToolController(QObject* parent) :ToolController(parent) 
 void LineToolController::onMousePress(QMouseEvent* event)
 {
 	m_startPos = m_view->mapToScene(event->pos());
-	m_previewItem = m_view->scene()->addLine(QLineF(m_startPos, m_startPos), QPen(Qt::DashLine));
+	m_previewItem = m_view->scene()->addLine(QLineF(), QPen(Qt::DashLine));
 }
 
 void LineToolController::onMouseMove(QMouseEvent* event)
 {
 	if (!m_previewItem) return;
-	QPointF startPos = m_view->mapToScene(m_startPos.toPoint());
 	QPointF currentPos = m_view->mapToScene(event->pos());
-	m_previewItem->setLine(QLineF(startPos, currentPos));
+	m_previewItem->setLine(QLineF(m_startPos, currentPos));
 }
 
 void LineToolController::onMouseRelease(QMouseEvent* event)
@@ -41,6 +40,6 @@ void LineToolController::onMouseRelease(QMouseEvent* event)
 	lineElem->setX2(finalLine.x2());
 	lineElem->setY2(finalLine.y2());
 
-	auto addCmd = new AddElementCommand(m_document, lineElem);
+	auto addCmd = new AddElementsCommand(m_document, lineElem);
 	CommandManager::instance().execute(addCmd);
 }

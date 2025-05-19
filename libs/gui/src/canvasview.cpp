@@ -1,16 +1,22 @@
 ﻿#include "canvasview.h"
 #include "graphicssvgitem.h"
 #include "selectionmanager.h"
+#include "clipboard.h"
+#include "commandmanager.h"
+#include "deleteelementscommand.h"
+#include "ordercommand.h"
+#include "addelementscommand.h"
 #include <QTextCursor>
 #include <QScrollBar>
-#include <QDebug>
+#include <QMenu>
 
 CanvasView::CanvasView(QWidget* parent)
     : QGraphicsView(parent) {
 
     QGraphicsScene* scene = new QGraphicsScene(this);
-    //scene->setSceneRect(0, 0, 750, 500);
     setScene(scene);
+    // 设置控制器和文档
+    setController(new CanvasController(this));
     auto doc = std::make_shared<SvgDocument>();
     setDocument(doc);
 
@@ -18,7 +24,7 @@ CanvasView::CanvasView(QWidget* parent)
     setDragMode(QGraphicsView::RubberBandDrag);
     setMouseTracking(true);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    setMinimumSize(100, 60);
+    //setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     // 关闭 QGraphicsView 自带的滚动条
@@ -26,19 +32,124 @@ CanvasView::CanvasView(QWidget* parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // 在 CanvasView 构造函数里（或初始化时）：
-    connect(scene, &QGraphicsScene::selectionChanged, this, &CanvasView::onSceneSelectionChanged);
+    //connect(scene, &QGraphicsScene::selectionChanged, this, &CanvasView::onSceneSelectionChanged);
 
-    setController(new CanvasController(this));
+    initActions();
 }
 
 CanvasView::~CanvasView() {
-    //m_itemMap.clear();
+
+}
+
+void CanvasView::initActions()
+{
+    QAction* selectAllAct = new QAction(tr("全选"), this);
+    selectAllAct->setShortcut(QKeySequence::SelectAll);
+    connect(selectAllAct, &QAction::triggered, this, [=]() {
+        for (auto item : scene()->items()) {
+            item->setSelected(true);
+        }
+        onSceneSelectionChanged();
+        });
+    addAction(selectAllAct);
+
+    QAction* undoAction = new QAction(tr("撤销"), this);
+    undoAction->setShortcut(QKeySequence::Undo);
+    undoAction->setEnabled(CommandManager::instance().canUndo());
+    connect(&CommandManager::instance(), &CommandManager::canUndoChanged, undoAction, &QAction::setEnabled);
+    connect(undoAction, &QAction::triggered, &CommandManager::instance(), &CommandManager::undo);
+    addAction(undoAction);
+
+    QAction* redoAction = new QAction(tr("重做"), this);
+    redoAction->setShortcut(QKeySequence::Redo);
+    redoAction->setEnabled(CommandManager::instance().canRedo());
+    connect(&CommandManager::instance(), &CommandManager::canRedoChanged, redoAction, &QAction::setEnabled);
+    connect(redoAction, &QAction::triggered, &CommandManager::instance(), &CommandManager::redo);
+
+    addAction(redoAction);
+
+    QAction* cutAct = new QAction(tr("剪切"), this);
+    cutAct->setShortcut(QKeySequence::Cut);
+    connect(cutAct, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        Clipboard::instance().copyToClipboard(elems);  // 将当前选中元素放入剪切板
+        CommandManager::instance().execute(new DeleteElementsCommand(m_document, elems));
+        });
+    addAction(cutAct);
+
+    QAction* copyAct = new QAction(tr("复制"), this);
+    copyAct->setShortcut(QKeySequence::Copy);
+    connect(copyAct, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        Clipboard::instance().copyToClipboard(elems);  // 将当前选中元素放入剪切板
+        });
+    addAction(copyAct);
+
+    QAction* overWriteAct = new QAction(tr("复写"), this);
+    overWriteAct->setShortcut(QKeySequence(tr("Ctrl+D")));
+    connect(overWriteAct, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        QVector<std::shared_ptr<SvgElement>> colneElems;
+        for (auto elem : elems) {
+            colneElems.append(elem->clone());
+        }
+        CommandManager::instance().execute(new AddElementsCommand(m_document, colneElems)); // 添加元素
+        });
+    addAction(overWriteAct);
+
+    QAction* pasteAct = new QAction(tr("粘贴"), this);
+    pasteAct->setShortcut(QKeySequence::Paste);
+    pasteAct->setEnabled(!Clipboard::instance().elements().isEmpty());
+    connect(&Clipboard::instance(), &Clipboard::hasElements, pasteAct, &QAction::setEnabled);
+    connect(pasteAct, &QAction::triggered, this, [=]() {
+        CommandManager::instance().execute(new AddElementsCommand(m_document, Clipboard::instance().elements()));
+        });
+    addAction(pasteAct);
+
+    QAction* deleteAct = new QAction(tr("删除"), this);
+    deleteAct->setShortcut(QKeySequence::Delete);
+    connect(deleteAct, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        CommandManager::instance().execute(new DeleteElementsCommand(m_document, elems));
+        });
+    addAction(deleteAct);
+
+    QAction* toFront = new QAction(tr("置最前"), this);
+    toFront->setShortcut(QKeySequence(tr("Ctrl+Shift+Up")));
+    connect(toFront, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        CommandManager::instance().execute(new OrderCommand(m_document, elems, OrderCommand::ToFront));
+        });
+    addAction(toFront);
+
+    QAction* upLayer = new QAction(tr("置上一层"), this);
+    upLayer->setShortcut(QKeySequence(tr("Ctrl+Up")));
+    connect(upLayer, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        CommandManager::instance().execute(new OrderCommand(m_document, elems, OrderCommand::Up));
+        });
+    addAction(upLayer);
+
+    QAction* downLayer = new QAction(tr("置下一层"), this);
+    downLayer->setShortcut(QKeySequence(tr("Ctrl+Down")));
+    connect(downLayer, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        CommandManager::instance().execute(new OrderCommand(m_document, elems, OrderCommand::Down));
+        });
+    addAction(downLayer);
+
+    QAction* toBack = new QAction(tr("置最后"), this);
+    toBack->setShortcut(QKeySequence(tr("Ctrl+Shift+Down")));
+    connect(toBack, &QAction::triggered, this, [=]() {
+        auto elems = SelectionManager::instance().selectedElements();
+        CommandManager::instance().execute(new OrderCommand(m_document, elems, OrderCommand::ToBack));
+        });
+    addAction(toBack);
 }
 
 void CanvasView::setController(CanvasController* ctrl) {
+    if (!ctrl) return;
     m_controller = ctrl;
-    //connect(m_controller, &CanvasController::requestRepaint,
-    //    this, QOverload<>::of(&QWidget::update));
 
     connect(m_controller, &CanvasController::changeTool, this, &CanvasView::onChangeTool);
 
@@ -48,21 +159,28 @@ void CanvasView::setController(CanvasController* ctrl) {
 
 void CanvasView::setDocument(std::shared_ptr<SvgDocument> doc)
 {
+    if (!doc) return;
     m_document = doc;
+    // 一定要更新控制器里的文档，否则控制器画的元素依旧添加在原来的文档中
+    if(m_controller)
+        m_controller->setDocument(m_document);
     connect(m_document.get(), &SvgDocument::documentChanged, this, &CanvasView::onDocumentChanged);
-    connect(m_document.get(), &SvgDocument::addElementChanged, this, &CanvasView::onAddElementChanged);
-    connect(m_document.get(), &SvgDocument::removeElementChanged, this, &CanvasView::onRemoveElementChanged);
+    connect(m_document.get(), &SvgDocument::addElementsChanged, this, &CanvasView::onAddElementsChanged);
+    connect(m_document.get(), &SvgDocument::removeElementsChanged, this, &CanvasView::onRemoveElementsChanged);
     connect(m_document.get(), &SvgDocument::documentAttributeChanged, this, &CanvasView::onDocumentAttributeChanged);
-    onDocumentChanged();
 
     double w = m_document->canvasWidth();
     double h = m_document->canvasHeight();
+    double scale = m_document->scale();
     QString color = m_document->canvasFill();
 
-    scene()->setSceneRect(0, 0, w, h);
+    m_currentScale = scale;
 
-    setFixedSize(w, h);
+    scene()->setSceneRect(0, 0, w, h);
+    setFixedSize(w * scale, h * scale);
     setBackgroundBrush(QColor(color));
+
+    onDocumentChanged();
 }
 
 std::shared_ptr<SvgDocument> CanvasView::document()
@@ -79,34 +197,41 @@ void CanvasView::onDocumentChanged()
         scene()->addItem(item);
         m_itemMap[elem] = item;
     }
+    onSceneSelectionChanged();
 }
 
-void CanvasView::onAddElementChanged(std::shared_ptr<SvgElement> elem)
+void CanvasView::onAddElementsChanged(QVector<std::shared_ptr<SvgElement>> elems)
 {
-    GraphicsSvgItem* item = new GraphicsSvgItem(elem);
-    item->setSelected(true);
-    scene()->addItem(item);
-    m_itemMap[elem] = item;
+    // 先清除选区，将新添加的元素设置为选中状态
+    scene()->clearSelection();
+    for (auto elem : elems) {
+        GraphicsSvgItem* item = new GraphicsSvgItem(elem);
+        item->setSelected(true);
+        scene()->addItem(item);
+        m_itemMap[elem] = item;
+    }
+    onSceneSelectionChanged();
 }
 
-void CanvasView::onRemoveElementChanged(std::shared_ptr<SvgElement> elem)
+void CanvasView::onRemoveElementsChanged(QVector<std::shared_ptr<SvgElement>> elems)
 {
-    GraphicsSvgItem* item = m_itemMap[elem];
-    scene()->removeItem(item);
-    m_itemMap.remove(elem);
+    for (auto elem : elems) {
+        GraphicsSvgItem* item = m_itemMap[elem];
+        scene()->removeItem(item);
+        m_itemMap.remove(elem);
+    }
+    onSceneSelectionChanged();
 }
 
 void CanvasView::onDocumentAttributeChanged(const QString& name)
 {
     double w = m_document->canvasWidth();
     double h = m_document->canvasHeight();
+    double scale = m_document->scale();
 
-    // 1) 让场景知道新的画布范围
-    scene()->setSceneRect(0, 0, w, h);
+    m_currentScale = scale;
 
-    // 2) 把 CanvasView 的大小也同步到这个尺寸
-    //    这样因为 scrollArea.setWidgetResizable(false)，它就会自动出现滚动条
-    setFixedSize(w, h);
+    setFixedSize(w * scale, h * scale);
 
     if (name == "fill") {
         setBackgroundBrush(QColor(m_document->canvasFill()));
@@ -133,29 +258,49 @@ void CanvasView::onChangeTool()
 
 void CanvasView::onToolSelected(ToolId toolId) {
     m_toolId = toolId;
-    if (toolId == ToolId::Tool_Move) {
-        setDragMode(QGraphicsView::RubberBandDrag);
+    scene()->clearSelection();
+    onSceneSelectionChanged();
+    // 设置光标样式
+    if (m_toolId == ToolId::Move) {
+        viewport()->setCursor(Qt::ArrowCursor); // 正常箭头
     }
-    else {
-        setDragMode(QGraphicsView::NoDrag);
+    else if (m_toolId == ToolId::Freehand) {
+        QPixmap pm(":/icons/pen.png");
+        viewport()->setCursor(QCursor(pm, /*hotX=*/1, /*hotY=*/30));
     }
+    else if(m_toolId == ToolId::Text) {
+        viewport()->setCursor(Qt::IBeamCursor); // 文本输入光标
+    }
+    else if (m_toolId == ToolId::ZoomOut || m_toolId == ToolId::ZoomIn) {
+        QPixmap pm(":/icons/zoom.png");
+        viewport()->setCursor(QCursor(pm, /*hotX=*/15, /*hotY=*/15));
+    }
+    else
+        viewport()->setCursor(Qt::CrossCursor); // 十字光标
 
     m_controller->setCurrentTool(toolId);
+
+    bool isMoveTool = m_toolId == ToolId::Move;
+    for (auto* gi : scene()->items()) {
+        if (auto* svg = dynamic_cast<GraphicsSvgItem*>(gi)) {
+            gi->setAcceptHoverEvents(isMoveTool);
+            gi->setCursor(viewport()->cursor());
+        }
+    }
 }
 
 void CanvasView::mousePressEvent(QMouseEvent* event) {
 
-    if (m_toolId != ToolId::Tool_Move) {
-        // 设置其他图元为未选中状态
-        for (auto item : scene()->items()) {
-            item->setSelected(false);
-        }
+    if (m_toolId != ToolId::Move) {
         if (m_controller)
             m_controller->mousePressEvent(event);
         return;
     }
-
-    QGraphicsView::mousePressEvent(event);
+    // 在MOVE工具下才执行父类的点击事件
+    if(viewport()->cursor() == Qt::ArrowCursor || viewport()->cursor() == Qt::SizeAllCursor)
+        QGraphicsView::mousePressEvent(event);
+    // 更新选区
+    onSceneSelectionChanged();
 
     if (m_controller)
         m_controller->mousePressEvent(event);
@@ -169,17 +314,11 @@ void CanvasView::mouseMoveEvent(QMouseEvent* event) {
 
 void CanvasView::mouseReleaseEvent(QMouseEvent* event) {
     QGraphicsView::mouseReleaseEvent(event);
-
+    onSceneSelectionChanged();
     if (m_controller)
         m_controller->mouseReleaseEvent(event);
 }
 
-void CanvasView::keyPressEvent(QKeyEvent* event) {
-    QGraphicsView::keyPressEvent(event);
-    if (m_controller) m_controller->keyPressEvent(event);
-}
-
-// CanvasView.cpp (snippet)
 void CanvasView::wheelEvent(QWheelEvent* event) {
     // Ctrl+滚轮：缩放
     if (event->modifiers() & Qt::ControlModifier) {
@@ -195,9 +334,7 @@ void CanvasView::wheelEvent(QWheelEvent* event) {
 
         scale(deltaF, deltaF);
         m_currentScale = nextScale;
-
-        // 同步 CanvasView 大小到 sceneRect
-        resizeSceneToView();
+        m_document->setScale(m_currentScale);
 
         event->accept();
         return;
@@ -206,11 +343,9 @@ void CanvasView::wheelEvent(QWheelEvent* event) {
 
 void CanvasView::mouseDoubleClickEvent(QMouseEvent* event) {
 
-    if (m_toolId != ToolId::Tool_Move) {
+    if (m_toolId != ToolId::Move) {
         return;
     }
-
-    //QGraphicsView::mouseDoubleClickEvent(event);
 
     auto items = scene()->selectedItems();
     if (!items.isEmpty()) {
@@ -225,14 +360,40 @@ void CanvasView::mouseDoubleClickEvent(QMouseEvent* event) {
     if (m_controller) m_controller->mouseDoubleClickEvent(event);
 }
 
-void CanvasView::resizeSceneToView()
+void CanvasView::contextMenuEvent(QContextMenuEvent* ev)
 {
-    // 拿到未缩放前 scene 的大小
-    QRectF sr = scene()->sceneRect();
-    // 计算缩放后的矩形在父布局中占多大
-    QRectF mapped = transform().mapRect(sr);
-    QSize newSize = mapped.size().toSize();
+    QPointF scenePt = mapToScene(ev->pos());
+    QGraphicsItem* gi = scene()->itemAt(scenePt, transform());
 
-    // 强制把 widget 的大小设成这个值
-    setFixedSize(newSize);
+    QMenu menu(this);
+
+    menu.addAction(actions()[0]); // 全选
+    menu.addAction(actions()[1]); // 撤销
+    menu.addAction(actions()[2]); // 重做
+
+    // 如果点击到某个 GraphicsSvgItem，就把它选中（或切换选区）
+    if (auto* svg = dynamic_cast<GraphicsSvgItem*>(gi)) {
+        if (!svg->isSelected()) {
+            scene()->clearSelection();
+            svg->setSelected(true);
+        }
+        onSceneSelectionChanged();
+    }
+    else {
+        scene()->clearSelection();
+        onSceneSelectionChanged();
+        menu.addAction(actions()[6]); // 粘贴
+        menu.exec(ev->globalPos());
+        return;
+    }
+    menu.addSeparator();
+
+    for (int i = 3; i < actions().size(); ++i) {
+        menu.addAction(actions()[i]);
+        if(i == 7)
+            menu.addSeparator();
+    }
+
+    // 4) 最后执行菜单
+    menu.exec(ev->globalPos());
 }

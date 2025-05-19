@@ -1,4 +1,4 @@
-#ifndef SVGELLIPSE_H
+ï»¿#ifndef SVGELLIPSE_H
 #define SVGELLIPSE_H
 
 #include "svgelement.h"
@@ -7,12 +7,14 @@ class SvgEllipse : public SvgElement {
 public:
     explicit SvgEllipse(QObject* parent = nullptr);
     QString tagName() const override { return "ellipse"; }
-    void move(QPointF& offset) override;
+    void move(const QPointF& offset) override;
+    void resize(const Handle handle, const qreal dx, const qreal dy) override;
+    std::shared_ptr<SvgElement> clone() const override;
 
-    double centerX() const;  // ÖĞĞÄµãºá×ø±ê
-    double centerY() const;  // ÖĞĞÄµã×İ×ø±ê
-    double radiusX() const;  // xÖá·½ÏòµÄ°ë¾¶
-    double radiusY() const;  // yÖá·½ÏòµÄ°ë¾¶
+    double centerX() const;  // ä¸­å¿ƒç‚¹æ¨ªåæ ‡
+    double centerY() const;  // ä¸­å¿ƒç‚¹çºµåæ ‡
+    double radiusX() const;  // xè½´æ–¹å‘çš„åŠå¾„
+    double radiusY() const;  // yè½´æ–¹å‘çš„åŠå¾„
 
     void setCenterX(double v);
     void setCenterY(double v);

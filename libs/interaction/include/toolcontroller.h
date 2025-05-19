@@ -17,6 +17,7 @@ public:
 
     // 唯一标识，返回对应 ToolId
     virtual ToolId id() const = 0;
+    virtual void setId(ToolId tid) {}
 
     // 设置场景与文档
     void setView(QGraphicsView* s) { m_view = s; }
@@ -26,7 +27,6 @@ public:
     virtual void onMousePress(QMouseEvent* event) = 0;
     virtual void onMouseMove(QMouseEvent* event) = 0;
     virtual void onMouseRelease(QMouseEvent* event) = 0;
-    virtual void onKeyPress(QKeyEvent* event) { Q_UNUSED(event); }
     virtual void mouseDoubleClickEvent(QMouseEvent* event) {};
 
     // 画图时，判断终点坐标和起始坐标是否一样

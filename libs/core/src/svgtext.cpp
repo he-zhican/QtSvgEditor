@@ -3,8 +3,7 @@
 SvgText::SvgText(QObject* parent)
 	: SvgElement(parent) {
 	// 初始化时默认添加样式属性
-	setAttribute("stoke", "#000000");     // 字体颜色：黑色
-	//setAttribute("stroke-width", "2");    // 边框宽度：2像素
+	setAttribute("fill", "#000000");     // 字体颜色：黑色
 	setAttribute("font-weight", "normal");  // 粗体/正常
 	setAttribute("font-style", "normal");  // 斜体/正常
 	setAttribute("text-decoration", "none");  // 下划线/无
@@ -12,10 +11,19 @@ SvgText::SvgText(QObject* parent)
 	setAttribute("font-family", "Microsoft YaHei"); // 字体样式：默认微软雅黑
 }
 
-void SvgText::move(QPointF& offset)
+void SvgText::move(const QPointF& offset)
 {
 	setX(x() + offset.x());
 	setY(y() + offset.y());
+}
+
+std::shared_ptr<SvgElement> SvgText::clone() const
+{
+	auto copy = std::make_shared<SvgText>();
+	for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
+		copy->setAttribute(it.key(), it.value());
+	}
+	return copy;
 }
 
 double SvgText::x() const { return attribute("x").toDouble(); }

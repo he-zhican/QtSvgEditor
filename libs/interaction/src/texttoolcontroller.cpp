@@ -1,10 +1,9 @@
 ﻿#include "texttoolcontroller.h"
 #include "svgtext.h"
-#include "addelementcommand.h"
+#include "addelementscommand.h"
 #include "commandmanager.h"
 #include <QTextCursor>
 #include <QTextDocument>
-#include <QDebug>
 
 TextToolController::TextToolController(QObject* parent)
     : ToolController(parent) {
@@ -44,24 +43,21 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
     else {
         QString text = m_previewItem->toPlainText().trimmed();
         QPointF scenePos = m_previewItem->pos();
-        m_view->scene()->removeItem(m_previewItem);
 
         if (!text.isEmpty()) {
             auto textElem = std::make_shared<SvgText>();
             textElem->setText(text);
             textElem->setX(scenePos.x());
             textElem->setY(scenePos.y());
-            textElem->setFontFamily("Arial");
-            textElem->setFontSize(16);
 
             QRectF boundRect = m_previewItem->boundingRect();
 
-
-            auto cmd = new AddElementCommand(m_document, textElem);
+            auto cmd = new AddElementsCommand(m_document, textElem);
             CommandManager::instance().execute(cmd);
         }
 
         m_previewItem->removeEventFilter(this);
+        m_view->scene()->removeItem(m_previewItem);
         delete m_previewItem;
         m_previewItem = nullptr;
 
@@ -72,37 +68,41 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
 bool TextToolController::eventFilter(QObject* obj, QEvent* event)
 {
     if (auto* textItem = qobject_cast<QGraphicsTextItem*>(obj)) {
-        if (event->type() == QEvent::KeyPress) {
-            QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+        bool commit = false;
+        if (event->type() == QEvent::FocusOut) {
+            commit = true;
+        }
+        else if (event->type() == QEvent::KeyPress) {
+            auto* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
-
-                QString text = textItem->toPlainText().trimmed();
-                QPointF scenePos = textItem->pos();
-                m_view->scene()->removeItem(textItem);
-
-                if (!text.isEmpty()) {
-                    auto textElem = std::make_shared<SvgText>();
-                    textElem->setText(text);
-                    textElem->setX(scenePos.x());
-                    textElem->setY(scenePos.y());
-                    textElem->setFontFamily("Microsoft YaHei");
-                    textElem->setFontSize(16);
-
-                    QRectF boundRect = textItem->boundingRect();
-
-                    auto cmd = new AddElementCommand(m_document, textElem);
-                    CommandManager::instance().execute(cmd);
-                }
-
-                textItem->removeEventFilter(this);
-                delete textItem;
-                textItem = nullptr;
-                m_previewItem = nullptr;
-
-                emit endCurrentTool();
-
-                return true;
+                commit = true;
             }
+        }
+        if (commit) {
+            QString text = textItem->toPlainText().trimmed();
+            QPointF scenePos = textItem->pos();
+            
+            if (!text.isEmpty()) {
+                auto textElem = std::make_shared<SvgText>();
+                textElem->setText(text);
+                textElem->setX(scenePos.x());
+                textElem->setY(scenePos.y());
+
+                QRectF boundRect = textItem->boundingRect();
+
+                auto cmd = new AddElementsCommand(m_document, textElem);
+                CommandManager::instance().execute(cmd);
+            }
+
+            textItem->removeEventFilter(this);
+            m_view->scene()->removeItem(textItem);
+            delete textItem;
+            textItem = nullptr;
+            m_previewItem = nullptr;
+
+            emit endCurrentTool();
+
+            return true;
         }
     }
     return ToolController::eventFilter(obj, event);

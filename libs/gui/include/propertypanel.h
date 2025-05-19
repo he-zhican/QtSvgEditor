@@ -21,6 +21,8 @@ class PropertyPanel : public QWidget
   public:
     explicit PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget *parent = nullptr);
 
+    void setDocument(std::shared_ptr<SvgDocument> doc);
+
   private slots:
     void onSelectionChanged(const QVector<std::shared_ptr<SvgElement>> &sel);
 

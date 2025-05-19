@@ -1,4 +1,4 @@
-#ifndef SVGDOCUMENT_H
+﻿#ifndef SVGDOCUMENT_H
 #define SVGDOCUMENT_H
 
 #include <QObject>
@@ -19,40 +19,36 @@ class SvgDocument : public QObject
     bool loadFromFile(const QString &filePath);
     bool saveToFile(const QString &filePath) const;
 
-    void addElement(std::shared_ptr<SvgElement> elem);
-    void removeElement(std::shared_ptr<SvgElement> elem);
+    void addElements(QVector<std::shared_ptr<SvgElement>> elems);
+    void removeElements(QVector<std::shared_ptr<SvgElement>> elems);
     QVector<std::shared_ptr<SvgElement>> elements() const;
-    int elementCount() const
-    {
-        return m_elements.size();
-    }
+    void restoreOrder(const QVector<std::shared_ptr<SvgElement>>& newOrder);
+    void reset();
+    
+    int elementCount() const;
 
-    double canvasWidth() const
-    {
-        return m_canvasWidth;
-    }
-    double canvasHeight() const
-    {
-        return m_canvasHeight;
-    }
-    QString canvasFill() const
-    {
-        return m_canvasFill;
-    }
+    double canvasWidth() const;
+    double canvasHeight() const;
+    double scale() const;
+    QString canvasFill() const;
     void setCanvasWidth(const double width);
     void setCanvasHeight(const double height);
+    void setScale(const double scale);
     void setCanvasFillColor(const QString &fill);
+
+    void moveZ(const QVector<std::shared_ptr<SvgElement>>& elems, int delta);
 
   signals:
     void documentChanged();
     void documentAttributeChanged(const QString &name);
-    void addElementChanged(std::shared_ptr<SvgElement> elem);
-    void removeElementChanged(std::shared_ptr<SvgElement> elem);
+    void addElementsChanged(QVector<std::shared_ptr<SvgElement>> elems);
+    void removeElementsChanged(QVector<std::shared_ptr<SvgElement>> elems);
 
   private:
     QVector<std::shared_ptr<SvgElement>> m_elements;
-    double m_canvasWidth = 750;
-    double m_canvasHeight = 500;
+    double m_canvasWidth = 750.0;
+    double m_canvasHeight = 500.0;
+    double m_scale = 1.0;
     QString m_canvasFill = "white";
 };
 

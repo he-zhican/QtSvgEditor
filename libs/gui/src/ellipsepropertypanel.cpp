@@ -6,7 +6,6 @@
 #include <QIntValidator>
 #include <QColorDialog>
 #include <QSignalBlocker>
-#include <QDebug>
 
 EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
     : QWidget(parent)
@@ -32,7 +31,7 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
 
     // Rx
     m_rxEdit = new QLineEdit(this);
-    m_rxEdit->setValidator(new QIntValidator(1, 1000, m_rxEdit));
+    m_rxEdit->setValidator(new QIntValidator(1, 2000, m_rxEdit));
     m_rxEdit->setAlignment(Qt::AlignHCenter);
     connect(m_rxEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onRxChanged(toInt(t)); });
     names << tr("半径X");
@@ -40,7 +39,7 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
 
     // Ry
     m_ryEdit = new QLineEdit(this);
-    m_ryEdit->setValidator(new QIntValidator(1, 500, m_ryEdit));
+    m_ryEdit->setValidator(new QIntValidator(1, 1000, m_ryEdit));
     m_ryEdit->setAlignment(Qt::AlignHCenter);
     connect(m_ryEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onRyChanged(toInt(t)); });
     names << tr("半径Y");
@@ -100,11 +99,9 @@ void EllipsePropertyPanel::updateControls()
         b7(m_strokeColorBtn), b8(m_fillColorBtn);
 
     int cx = static_cast<int>(m_element->attribute("cx").toDouble());
-    int cy = static_cast<int>(m_element->attribute("cy").toInt());
-    int rx = static_cast<int>(m_element->attribute("rx").toInt());
-    int ry = static_cast<int>(m_element->attribute("ry").toInt());
-
-    qDebug() << cx << "," << cy << "," << rx << "," << ry;
+    int cy = static_cast<int>(m_element->attribute("cy").toDouble());
+    int rx = static_cast<int>(m_element->attribute("rx").toDouble());
+    int ry = static_cast<int>(m_element->attribute("ry").toDouble());
 
     // start-x, start-y
     m_xEdit->setText(QString::number(cx - rx));
@@ -137,7 +134,6 @@ void EllipsePropertyPanel::updateControls()
 }
 
 // ---- slots ----
-
 void EllipsePropertyPanel::onXChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "cx", QString::number(v + m_element->attribute("rx").toDouble()));
     CommandManager::instance().execute(cmd);

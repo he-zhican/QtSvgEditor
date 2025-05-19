@@ -1,18 +1,55 @@
-#include"svgellipse.h"
+ï»¿#include"svgellipse.h"
+//#include <QtMath>
+#include <QRectF>
 
 SvgEllipse::SvgEllipse(QObject* parent) : SvgElement(parent) {
-	// ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-	setAttribute("stroke", "#000000");     // ±ß¿òÑÕÉ«£ººÚÉ«
-	setAttribute("stroke-width", "2");    // ±ß¿ò¿í¶È£º2ÏñËØ
-	setAttribute("fill", "#ffffff");      // Ìî³äÑÕÉ«£º°×É«
+	// åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+	setAttribute("stroke", "#000000");     // è¾¹æ¡†é¢œè‰²ï¼šé»‘è‰²
+	setAttribute("stroke-width", "2");    // è¾¹æ¡†å®½åº¦ï¼š2åƒç´ 
+	setAttribute("fill", "#ffffff");      // å¡«å……é¢œè‰²ï¼šç™½è‰²
 	//setAttribute("fill", "none");
-	setAttribute("stroke-dasharray", ""); // ±ß¿òÑùÊ½
+	setAttribute("stroke-dasharray", ""); // è¾¹æ¡†æ ·å¼
 }
 
-void SvgEllipse::move(QPointF& offset)
+void SvgEllipse::move(const QPointF& offset)
 {
 	setCenterX(centerX() + offset.x());
 	setCenterY(centerY() + offset.y());
+}
+
+void SvgEllipse::resize(const Handle handle, const qreal dx, const qreal dy)
+{
+    QRectF r(centerX() - radiusX(), centerY() - radiusY(),
+        radiusX() * 2, radiusY() * 2);
+
+    switch (handle) {
+    case Handle::Left:      r.setLeft(r.left() + dx); break;
+    case Handle::Right:     r.setRight(r.right() + dx); break;
+    case Handle::Top:       r.setTop(r.top() + dy); break;
+    case Handle::Bottom:    r.setBottom(r.bottom() + dy); break;
+    case Handle::TopLeft:   r.setLeft(r.left() + dx); r.setTop(r.top() + dy); break;
+    case Handle::TopRight:  r.setRight(r.right() + dx); r.setTop(r.top() + dy); break;
+    case Handle::BottomLeft:r.setLeft(r.left() + dx); r.setBottom(r.bottom() + dy); break;
+    case Handle::BottomRight:r.setRight(r.right() + dx); r.setBottom(r.bottom() + dy); break;
+    default: return;
+    }
+    r = r.normalized();
+    if (r.width() < 1) r.setWidth(1);
+    if (r.height() < 1)r.setHeight(1);
+
+    setCenterX(r.center().x());
+    setCenterY(r.center().y());
+    setRadiusX(r.width() * 0.5);
+    setRadiusY(r.height() * 0.5);
+}
+
+std::shared_ptr<SvgElement> SvgEllipse::clone() const 
+{
+    auto copy = std::make_shared<SvgEllipse>();
+    for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
+        copy->setAttribute(it.key(), it.value());
+    }
+    return copy;
 }
 
 double SvgEllipse::centerX() const { return attribute("cx").toDouble(); }

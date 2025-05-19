@@ -61,7 +61,7 @@ PathPropertyPanel::PathPropertyPanel(QWidget* parent)
     editors << m_fillColorBtn;
 
     // 构建面板
-    PropertyPanelFactory::makePropertyPanel(this, tr("路径"), names, editors);
+    PropertyPanelFactory::makePropertyPanel(this, tr("多边形/路径"), names, editors);
 }
 
 void PathPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem)

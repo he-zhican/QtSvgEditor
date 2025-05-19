@@ -11,7 +11,9 @@ class SvgLine : public SvgElement
     {
         return "line";
     }
-    void move(QPointF &offset) override;
+    void move(const QPointF& offset) override;
+    void resize(const Handle handle, const qreal dx, const qreal dy) override;
+    std::shared_ptr<SvgElement> clone() const override;
 
     double x1() const;
     double y1() const;

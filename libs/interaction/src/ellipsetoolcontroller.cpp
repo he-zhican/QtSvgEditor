@@ -1,7 +1,7 @@
 #include <QGraphicsView>
 #include"ellipsetoolcontroller.h"
 #include "commandmanager.h"
-#include "addelementcommand.h"
+#include "addelementscommand.h"
 #include "svgellipse.h"
 
 EllipseToolController::EllipseToolController(QObject* parent)
@@ -42,6 +42,6 @@ void EllipseToolController::onMouseRelease(QMouseEvent* event)
 	ellipseElem->setRadiusX(finalRect.width() * 0.5);
 	ellipseElem->setRadiusY(finalRect.height() * 0.5);
 
-	auto addCmd = new AddElementCommand(m_document, ellipseElem);
+	auto addCmd = new AddElementsCommand(m_document, ellipseElem);
 	CommandManager::instance().execute(addCmd);
 }

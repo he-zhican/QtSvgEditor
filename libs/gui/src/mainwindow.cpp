@@ -1,15 +1,14 @@
 ﻿#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "commandmanager.h"
-#include <QMessageBox>
+#include "ui_mainwindow.h"
 #include <QFileDialog>
+#include <QGraphicsSvgItem>
 #include <QImage>
+#include <QMessageBox>
 #include <QPainter>
 #include <QSettings>
-#include <QGraphicsSvgItem>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     connect(ui->sideToolBar, &SideToolBar::toolSelected, ui->canvasView, &CanvasView::onToolSelected);
     connect(this, &MainWindow::loadFile, ui->sideToolBar, &SideToolBar::onLoadFile);
@@ -30,14 +29,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     loadSettings();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
 // 加载注册表中的本地配置
-void MainWindow::loadSettings()
-{
+void MainWindow::loadSettings() {
     QSettings settings;
     // 窗口位置和大小
     restoreGeometry(settings.value("MainWindow/Geometry").toByteArray());
@@ -54,8 +51,7 @@ void MainWindow::loadSettings()
 }
 
 // 保存配置到本地注册表
-void MainWindow::closeEvent(QCloseEvent* ev)
-{
+void MainWindow::closeEvent(QCloseEvent* ev) {
     QSettings settings;
     // 窗口位置和大小
     settings.setValue("MainWindow/Geometry", saveGeometry());
@@ -70,8 +66,7 @@ void MainWindow::closeEvent(QCloseEvent* ev)
     QMainWindow::closeEvent(ev);
 }
 
-void MainWindow::onNewFileActTriggered()
-{
+void MainWindow::onNewFileActTriggered() {
     auto doc = ui->canvasView->document();
     if (doc->elementCount() > 0) {
         auto ret = QMessageBox::warning(
@@ -79,8 +74,7 @@ void MainWindow::onNewFileActTriggered()
             tr("新建画布"),
             tr("新建画布会清除所有记录，操作不可逆！\n确定要继续吗？"),
             QMessageBox::Yes | QMessageBox::No,
-            QMessageBox::No
-        );
+            QMessageBox::No);
         if (ret != QMessageBox::Yes)
             return;
     }
@@ -89,23 +83,21 @@ void MainWindow::onNewFileActTriggered()
     m_filePath.clear();
 }
 
-void MainWindow::onOpenFileActTriggered()
-{
+void MainWindow::onOpenFileActTriggered() {
     QString path = QFileDialog::getOpenFileName(
         this,
         tr("打开 SVG 文件"),
         QString(),
-        tr("SVG Files (*.svg)")
-    );
-    if (path.isEmpty()) return;
+        tr("SVG Files (*.svg)"));
+    if (path.isEmpty())
+        return;
 
     auto doc = ui->canvasView->document();
     if (doc->loadFromFile(path)) {
         m_filePath = path;
         CommandManager::instance().clear();
         emit loadFile(true);
-    }
-    else {
+    } else {
         // 清空现有场景
         auto* scene = ui->canvasView->scene();
         doc->reset();
@@ -126,17 +118,16 @@ void MainWindow::onOpenFileActTriggered()
     }
 }
 
-void MainWindow::onSaveFileActTriggered()
-{
+void MainWindow::onSaveFileActTriggered() {
     auto doc = ui->canvasView->document();
     if (m_filePath.isEmpty()) {
         QString path = QFileDialog::getSaveFileName(
             this,
             tr("保存 SVG 文件"),
             QString(),
-            tr("SVG Files (*.svg)")
-        );
-        if (path.isEmpty()) return;
+            tr("SVG Files (*.svg)"));
+        if (path.isEmpty())
+            return;
         if (!path.endsWith(".svg", Qt::CaseInsensitive))
             path += ".svg";
 
@@ -148,16 +139,15 @@ void MainWindow::onSaveFileActTriggered()
     }
 }
 
-void MainWindow::onToPNGActTriggered()
-{
+void MainWindow::onToPNGActTriggered() {
     // 先让用户选路径
     QString path = QFileDialog::getSaveFileName(
         this,
         tr("导出为 PNG"),
         QString(),
-        tr("PNG Files (*.png)")
-    );
-    if (path.isEmpty()) return;
+        tr("PNG Files (*.png)"));
+    if (path.isEmpty())
+        return;
     if (!path.endsWith(".png", Qt::CaseInsensitive))
         path += ".png";
     auto doc = ui->canvasView->document();

@@ -1,17 +1,17 @@
-#include "sidetoolbar.h"
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QToolTip>
+﻿#include "sidetoolbar.h"
+#include <QAction>
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHoverEvent>
-#include <QAction>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QNetworkReply>
+#include <QToolTip>
 
 SideToolBar::SideToolBar(QWidget* parent)
     : QToolBar(parent), m_actionGroup(new QActionGroup(this)), m_networkAM(new QNetworkAccessManager(this)) {
-    m_actionGroup->setExclusive(true);    // 仅能单选
+    m_actionGroup->setExclusive(true); // 仅能单选
     this->setMovable(false);
     this->setOrientation(Qt::Vertical);
     initTools();
@@ -21,34 +21,38 @@ SideToolBar::SideToolBar(QWidget* parent)
 }
 
 SideToolBar::~SideToolBar() {
-
 }
 
-void SideToolBar::onLoadFile(bool enable)
-{
+void SideToolBar::onLoadFile(bool enable) {
     // 设置除 移动工具和缩放工具 之外的所有工具的可用状态
     auto actions = m_actionGroup->actions();
     for (int i = 1; i < actions.size() - 2; ++i) {
         actions[i]->setVisible(enable);
     }
+    // 返回到移动工具
+    actions.first()->trigger();
 }
 
 void SideToolBar::initTools() {
-    struct ToolInfo { ToolId id; const char* icon; const char* text; } tools[] = {
-        {ToolId::Move,     ":/icons/move.svg",      "Move"},
-        {ToolId::Freehand, ":/icons/freehand.svg",  "Freehand"},
-        {ToolId::Line,     ":/icons/line.svg",      "Line"},
-        {ToolId::Ellipse,  ":/icons/ellipse.svg",   "Ellipse"},
-        {ToolId::Triangle, ":/icons/triangle.svg",  "Triangle"},
-        {ToolId::Rectangle,    ":/icons/rect.svg",      "Rectangle"},
-        {ToolId::Parallelogram,":/icons/parallelogram.svg",      "Parallelogram"},
-        {ToolId::Trapezium,    ":/icons/trapezium.svg", "Trapezium"},
-        {ToolId::Pentagon,     ":/icons/pentagon.svg",  "pentagon"},
-        {ToolId::Hexagon,      ":/icons/hexagon.svg",   "hexagon"},
-        {ToolId::Star,         ":/icons/star.svg",      "Star"},
-        {ToolId::Text,         ":/icons/text.svg",      "Text"},
-        {ToolId::ZoomOut,     ":/icons/zoomout.svg",   "Zoom Out"},
-        {ToolId::ZoomIn,      ":/icons/zoomin.svg",    "Zoom In"},
+    struct ToolInfo {
+        ToolId id;
+        const char* icon;
+        const char* text;
+    } tools[] = {
+        {ToolId::Move, ":/icons/move.svg", "Move"},
+        {ToolId::Freehand, ":/icons/freehand.svg", "Freehand"},
+        {ToolId::Line, ":/icons/line.svg", "Line"},
+        {ToolId::Ellipse, ":/icons/ellipse.svg", "Ellipse"},
+        {ToolId::Triangle, ":/icons/triangle.svg", "Triangle"},
+        {ToolId::Rectangle, ":/icons/rect.svg", "Rectangle"},
+        {ToolId::Parallelogram, ":/icons/parallelogram.svg", "Parallelogram"},
+        {ToolId::Trapezium, ":/icons/trapezium.svg", "Trapezium"},
+        {ToolId::Pentagon, ":/icons/pentagon.svg", "pentagon"},
+        {ToolId::Hexagon, ":/icons/hexagon.svg", "hexagon"},
+        {ToolId::Star, ":/icons/star.svg", "Star"},
+        {ToolId::Text, ":/icons/text.svg", "Text"},
+        {ToolId::ZoomOut, ":/icons/zoomout.svg", "Zoom Out"},
+        {ToolId::ZoomIn, ":/icons/zoomin.svg", "Zoom In"},
     };
 
     for (auto& info : tools) {
@@ -63,15 +67,14 @@ void SideToolBar::initTools() {
         connect(act, &QAction::triggered, this, [this, act] {
             ToolId id = static_cast<ToolId>(act->data().toInt());
             emit toolSelected(id);
-            });
+        });
     }
 
     // 默认选中移动工具
     m_actionGroup->actions().first()->trigger();
 }
 
-void SideToolBar::fetchToolTips()
-{
+void SideToolBar::fetchToolTips() {
     // 向服务器拉取JSON
     QNetworkRequest req(QUrl("https://m1.apifoxmock.com/m1/6237106-5930859-default/app/buttontips"));
     m_networkAM->get(req);
@@ -86,36 +89,37 @@ void SideToolBar::onTipsReply(QNetworkReply* reply) {
     reply->deleteLater();
 
     auto doc = QJsonDocument::fromJson(bytes);
-    if (!doc.isObject()) return;
+    if (!doc.isObject())
+        return;
     auto root = doc.object();
 
     // JSON key 到 ToolId 的映射
     const QMap<QString, ToolId> key2id = {
-        { "selectionbutton",        ToolId::Move       },
-        { "freehandlinedrawbutton", ToolId::Freehand   },
-        { "linedrawbutton",         ToolId::Line       },
-        { "rectdrawbutton",         ToolId::Rectangle  },
-        { "pentagondrawbutton",     ToolId::Pentagon   },
-        { "stardrawbutton",         ToolId::Star       },
-        { "zoominbutton",           ToolId::ZoomIn     },
-        { "zoomoutbutton",          ToolId::ZoomOut    },
-        { "textdrawbutton",         ToolId::Text       }
-    };
+        {"selectionbutton", ToolId::Move},
+        {"freehandlinedrawbutton", ToolId::Freehand},
+        {"linedrawbutton", ToolId::Line},
+        {"rectdrawbutton", ToolId::Rectangle},
+        {"pentagondrawbutton", ToolId::Pentagon},
+        {"stardrawbutton", ToolId::Star},
+        {"zoominbutton", ToolId::ZoomIn},
+        {"zoomoutbutton", ToolId::ZoomOut},
+        {"textdrawbutton", ToolId::Text}};
 
-    QMap<ToolId, QString> toolTipHtml;  // 存放从服务器获取到的HTML提示
+    QMap<ToolId, QString> toolTipHtml; // 存放从服务器获取到的HTML提示
 
     // 遍历 JSON，为每个 action 准备 HTML
     for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
         QString key = it.key();
-        if (!key2id.contains(key)) continue;
+        if (!key2id.contains(key))
+            continue;
         ToolId tid = key2id.value(key);
         auto obj = it.value().toObject();
         QString title = obj.value("title").toString();
         QString text = obj.value("text").toString();
         // 组合成 HTML
         QString html = QString("<b>%1</b><br>%2")
-            .arg(title.toHtmlEscaped())
-            .arg(text.toHtmlEscaped());
+                           .arg(title.toHtmlEscaped())
+                           .arg(text.toHtmlEscaped());
         toolTipHtml[tid] = html;
     }
 

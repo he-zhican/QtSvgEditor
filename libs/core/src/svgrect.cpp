@@ -1,21 +1,19 @@
-#include "svgrect.h"
+ï»¿#include "svgrect.h"
 
 SvgRect::SvgRect(QObject* parent) : SvgElement(parent) {
-	// ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-	setAttribute("stroke", "#000000");     // ±ß¿òÑÕÉ«£ººÚÉ«
-	setAttribute("stroke-width", "2");    // ±ß¿ò¿í¶È£º2ÏñËØ
-	setAttribute("fill", "#ffffff");      // Ìî³äÑÕÉ«£º°×É«
-	setAttribute("stroke-dasharray", ""); // ±ß¿òÑùÊ½
+    // åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+    setAttribute("stroke", "#000000");    // è¾¹æ¡†é¢œè‰²ï¼šé»‘è‰²
+    setAttribute("stroke-width", "2");    // è¾¹æ¡†å®½åº¦ï¼š2åƒç´ 
+    setAttribute("fill", "#ffffff");      // å¡«å……é¢œè‰²ï¼šç™½è‰²
+    setAttribute("stroke-dasharray", ""); // è¾¹æ¡†æ ·å¼
 }
 
-void SvgRect::move(const QPointF& offset)
-{
-	setX(x() + offset.x());
-	setY(y() + offset.y());
+void SvgRect::move(const QPointF& offset) {
+    setX(x() + offset.x());
+    setY(y() + offset.y());
 }
 
-void SvgRect::resize(const Handle handle, const qreal dx, const qreal dy)
-{
+void SvgRect::resize(const Handle handle, const qreal dx, const qreal dy) {
     qreal qx = x();
     qreal qy = y();
     qreal w = width();
@@ -26,55 +24,46 @@ void SvgRect::resize(const Handle handle, const qreal dx, const qreal dy)
         qx += dx;
         w -= dx;
         break;
-
     case Handle::Right:
         w += dx;
         break;
-
     case Handle::Top:
         qy += dy;
         h -= dy;
         break;
-
     case Handle::Bottom:
         h += dy;
         break;
-
     case Handle::TopLeft:
         qx += dx;
         w -= dx;
         qy += dy;
         h -= dy;
         break;
-
     case Handle::TopRight:
-        // ±£³ÖÓÒ±ß²»¶¯£¬¸Ä±ä¿í¶È£»±£³ÖÉÏ±ßÊÖ±ú
+        // ä¿æŒå³è¾¹ä¸åŠ¨ï¼Œæ”¹å˜å®½åº¦ï¼›ä¿æŒä¸Šè¾¹æ‰‹æŸ„
         w += dx;
         qy += dy;
         h -= dy;
         break;
-
     case Handle::BottomLeft:
         qx += dx;
         w -= dx;
-        // ±£³Öµ×±ß²»¶¯£¬¸ß¶ÈÔö¼õÓÉ h ´¦Àí
+        // ä¿æŒåº•è¾¹ä¸åŠ¨ï¼Œé«˜åº¦å¢å‡ç”± h å¤„ç†
         h += dy;
         break;
-
     case Handle::BottomRight:
-        // µ×ÓÒ½Ç£¬¿í¸ßÍ¬Ê±Ôö¼õ
+        // åº•å³è§’ï¼Œå®½é«˜åŒæ—¶å¢å‡
         w += dx;
         h += dy;
         break;
-
     default:
-        // None »òÎ´´¦ÀíµÄ£¬²»×ö±ä»¯
         return;
     }
 
-    // Ç¿ÖÆ×îĞ¡³ß´çÎª 1 ÏñËØ£¨»ò¸ù¾İĞèÇó¸Ä³É¸ü´ó£©
+    // å¼ºåˆ¶æœ€å°å°ºå¯¸ä¸º 1 åƒç´ ï¼ˆæˆ–æ ¹æ®éœ€æ±‚æ”¹æˆæ›´å¤§ï¼‰
     if (w < 1.0) {
-        // Èç¹û¿í¶È±»Ëõµ½ <0£¬ĞèÒªĞŞÕı x
+        // å¦‚æœå®½åº¦è¢«ç¼©åˆ° <0ï¼Œéœ€è¦ä¿®æ­£ x
         if (handle == Handle::Left || handle == Handle::TopLeft || handle == Handle::BottomLeft) {
             qx -= (1.0 - w);
         }
@@ -87,15 +76,13 @@ void SvgRect::resize(const Handle handle, const qreal dx, const qreal dy)
         h = 1.0;
     }
 
-    // Ó¦ÓÃ»ØÄ£ĞÍÊôĞÔ
     setX(qx);
     setY(qy);
     setWidth(w);
     setHeight(h);
 }
 
-std::shared_ptr<SvgElement> SvgRect::clone() const
-{
+std::shared_ptr<SvgElement> SvgRect::clone() const {
     auto copy = std::make_shared<SvgRect>();
     for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
         copy->setAttribute(it.key(), it.value());
@@ -120,9 +107,9 @@ double SvgRect::height() const { return attribute("height").toDouble(); }
 void SvgRect::setHeight(double v) { setAttribute("height", QString::number(v)); }
 
 QDomElement SvgRect::toXml(QDomDocument& doc) const {
-	return SvgElement::toXml(doc);
+    return SvgElement::toXml(doc);
 }
 
 void SvgRect::fromXml(const QDomElement& elem) {
-	SvgElement::fromXml(elem);
+    SvgElement::fromXml(elem);
 }

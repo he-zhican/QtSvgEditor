@@ -1,23 +1,21 @@
-#include "svgline.h"
+ï»¿#include "svgline.h"
 #include <QLineF>
 
 SvgLine::SvgLine(QObject* parent) : SvgElement(parent) {
-	// ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-	setAttribute("stroke", "#000000");     // ±ß¿òÑÕÉ«£ººÚÉ«
-	setAttribute("stroke-width", "2");    // ±ß¿ò¿í¶È£º2ÏñËØ
-	setAttribute("stroke-dasharray", ""); // ±ß¿òÑùÊ½
+    // åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+    setAttribute("stroke", "#000000");    // è¾¹æ¡†é¢œè‰²ï¼šé»‘è‰²
+    setAttribute("stroke-width", "2");    // è¾¹æ¡†å®½åº¦ï¼š2åƒç´ 
+    setAttribute("stroke-dasharray", ""); // è¾¹æ¡†æ ·å¼
 }
 
-void SvgLine::move(const QPointF& offset)
-{
-	setX1(x1() + offset.x());
-	setY1(y1() + offset.y());
-	setX2(x2() + offset.x());
-	setY2(y2() + offset.y());
+void SvgLine::move(const QPointF& offset) {
+    setX1(x1() + offset.x());
+    setY1(y1() + offset.y());
+    setX2(x2() + offset.x());
+    setY2(y2() + offset.y());
 }
 
-void SvgLine::resize(const Handle handle, const qreal dx, const qreal dy)
-{
+void SvgLine::resize(const Handle handle, const qreal dx, const qreal dy) {
     double nx1 = x1(), ny1 = y1();
     double nx2 = x2(), ny2 = y2();
 
@@ -54,22 +52,21 @@ void SvgLine::resize(const Handle handle, const qreal dx, const qreal dy)
         return;
     }
 
-    // ¿ÉÑ¡£º±£Ö¤ÏßÉÏÁ½µã²»ÖØºÏ£¬×îĞ¡¾àÀë e.g. 1px
+    // å¯é€‰ï¼šä¿è¯çº¿ä¸Šä¸¤ç‚¹ä¸é‡åˆï¼Œæœ€å°è·ç¦» e.g. 1px
     const double minDist = 1.0;
     if (QLineF(QPointF(nx1, ny1), QPointF(nx2, ny2)).length() < minDist) {
-        // Èç¹û¾àÀëÌ«Ğ¡£¬·ÅÆú±¾´Îµ÷Õû
+        // å¦‚æœè·ç¦»å¤ªå°ï¼Œæ”¾å¼ƒæœ¬æ¬¡è°ƒæ•´
         return;
     }
 
-    // Ó¦ÓÃ»ØÊôĞÔ
+    // åº”ç”¨å›å±æ€§
     setX1(nx1);
     setY1(ny1);
     setX2(nx2);
     setY2(ny2);
 }
 
-std::shared_ptr<SvgElement> SvgLine::clone() const
-{
+std::shared_ptr<SvgElement> SvgLine::clone() const {
     auto copy = std::make_shared<SvgLine>();
     for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
         copy->setAttribute(it.key(), it.value());
@@ -94,9 +91,9 @@ void SvgLine::setX2(double v) { setAttribute("x2", QString::number(v)); }
 void SvgLine::setY2(double v) { setAttribute("y2", QString::number(v)); }
 
 QDomElement SvgLine::toXml(QDomDocument& doc) const {
-	return SvgElement::toXml(doc);
+    return SvgElement::toXml(doc);
 }
 
 void SvgLine::fromXml(const QDomElement& elem) {
-	SvgElement::fromXml(elem);
+    SvgElement::fromXml(elem);
 }

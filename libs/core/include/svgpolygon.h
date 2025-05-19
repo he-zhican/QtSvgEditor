@@ -1,14 +1,18 @@
 ﻿#ifndef SVGPOLYGON_H
 #define SVGPOLYGON_H
 
-#include <Qvector>
-#include <QPointF>
 #include "svgelement.h"
+#include <QPointF>
+#include <Qvector>
 
 class SvgPolygon : public SvgElement {
 public:
     explicit SvgPolygon(QObject* parent = nullptr);
-    QString tagName() const override { return "polygon"; }
+
+    QString tagName() const override {
+        return "polygon";
+    }
+
     void move(const QPointF& offset) override;
     void resize(const Handle handle, const qreal dx, const qreal dy) override;
     std::shared_ptr<SvgElement> clone() const override;
@@ -20,6 +24,7 @@ public:
     double startY() const;
     double endX() const;
     double endY() const;
+
     void setStartX(double v);
     void setStartY(double v);
     void setEndX(double v);

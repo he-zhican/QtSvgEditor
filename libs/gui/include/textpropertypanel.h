@@ -1,13 +1,13 @@
-#ifndef TEXTPROPERTYPANEL_H
+Ôªø#ifndef TEXTPROPERTYPANEL_H
 #define TEXTPROPERTYPANEL_H
 
-#include <QWidget>
-#include <QLineEdit>
 #include <QCheckBox>
-#include <QFontComboBox>
-#include <QSpinBox>
-#include <QPushButton>
 #include <QColor>
+#include <QFontComboBox>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QWidget>
 #include <memory>
 
 class SvgElement;
@@ -17,7 +17,7 @@ class TextPropertyPanel : public QWidget {
 public:
     explicit TextPropertyPanel(QWidget* parent = nullptr);
 
-    /// «–ªªµΩ–¬µƒ <text> ‘™Àÿ ±µ˜”√
+    /// ÂàáÊç¢Âà∞Êñ∞ÁöÑ <text> ÂÖÉÁ¥†Êó∂Ë∞ÉÁî®
     void loadElement(std::shared_ptr<SvgElement> elem);
 
 private slots:
@@ -33,15 +33,19 @@ private slots:
 private:
     std::shared_ptr<SvgElement> m_element;
 
-    QLineEdit* m_xEdit, * m_yEdit;
-    QCheckBox* m_boldChk, * m_italicChk, * m_underlineChk;
+    QLineEdit *m_xEdit, *m_yEdit;
+    QCheckBox *m_boldChk, *m_italicChk, *m_underlineChk;
     QFontComboBox* m_fontCombo;
     QSpinBox* m_sizeSpin;
     QPushButton* m_colorBtn;
-    QColor           m_textColor;
+    QColor m_textColor;
 
     void updateControls();
-    int  toInt(const QString& t) const { bool ok; int v = t.toInt(&ok); return ok ? v : 0; }
+    int toInt(const QString& t) const {
+        bool ok;
+        int v = t.toInt(&ok);
+        return ok ? v : 0;
+    }
 };
 
 #endif // TEXTPROPERTYPANEL_H

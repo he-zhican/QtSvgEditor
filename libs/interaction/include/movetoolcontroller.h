@@ -1,32 +1,31 @@
-#ifndef MOVETOOLCONTROLLER_H
+Ôªø#ifndef MOVETOOLCONTROLLER_H
 #define MOVETOOLCONTROLLER_H
 
-#include "toolcontroller.h"
 #include "svgelement.h"
+#include "toolcontroller.h"
 
 class QGraphicsTextItem;
 class SvgText;
 
-class MoveToolController : public ToolController
-{
-  public:
-    explicit MoveToolController(QObject *parent = nullptr);
-    ToolId id() const override
-    {
+class MoveToolController : public ToolController {
+public:
+    explicit MoveToolController(QObject* parent = nullptr);
+
+    ToolId id() const override {
         return ToolId::Move;
     }
 
-    void onMousePress(QMouseEvent *event) override;
-    void onMouseMove(QMouseEvent *event) override;
-    void onMouseRelease(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void onMousePress(QMouseEvent* event) override;
+    void onMouseMove(QMouseEvent* event) override;
+    void onMouseRelease(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
-  private:
+private:
     QPointF m_startPos;
-    QPointF m_lastTimePos;  // º«¬º…œ“ª ±øÃµƒŒª÷√
-    QGraphicsTextItem *m_editItem = nullptr;
+    QPointF m_lastTimePos; // ËÆ∞ÂΩï‰∏ä‰∏ÄÊó∂ÂàªÁöÑ‰ΩçÁΩÆ
+    QGraphicsTextItem* m_editItem = nullptr;
     std::shared_ptr<SvgText> m_textElem;
     bool m_isSelectElem = false;
     bool m_isTextEditing = false;

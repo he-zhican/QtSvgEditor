@@ -1,4 +1,4 @@
-// deleteelementscommand.h
+﻿// deleteelementscommand.h
 #ifndef DELETEELEMENTSCOMMAND_H
 #define DELETEELEMENTSCOMMAND_H
 
@@ -7,23 +7,17 @@
 
 class DeleteElementsCommand : public Command {
 public:
-    DeleteElementsCommand(std::shared_ptr<SvgDocument> doc,
-                          const QVector<std::shared_ptr<SvgElement>>& elems,
+    DeleteElementsCommand(std::shared_ptr<SvgDocument> doc, const QVector<std::shared_ptr<SvgElement>>& elems,
                           QUndoCommand* parent = nullptr)
-      : Command("Delete Elements", parent)
-      , m_document(doc)
-      , m_toDelete(elems)
-    {
+        : Command("Delete Elements", parent), m_document(doc), m_toDelete(elems) {
         // 记录删除前的完整顺序，用于 undo
         m_oldOrder = doc->elements();
     }
 
     DeleteElementsCommand(std::shared_ptr<SvgDocument> doc,
-        const std::shared_ptr<SvgElement>& elem,
-        QUndoCommand* parent = nullptr)
-        : Command("Delete Elements", parent)
-        , m_document(doc)
-    {
+                          const std::shared_ptr<SvgElement>& elem,
+                          QUndoCommand* parent = nullptr)
+        : Command("Delete Elements", parent), m_document(doc) {
         m_toDelete.append(elem);
         // 记录删除前的完整顺序，用于 undo
         m_oldOrder = doc->elements();

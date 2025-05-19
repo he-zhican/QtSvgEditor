@@ -1,10 +1,10 @@
-#ifndef CANVASCONTROLLER_H
+ï»¿#ifndef CANVASCONTROLLER_H
 #define CANVASCONTROLLER_H
 
+#include "toolcontroller.h"
+#include <QGraphicsView>
 #include <QObject>
 #include <QPointF>
-#include <QGraphicsView>
-#include "toolcontroller.h"
 
 class CanvasController : public QObject {
     Q_OBJECT
@@ -12,14 +12,14 @@ public:
     explicit CanvasController(QObject* parent = nullptr);
     ~CanvasController();
 
-    // ÉèÖÃµ±Ç°¹¤¾ß
+    // è®¾ç½®å½“å‰å·¥å…·
     void setCurrentTool(ToolId toolId);
 
-    // ¹ØÁªÊÓÍ¼ºÍÎÄµµ
+    // å…³è”è§†å›¾å’Œæ–‡æ¡£
     void setView(QGraphicsView* scene);
     void setDocument(std::shared_ptr<SvgDocument> doc);
 
-    // À´×Ô CanvasView µÄÊÂ¼ş½Ó¿Ú
+    // æ¥è‡ª CanvasView çš„äº‹ä»¶æ¥å£
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
@@ -36,7 +36,7 @@ private:
     std::shared_ptr<SvgDocument> m_document;
     ToolController* m_currentTool = nullptr;
 
-    // ¹¤¾ß¹ÜÀí
+    // å·¥å…·ç®¡ç†
     QList<ToolController*> m_tools;
     void initTools();
 };

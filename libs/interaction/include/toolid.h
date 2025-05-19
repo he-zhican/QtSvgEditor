@@ -1,8 +1,7 @@
-#ifndef TOOLID_H
+﻿#ifndef TOOLID_H
 #define TOOLID_H
 
-enum class ToolId : unsigned short
-{
+enum class ToolId : unsigned short {
     Move,
     Line,
     Freehand,

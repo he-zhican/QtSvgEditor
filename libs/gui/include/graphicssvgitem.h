@@ -1,31 +1,31 @@
-#ifndef GRAPHICSSVGITEM_H
+﻿#ifndef GRAPHICSSVGITEM_H
 #define GRAPHICSSVGITEM_H
 
 #include "svgelement.h"
 #include <QBrush>
+#include <QFont>
 #include <QGraphicsObject>
 #include <QPen>
 #include <memory>
 
-class GraphicsSvgItem : public QGraphicsObject
-{
+class GraphicsSvgItem : public QGraphicsObject {
     Q_OBJECT
-  public:
+public:
     GraphicsSvgItem(std::shared_ptr<SvgElement> element);
     ~GraphicsSvgItem();
 
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
     std::shared_ptr<SvgElement> element();
 
-  public slots:
-    void onAttributeChanged(const QString &name, const QString &value);
+public slots:
+    void onAttributeChanged(const QString& name, const QString& value);
 
 protected:
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 
-  private:
+private:
     std::shared_ptr<SvgElement> m_element;
     QRectF m_boundingRect;
     QPen m_pen;

@@ -1,15 +1,14 @@
 ﻿#include "textpropertypanel.h"
-#include "propertypanelfactory.h"
 #include "changeattributecommand.h"
 #include "commandmanager.h"
+#include "propertypanelfactory.h"
 #include "svgelement.h"
-#include <QIntValidator>
 #include <QColorDialog>
+#include <QIntValidator>
 #include <QSignalBlocker>
 
 TextPropertyPanel::TextPropertyPanel(QWidget* parent)
-    : QWidget(parent)
-{
+    : QWidget(parent) {
     QStringList names;
     QVector<QWidget*> editors;
 
@@ -50,7 +49,7 @@ TextPropertyPanel::TextPropertyPanel(QWidget* parent)
     // 字体
     m_fontCombo = new QFontComboBox(this);
     connect(m_fontCombo, &QFontComboBox::currentFontChanged,
-        this, [=](const QFont& f) { onFontFamilyChanged(f.family()); });
+            this, [=](const QFont& f) { onFontFamilyChanged(f.family()); });
     names << tr("字体");
     editors << m_fontCombo;
 
@@ -58,7 +57,7 @@ TextPropertyPanel::TextPropertyPanel(QWidget* parent)
     m_sizeSpin = new QSpinBox(this);
     m_sizeSpin->setRange(6, 200);
     connect(m_sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-        this, &TextPropertyPanel::onFontSizeChanged);
+            this, &TextPropertyPanel::onFontSizeChanged);
     names << tr("字号");
     editors << m_sizeSpin;
 
@@ -72,18 +71,17 @@ TextPropertyPanel::TextPropertyPanel(QWidget* parent)
     PropertyPanelFactory::makePropertyPanel(this, tr("文字"), names, editors);
 }
 
-void TextPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem)
-{
+void TextPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem) {
     m_element = elem;
     connect(m_element.get(), &SvgElement::attributeChanged, this, [&](auto, auto) {
         updateControls();
-        });
+    });
     updateControls();
 }
 
-void TextPropertyPanel::updateControls()
-{
-    if (!m_element) return;
+void TextPropertyPanel::updateControls() {
+    if (!m_element)
+        return;
     QSignalBlocker b1(m_xEdit), b2(m_yEdit),
         b3(m_boldChk), b4(m_italicChk), b5(m_underlineChk),
         b6(m_fontCombo), b7(m_sizeSpin), b8(m_colorBtn);
@@ -103,7 +101,8 @@ void TextPropertyPanel::updateControls()
     // 字体家族 & 大小
     QString fam = m_element->attribute("font-family");
     int idx = m_fontCombo->findText(fam);
-    if (idx >= 0) m_fontCombo->setCurrentIndex(idx);
+    if (idx >= 0)
+        m_fontCombo->setCurrentIndex(idx);
     int size = m_element->attribute("font-size").toInt();
     m_sizeSpin->setValue(size);
 
@@ -118,33 +117,41 @@ void TextPropertyPanel::onXChanged(int v) {
     auto c = new ChangeAttributeCommand(m_element, "x", QString::number(v));
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onYChanged(int v) {
     auto c = new ChangeAttributeCommand(m_element, "y", QString::number(v));
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onBoldToggled(bool on) {
     auto c = new ChangeAttributeCommand(m_element, "font-weight", on ? "bold" : "normal");
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onItalicToggled(bool on) {
     auto c = new ChangeAttributeCommand(m_element, "font-style", on ? "italic" : "normal");
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onUnderlineToggled(bool on) {
     auto c = new ChangeAttributeCommand(m_element, "text-decoration", on ? "underline" : "none");
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onFontFamilyChanged(const QString& fam) {
     auto c = new ChangeAttributeCommand(m_element, "font-family", fam);
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onFontSizeChanged(int sz) {
     auto c = new ChangeAttributeCommand(m_element, "font-size", QString::number(sz));
     CommandManager::instance().execute(c);
 }
+
 void TextPropertyPanel::onColorClicked() {
     QColor c = QColorDialog::getColor(m_textColor, this, tr("选择文字颜色"));
-    if (!c.isValid())return;
+    if (!c.isValid())
+        return;
     m_textColor = c;
     m_colorBtn->setStyleSheet(
         QString("background-color:%1;").arg(c.name()));

@@ -1,17 +1,16 @@
 ﻿#include "pathpropertypanel.h"
+#include "Svgfreehand.h"
 #include "changeattributecommand.h"
 #include "commandmanager.h"
 #include "moveelementscommand.h"
 #include "propertypanelfactory.h"
 #include "svgelement.h"
-#include "Svgfreehand.h"
 #include <QColorDialog>
 #include <QIntValidator>
 #include <QSignalBlocker>
 
 PathPropertyPanel::PathPropertyPanel(QWidget* parent)
-    : QWidget(parent)
-{
+    : QWidget(parent) {
     QStringList names;
     QVector<QWidget*> editors;
 
@@ -41,7 +40,7 @@ PathPropertyPanel::PathPropertyPanel(QWidget* parent)
 
     // stroke-style
     m_styleCombo = new QComboBox(this);
-    m_styleCombo->addItems({ tr("实线"), tr("虚线"), tr("点线"), tr("虚点") });
+    m_styleCombo->addItems({tr("实线"), tr("虚线"), tr("点线"), tr("虚点")});
     connect(m_styleCombo, &QComboBox::currentTextChanged, this, &PathPropertyPanel::onStrokeStyleChanged);
     names << tr("边框样式");
     editors << m_styleCombo;
@@ -64,18 +63,17 @@ PathPropertyPanel::PathPropertyPanel(QWidget* parent)
     PropertyPanelFactory::makePropertyPanel(this, tr("多边形/路径"), names, editors);
 }
 
-void PathPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem)
-{
+void PathPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem) {
     m_element = elem;
     connect(m_element.get(), &SvgElement::attributeChanged, this, [&](const QString&, const QString&) {
         updateControls();
-        });
+    });
     updateControls();
 }
 
-void PathPropertyPanel::updateControls()
-{
-    if (!m_element) return;
+void PathPropertyPanel::updateControls() {
+    if (!m_element)
+        return;
     QSignalBlocker b1(m_xEdit), b2(m_yEdit), b3(m_swEdit),
         b4(m_styleCombo), b5(m_strokeColorBtn), b6(m_fillColorBtn);
 
@@ -85,8 +83,7 @@ void PathPropertyPanel::updateControls()
         QPainterPath path = std::dynamic_pointer_cast<SvgFreehand>(m_element)->path();
         x = static_cast<int>(path.boundingRect().x());
         y = static_cast<int>(path.boundingRect().y());
-    }
-    else {
+    } else {
         x = m_element->attribute("start-x").toInt();
         y = m_element->attribute("start-y").toInt();
     }
@@ -101,9 +98,12 @@ void PathPropertyPanel::updateControls()
     // dasharray → index
     QString dash = m_element->attribute("stroke-dasharray");
     int idx = 0;
-    if (dash == "5,5")         idx = 1;
-    else if (dash == "1,3")    idx = 2;
-    else if (dash == "5,3,1,3") idx = 3;
+    if (dash == "5,5")
+        idx = 1;
+    else if (dash == "1,3")
+        idx = 2;
+    else if (dash == "5,3,1,3")
+        idx = 3;
     m_styleCombo->setCurrentIndex(idx);
 
     // stroke color
@@ -124,8 +124,7 @@ void PathPropertyPanel::onXChanged(int v) {
     if (m_element->tagName() == "path") {
         QPainterPath path = std::dynamic_pointer_cast<SvgFreehand>(m_element)->path();
         x = path.boundingRect().x();
-    }
-    else {
+    } else {
         x = m_element->attribute("start-x").toDouble();
     }
     QVector<std::shared_ptr<SvgElement>> elems;
@@ -140,8 +139,7 @@ void PathPropertyPanel::onYChanged(int v) {
     if (m_element->tagName() == "path") {
         QPainterPath path = std::dynamic_pointer_cast<SvgFreehand>(m_element)->path();
         y = path.boundingRect().y();
-    }
-    else {
+    } else {
         y = m_element->attribute("start-y").toDouble();
     }
     QVector<std::shared_ptr<SvgElement>> elems;
@@ -150,28 +148,37 @@ void PathPropertyPanel::onYChanged(int v) {
     auto c = new MoveElementsCommand(elems, offset);
     CommandManager::instance().execute(c);
 }
+
 void PathPropertyPanel::onStrokeWidthChanged(int v) {
     auto c = new ChangeAttributeCommand(m_element, "stroke-width", QString::number(v));
     CommandManager::instance().execute(c);
 }
+
 void PathPropertyPanel::onStrokeStyleChanged(const QString& style) {
     QString dash;
-    if (style == tr("虚线"))       dash = "5,5";
-    else if (style == tr("点线"))  dash = "1,3";
-    else if (style == tr("虚点"))  dash = "5,3,1,3";
+    if (style == tr("虚线"))
+        dash = "5,5";
+    else if (style == tr("点线"))
+        dash = "1,3";
+    else if (style == tr("虚点"))
+        dash = "5,3,1,3";
     auto c = new ChangeAttributeCommand(m_element, "stroke-dasharray", dash);
     CommandManager::instance().execute(c);
 }
+
 void PathPropertyPanel::onStrokeColorClicked() {
     QColor c = QColorDialog::getColor(m_strokeColor, this, tr("选择边框颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_strokeColor = c;
     auto cmd = new ChangeAttributeCommand(m_element, "stroke", c.name());
     CommandManager::instance().execute(cmd);
 }
+
 void PathPropertyPanel::onFillColorClicked() {
     QColor c = QColorDialog::getColor(m_fillColor, this, tr("选择填充颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_fillColor = c;
     auto cmd = new ChangeAttributeCommand(m_element, "fill", c.name());
     CommandManager::instance().execute(cmd);

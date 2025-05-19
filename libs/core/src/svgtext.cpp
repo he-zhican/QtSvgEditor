@@ -1,57 +1,64 @@
-#include"svgtext.h"
+ï»¿#include "svgtext.h"
 
 SvgText::SvgText(QObject* parent)
-	: SvgElement(parent) {
-	// ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-	setAttribute("fill", "#000000");     // ×ÖÌåÑÕÉ«£ººÚÉ«
-	setAttribute("font-weight", "normal");  // ´ÖÌå/Õı³£
-	setAttribute("font-style", "normal");  // Ğ±Ìå/Õı³£
-	setAttribute("text-decoration", "none");  // ÏÂ»®Ïß/ÎŞ
-	setAttribute("font-size", "16");  // ÏÂ»®Ïß/ÎŞ
-	setAttribute("font-family", "Microsoft YaHei"); // ×ÖÌåÑùÊ½£ºÄ¬ÈÏÎ¢ÈíÑÅºÚ
+    : SvgElement(parent) {
+    // åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+    setAttribute("fill", "#000000");                // å­—ä½“é¢œè‰²ï¼šé»‘è‰²
+    setAttribute("font-weight", "normal");          // ç²—ä½“/æ­£å¸¸
+    setAttribute("font-style", "normal");           // æ–œä½“/æ­£å¸¸
+    setAttribute("text-decoration", "none");        // ä¸‹åˆ’çº¿/æ— 
+    setAttribute("font-size", "16");                // ä¸‹åˆ’çº¿/æ— 
+    setAttribute("font-family", "Microsoft YaHei"); // å­—ä½“æ ·å¼ï¼šé»˜è®¤å¾®è½¯é›…é»‘
 }
 
-void SvgText::move(const QPointF& offset)
-{
-	setX(x() + offset.x());
-	setY(y() + offset.y());
+void SvgText::move(const QPointF& offset) {
+    setX(x() + offset.x());
+    setY(y() + offset.y());
 }
 
-std::shared_ptr<SvgElement> SvgText::clone() const
-{
-	auto copy = std::make_shared<SvgText>();
-	for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
-		copy->setAttribute(it.key(), it.value());
-	}
-	return copy;
+std::shared_ptr<SvgElement> SvgText::clone() const {
+    auto copy = std::make_shared<SvgText>();
+    for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
+        copy->setAttribute(it.key(), it.value());
+    }
+    return copy;
 }
 
-double SvgText::x() const { return attribute("x").toDouble(); }
-void SvgText::setX(double v) { setAttribute("x", QString::number(v)); }
+double SvgText::x() const {
+    return attribute("x").toDouble();
+}
 
-double SvgText::y() const { return attribute("y").toDouble(); }
-void SvgText::setY(double v) { setAttribute("y", QString::number(v)); }
+void SvgText::setX(double v) {
+    setAttribute("x", QString::number(v));
+}
 
-QString SvgText::text() const { return attribute("text"); }
-void SvgText::setText(const QString& t) { setAttribute("text", t); }
+double SvgText::y() const {
+    return attribute("y").toDouble();
+}
 
-QString SvgText::fontFamily() const { return attribute("font-family"); }
-void SvgText::setFontFamily(const QString& f) { setAttribute("font-family", f); }
+void SvgText::setY(double v) {
+    setAttribute("y", QString::number(v));
+}
 
-double SvgText::fontSize() const { return attribute("font-size").toDouble(); }
-void SvgText::setFontSize(double s) { setAttribute("font-size", QString::number(s)); }
+QString SvgText::text() const {
+    return attribute("text");
+}
+
+void SvgText::setText(const QString& t) {
+    setAttribute("text", t);
+}
 
 QDomElement SvgText::toXml(QDomDocument& doc) const {
-	QDomElement elem = SvgElement::toXml(doc);
-	// ÒÆ³ı¡°text¡±ÊôĞÔ
-	elem.removeAttribute("text");
-	// Ìí¼Ó ¡°text¡±Îª½ÚµãÄÚµÄÎÄ±¾
-	QDomText t = doc.createTextNode(text());
-	elem.appendChild(t);
-	return elem;
+    QDomElement elem = SvgElement::toXml(doc);
+    // ç§»é™¤â€œtextâ€å±æ€§
+    elem.removeAttribute("text");
+    // æ·»åŠ  â€œtextâ€ä¸ºèŠ‚ç‚¹å†…çš„æ–‡æœ¬
+    QDomText t = doc.createTextNode(text());
+    elem.appendChild(t);
+    return elem;
 }
 
 void SvgText::fromXml(const QDomElement& elem) {
-	SvgElement::fromXml(elem);
-	setText(elem.text());
+    SvgElement::fromXml(elem);
+    setText(elem.text());
 }

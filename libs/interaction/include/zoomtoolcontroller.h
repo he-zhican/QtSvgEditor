@@ -1,14 +1,13 @@
-#ifndef ZOOMTOOLCONTROLLER_H
+ï»¿#ifndef ZOOMTOOLCONTROLLER_H
 #define ZOOMTOOLCONTROLLER_H
 
 #include "toolcontroller.h"
 
-class ZoomToolController : public ToolController
-{
-  public:
-    explicit ZoomToolController(QObject *parent = nullptr);
-    ToolId id() const override
-    {
+class ZoomToolController : public ToolController {
+public:
+    explicit ZoomToolController(QObject* parent = nullptr);
+
+    ToolId id() const override {
         return ToolId::ZoomOut;
     }
 
@@ -17,16 +16,16 @@ class ZoomToolController : public ToolController
             m_toolId = tid;
     }
 
-    void onMousePress(QMouseEvent *event) override;
-    void onMouseMove(QMouseEvent *event) override;
-    void onMouseRelease(QMouseEvent *event) override;
+    void onMousePress(QMouseEvent* event) override;
+    void onMouseMove(QMouseEvent* event) override;
+    void onMouseRelease(QMouseEvent* event) override;
 
-  private:
-      const double m_deltaF = 0.2;  // Ã¿´ÎËõ·Å±ÈÀı20%
-      const double m_maxScale = 5.0;  // ×î´óËõ·Å±È
-      const double m_minScale = 0.1;  // ×îĞ¡Ëõ·Å±È
+private:
+    const double m_deltaF = 0.2;   // æ¯æ¬¡ç¼©æ”¾æ¯”ä¾‹20%
+    const double m_maxScale = 5.0; // æœ€å¤§ç¼©æ”¾æ¯”
+    const double m_minScale = 0.1; // æœ€å°ç¼©æ”¾æ¯”
 
-      ToolId m_toolId = ToolId::ZoomOut;
+    ToolId m_toolId = ToolId::ZoomOut;
 };
 
 #endif // !ZOOMTOOLCONTROLLER_H

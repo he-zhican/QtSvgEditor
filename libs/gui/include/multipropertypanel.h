@@ -1,4 +1,4 @@
-#ifndef MULTIPROPERTYPANEL_H
+﻿#ifndef MULTIPROPERTYPANEL_H
 #define MULTIPROPERTYPANEL_H
 
 #include "svgelement.h"
@@ -9,29 +9,27 @@
 #include <QWidget>
 #include <memory>
 
-class MultiPropertyPanel : public QWidget
-{
+class MultiPropertyPanel : public QWidget {
     Q_OBJECT
-  public:
-    explicit MultiPropertyPanel(QWidget *parent = nullptr);
+public:
+    explicit MultiPropertyPanel(QWidget* parent = nullptr);
 
-    void loadElements(const QVector<std::shared_ptr<SvgElement>> &elems);
+    void loadElements(const QVector<std::shared_ptr<SvgElement>>& elems);
 
-  private slots:
+private slots:
     void onStrokeWidthChanged(int v);
-    void onStrokeStyleChanged(const QString &style);
+    void onStrokeStyleChanged(const QString& style);
     void onStrokeColorClicked();
     void onFillColorClicked();
 
-  private:
+private:
     QVector<std::shared_ptr<SvgElement>> m_elements;
-    QLineEdit *m_swEdit;
-    QComboBox *m_styleCombo;
+    QLineEdit* m_swEdit;
+    QComboBox* m_styleCombo;
     QPushButton *m_strokeColorBtn, *m_fillColorBtn;
     QColor m_strokeColor, m_fillColor;
 
-    int toInt(const QString &t) const
-    {
+    int toInt(const QString& t) const {
         bool ok;
         int v = t.toInt(&ok);
         return ok ? v : 0;

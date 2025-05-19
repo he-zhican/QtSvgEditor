@@ -1,4 +1,4 @@
-#ifndef COMMANDGLOBAL_H
+﻿#ifndef COMMANDGLOBAL_H
 #define COMMANDGLOBAL_H
 
 #include <QtCore/qglobal.h>

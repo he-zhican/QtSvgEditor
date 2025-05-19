@@ -1,16 +1,16 @@
-#ifndef UI_MAINWINDOW_H
+ï»¿#ifndef UI_MAINWINDOW_H
 #define UI_MAINWINDOW_H
 
-#include "menubar.h"
-#include "sidetoolbar.h"
 #include "canvasview.h"
+#include "menubar.h"
 #include "propertypanel.h"
+#include "sidetoolbar.h"
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QDockWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -30,24 +30,24 @@ public:
 
         MainWindow->setWindowIcon(QIcon(":/icons/SVG.png"));
 
-        // ¶¥²¿²Ëµ¥À¸
+        // é¡¶éƒ¨èœå•æ 
         menubar = new MenuBar(MainWindow);
         MainWindow->setMenuBar(menubar);
 
-        // ×ó²à¹¤¾ßÀ¸
+        // å·¦ä¾§å·¥å…·æ 
         sideToolBar = new SideToolBar(MainWindow);
         MainWindow->addToolBar(Qt::LeftToolBarArea, sideToolBar);
 
-        // ÖÐ¼ä»­Í¼ÇøÓò
+        // ä¸­é—´ç”»å›¾åŒºåŸŸ
         scrollArea = new QScrollArea(MainWindow);
         canvasView = new CanvasView(scrollArea);
         scrollArea->setWidget(canvasView);
-        // ²»×Ô¶¯À­Éì»­²¼£¬ÈÃÆä±£³Ö³õÊ¼/×îÐ¡³ß´ç
+        // ä¸è‡ªåŠ¨æ‹‰ä¼¸ç”»å¸ƒï¼Œè®©å…¶ä¿æŒåˆå§‹/æœ€å°å°ºå¯¸
         scrollArea->setWidgetResizable(false);
         scrollArea->setAlignment(Qt::AlignCenter);
         MainWindow->setCentralWidget(scrollArea);
 
-        // ÓÒ²àÊôÐÔÃæ°å
+        // å³ä¾§å±žæ€§é¢æ¿
         auto* dock = new QDockWidget(MainWindow);
         dock->setTitleBarWidget(new QWidget(dock));
         propertyPanel = new PropertyPanel(canvasView->document(), dock);
@@ -66,7 +66,7 @@ public:
 };
 
 namespace Ui {
-    class MainWindow : public Ui_MainWindow {};
+class MainWindow : public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

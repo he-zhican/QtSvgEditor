@@ -1,4 +1,4 @@
-#include "canvascontroller.h"
+ï»¿#include "canvascontroller.h"
 #include "ellipsetoolcontroller.h"
 #include "freehandtoolcontroller.h"
 #include "linetoolcontroller.h"
@@ -9,88 +9,69 @@
 #include "texttoolcontroller.h"
 #include "zoomtoolcontroller.h"
 
-CanvasController::CanvasController(QObject *parent) : QObject(parent)
-{
+CanvasController::CanvasController(QObject* parent) : QObject(parent) {
     initTools();
     setCurrentTool(ToolId::Move);
 }
 
-CanvasController::~CanvasController()
-{
+CanvasController::~CanvasController() {
 }
 
-void CanvasController::initTools()
-{
+void CanvasController::initTools() {
     m_tools << new MoveToolController(this) << new RectToolController(this) << new EllipseToolController(this)
-        << new LineToolController(this) << new PolygonToolController(this) << new FreehandToolController(this)
-        <<  new TextToolController(this) << new ZoomToolController(this);
+            << new LineToolController(this) << new PolygonToolController(this) << new FreehandToolController(this)
+            << new TextToolController(this) << new ZoomToolController(this);
 
-    for (auto tool : m_tools)
-    {
+    for (auto tool : m_tools) {
         connect(tool, &ToolController::endCurrentTool, this, &CanvasController::onEndCurrentTool);
     }
 }
 
-void CanvasController::setCurrentTool(ToolId toolId)
-{
-    for (auto t : m_tools)
-    {
-        t->setId(toolId); // Ö»ÓÐ¶à±ßÐÎºÍËõ·Å¹¤¾ßÊµÏÖÁË¸Ãº¯Êý
-        if (t->id() == toolId)
-        {
+void CanvasController::setCurrentTool(ToolId toolId) {
+    for (auto t : m_tools) {
+        t->setId(toolId); // åªæœ‰å¤šè¾¹å½¢å’Œç¼©æ”¾å·¥å…·å®žçŽ°äº†è¯¥å‡½æ•°
+        if (t->id() == toolId) {
             m_currentTool = t;
             break;
         }
     }
 }
 
-void CanvasController::setView(QGraphicsView *view)
-{
-    for (auto t : m_tools)
-    {
+void CanvasController::setView(QGraphicsView* view) {
+    for (auto t : m_tools) {
         t->setView(view);
     }
 }
 
-void CanvasController::setDocument(std::shared_ptr<SvgDocument> doc)
-{
-    for (auto t : m_tools)
-    {
+void CanvasController::setDocument(std::shared_ptr<SvgDocument> doc) {
+    for (auto t : m_tools) {
         t->setDocument(doc);
     }
 }
 
-void CanvasController::mousePressEvent(QMouseEvent *event)
-{
-    if (m_currentTool)
-    {
+void CanvasController::mousePressEvent(QMouseEvent* event) {
+    if (m_currentTool) {
         m_currentTool->onMousePress(event);
     }
 }
 
-void CanvasController::mouseMoveEvent(QMouseEvent *event)
-{
-    if (m_currentTool)
-    {
+void CanvasController::mouseMoveEvent(QMouseEvent* event) {
+    if (m_currentTool) {
         m_currentTool->onMouseMove(event);
     }
 }
 
-void CanvasController::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (m_currentTool)
-    {
+void CanvasController::mouseReleaseEvent(QMouseEvent* event) {
+    if (m_currentTool) {
         m_currentTool->onMouseRelease(event);
     }
 }
 
-void CanvasController::mouseDoubleClickEvent(QMouseEvent *event)
-{
+void CanvasController::mouseDoubleClickEvent(QMouseEvent* event) {
     if (m_currentTool)
         m_currentTool->mouseDoubleClickEvent(event);
 }
 
-void CanvasController::onEndCurrentTool()
-{
+void CanvasController::onEndCurrentTool() {
     emit changeTool();
 }

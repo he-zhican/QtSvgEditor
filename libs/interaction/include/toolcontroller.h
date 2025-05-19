@@ -1,13 +1,13 @@
 ﻿#ifndef TOOLCONTROLLER_H
 #define TOOLCONTROLLER_H
 
-#include <QObject>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include "svgdocument.h"
 #include "toolid.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QObject>
 
 class ToolController : public QObject {
     Q_OBJECT
@@ -27,7 +27,7 @@ public:
     virtual void onMousePress(QMouseEvent* event) = 0;
     virtual void onMouseMove(QMouseEvent* event) = 0;
     virtual void onMouseRelease(QMouseEvent* event) = 0;
-    virtual void mouseDoubleClickEvent(QMouseEvent* event) {};
+    virtual void mouseDoubleClickEvent(QMouseEvent* event){};
 
     // 画图时，判断终点坐标和起始坐标是否一样
     bool isSameEndPosStartPos(QPointF& start, QPointF& end) {

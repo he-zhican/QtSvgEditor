@@ -1,15 +1,14 @@
 ﻿#include "rectpropertypanel.h"
-#include "propertypanelfactory.h"
 #include "changeattributecommand.h"
 #include "commandmanager.h"
+#include "propertypanelfactory.h"
 #include "svgelement.h"
-#include <QIntValidator>
 #include <QColorDialog>
+#include <QIntValidator>
 #include <QSignalBlocker>
 
 RectPropertyPanel::RectPropertyPanel(QWidget* parent)
-    : QWidget(parent)
-{
+    : QWidget(parent) {
     QStringList names;
     QVector<QWidget*> editors;
 
@@ -50,7 +49,7 @@ RectPropertyPanel::RectPropertyPanel(QWidget* parent)
 
     // Stroke style
     m_styleCombo = new QComboBox(this);
-    m_styleCombo->addItems({ tr("实线"), tr("虚线"), tr("点线"), tr("虚点") });
+    m_styleCombo->addItems({tr("实线"), tr("虚线"), tr("点线"), tr("虚点")});
     m_styleCombo->setCurrentIndex(0);
     names << tr("边框样式");
     editors << m_styleCombo;
@@ -67,11 +66,11 @@ RectPropertyPanel::RectPropertyPanel(QWidget* parent)
     editors << m_fillColorBtn;
 
     // 绑定槽函数
-    connect(m_xEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onXChanged(toInt(t)); });
-    connect(m_yEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onYChanged(toInt(t)); });
-    connect(m_wEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onWidthChanged(toInt(t)); });
-    connect(m_hEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onHeightChanged(toInt(t)); });
-    connect(m_swEdit, &QLineEdit::textChanged, this, [=](const QString& t) {onStrokeWidthChanged(toInt(t)); });
+    connect(m_xEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onXChanged(toInt(t)); });
+    connect(m_yEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onYChanged(toInt(t)); });
+    connect(m_wEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onWidthChanged(toInt(t)); });
+    connect(m_hEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onHeightChanged(toInt(t)); });
+    connect(m_swEdit, &QLineEdit::textChanged, this, [=](const QString& t) { onStrokeWidthChanged(toInt(t)); });
     connect(m_styleCombo, &QComboBox::currentTextChanged, this, &RectPropertyPanel::onStrokeStyleChanged);
     connect(m_strokeColorBtn, &QPushButton::clicked, this, &RectPropertyPanel::onStrokeColorClicked);
     connect(m_fillColorBtn, &QPushButton::clicked, this, &RectPropertyPanel::onFillColorClicked);
@@ -80,17 +79,15 @@ RectPropertyPanel::RectPropertyPanel(QWidget* parent)
     PropertyPanelFactory::makePropertyPanel(this, tr("矩形"), names, editors);
 }
 
-void RectPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem)
-{
+void RectPropertyPanel::loadElement(std::shared_ptr<SvgElement> elem) {
     m_element = elem;
     connect(m_element.get(), &SvgElement::attributeChanged, this, [&](const QString& name, const QString& value) {
         update();
-        });
+    });
     update();
 }
 
-void RectPropertyPanel::update()
-{
+void RectPropertyPanel::update() {
     // 暂时屏蔽信号
     QSignalBlocker b1(m_xEdit),
         b2(m_yEdit),
@@ -114,9 +111,12 @@ void RectPropertyPanel::update()
     // 边框样式
     QString dash = m_element->attribute("stroke-dasharray");
     int idx = 0;
-    if (dash == "5,5")       idx = 1;  // 虚线
-    else if (dash == "1,3")       idx = 2;  // 点线
-    else if (dash == "5,3,1,3")   idx = 3;  // 虚点
+    if (dash == "5,5")
+        idx = 1; // 虚线
+    else if (dash == "1,3")
+        idx = 2; // 点线
+    else if (dash == "5,3,1,3")
+        idx = 3; // 虚点
     // idx == 0 对应“实线”
     m_styleCombo->setCurrentIndex(idx);
 
@@ -157,9 +157,12 @@ void RectPropertyPanel::onStrokeWidthChanged(int v) {
 
 void RectPropertyPanel::onStrokeStyleChanged(const QString& style) {
     QString dash;
-    if (style == tr("虚线")) dash = "5,5";
-    else if (style == tr("点线")) dash = "1,3";
-    else if (style == tr("虚点")) dash = "5,3,1,3";
+    if (style == tr("虚线"))
+        dash = "5,5";
+    else if (style == tr("点线"))
+        dash = "1,3";
+    else if (style == tr("虚点"))
+        dash = "5,3,1,3";
     // 实线 清空
     auto cmd = new ChangeAttributeCommand(m_element, "stroke-dasharray", dash);
     CommandManager::instance().execute(cmd);
@@ -167,7 +170,8 @@ void RectPropertyPanel::onStrokeStyleChanged(const QString& style) {
 
 void RectPropertyPanel::onStrokeColorClicked() {
     QColor c = QColorDialog::getColor(m_strokeColor, this, tr("选择边框颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_strokeColor = c;
 
     auto cmd = new ChangeAttributeCommand(m_element, "stroke", c.name());
@@ -176,7 +180,8 @@ void RectPropertyPanel::onStrokeColorClicked() {
 
 void RectPropertyPanel::onFillColorClicked() {
     QColor c = QColorDialog::getColor(m_fillColor, this, tr("选择填充颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_fillColor = c;
 
     auto cmd = new ChangeAttributeCommand(m_element, "fill", m_fillColor.name());

@@ -1,45 +1,46 @@
-#include"svgpolygon.h"
+ï»¿#include "svgpolygon.h"
 #include <QRectF>
 
 SvgPolygon::SvgPolygon(QObject* parent)
-	: SvgElement(parent) {
-	// ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-	setAttribute("stroke", "#000000");     // ±ß¿òÑÕÉ«£ººÚÉ«
-	setAttribute("stroke-width", "2");    // ±ß¿ò¿í¶È£º2ÏñËØ
-	setAttribute("fill", "#ffffff");      // Ìî³äÑÕÉ«£º°×É«
-	setAttribute("stroke-dasharray", ""); // ±ß¿òÑùÊ½
+    : SvgElement(parent) {
+    // åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+    setAttribute("stroke", "#000000");    // è¾¹æ¡†é¢œè‰²ï¼šé»‘è‰²
+    setAttribute("stroke-width", "2");    // è¾¹æ¡†å®½åº¦ï¼š2åƒç´ 
+    setAttribute("fill", "#ffffff");      // å¡«å……é¢œè‰²ï¼šç™½è‰²
+    setAttribute("stroke-dasharray", ""); // è¾¹æ¡†æ ·å¼
 }
 
-void SvgPolygon::move(const QPointF& offset)
-{
-	QVector<QPointF> originPoints = points();
-	for (QPointF& p : originPoints) {
-		p = p + offset;
-	}
-	setPoints(originPoints);
+void SvgPolygon::move(const QPointF& offset) {
+    QVector<QPointF> originPoints = points();
 
-	setStartX(startX() + offset.x());
-	setStartY(startY() + offset.y());
-	setEndX(endX() + offset.x());
-	setEndY(endY() + offset.y());
+    for (QPointF& p : originPoints) {
+        p = p + offset;
+    }
+    setPoints(originPoints);
+
+    setStartX(startX() + offset.x());
+    setStartY(startY() + offset.y());
+    setEndX(endX() + offset.x());
+    setEndY(endY() + offset.y());
 }
 
-void SvgPolygon::resize(const Handle handle, const qreal dx, const qreal dy)
-{
-    // 1) Ô­Ê¼°üÎ§ºĞ
+void SvgPolygon::resize(const Handle handle, const qreal dx, const qreal dy) {
+    // 1) åŸå§‹åŒ…å›´ç›’
     double x1 = startX(), y1 = startY();
     double x2 = endX(), y2 = endY();
-    // ±£Ö¤ x1/y1 ÊÇ×óÉÏ£¬x2/y2 ÊÇÓÒÏÂ
+    // ä¿è¯ x1/y1 æ˜¯å·¦ä¸Šï¼Œx2/y2 æ˜¯å³ä¸‹
     double left = qMin(x1, x2);
     double top = qMin(y1, y2);
     double right = qMax(x1, x2);
     double bottom = qMax(y1, y2);
     double w = right - left;
     double h = bottom - top;
-    if (w < 1) w = 1;
-    if (h < 1) h = 1;
+    if (w < 1)
+        w = 1;
+    if (h < 1)
+        h = 1;
 
-    // 2) ¼ÆËãĞÂµÄ°üÎ§ºĞ
+    // 2) è®¡ç®—æ–°çš„åŒ…å›´ç›’
     QRectF newRect(left, top, w, h);
     switch (handle) {
     case Handle::Left:
@@ -73,11 +74,13 @@ void SvgPolygon::resize(const Handle handle, const qreal dx, const qreal dy)
     default:
         return;
     }
-    // È·±£×îĞ¡³ß´ç
-    if (newRect.width() < 1)  newRect.setWidth(1);
-    if (newRect.height() < 1) newRect.setHeight(1);
+    // ç¡®ä¿æœ€å°å°ºå¯¸
+    if (newRect.width() < 1)
+        newRect.setWidth(1);
+    if (newRect.height() < 1)
+        newRect.setHeight(1);
 
-    // 3) °´ĞÂµÄ¾ØĞÎ¶ÔËùÓĞµã×ö·ÂÉäÓ³Éä
+    // 3) æŒ‰æ–°çš„çŸ©å½¢å¯¹æ‰€æœ‰ç‚¹åšä»¿å°„æ˜ å°„
     QVector<QPointF> pts = points();
     QVector<QPointF> out;
     out.reserve(pts.size());
@@ -96,8 +99,7 @@ void SvgPolygon::resize(const Handle handle, const qreal dx, const qreal dy)
     setEndY(newRect.bottom());
 }
 
-std::shared_ptr<SvgElement> SvgPolygon::clone() const
-{
+std::shared_ptr<SvgElement> SvgPolygon::clone() const {
     auto copy = std::make_shared<SvgPolygon>();
     for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
         copy->setAttribute(it.key(), it.value());
@@ -105,70 +107,61 @@ std::shared_ptr<SvgElement> SvgPolygon::clone() const
     return copy;
 }
 
-
 QVector<QPointF> SvgPolygon::points() const {
-	QVector<QPointF> pts;
-	QString data = attribute("points");
-	auto list = data.split(' ', Qt::SkipEmptyParts);
-	for (const QString& pair : list) {
-		auto xy = pair.split(',');
-		if (xy.size() == 2)
-			pts << (QPointF(xy[0].toDouble(), xy[1].toDouble()));
-	}
-	return pts;
+    QVector<QPointF> pts;
+    QString data = attribute("points");
+    auto list = data.split(' ', Qt::SkipEmptyParts);
+    for (const QString& pair : list) {
+        auto xy = pair.split(',');
+        if (xy.size() == 2)
+            pts << (QPointF(xy[0].toDouble(), xy[1].toDouble()));
+    }
+    return pts;
 }
 
 void SvgPolygon::setPoints(const QVector<QPointF>& pts) {
-	QStringList list;
-	for (auto& p : pts)
-		list << QString("%1,%2").arg(p.x()).arg(p.y());
-	setAttribute("points", list.join(' '));
+    QStringList list;
+    for (auto& p : pts)
+        list << QString("%1,%2").arg(p.x()).arg(p.y());
+    setAttribute("points", list.join(' '));
 }
 
-double SvgPolygon::startX() const
-{
-	return attribute("start-x").toDouble();
+double SvgPolygon::startX() const {
+    return attribute("start-x").toDouble();
 }
 
-double SvgPolygon::startY() const
-{
-	return attribute("start-y").toDouble();
+double SvgPolygon::startY() const {
+    return attribute("start-y").toDouble();
 }
 
-double SvgPolygon::endX() const
-{
-	return attribute("end-x").toDouble();
+double SvgPolygon::endX() const {
+    return attribute("end-x").toDouble();
 }
 
-double SvgPolygon::endY() const
-{
-	return attribute("end-y").toDouble();
+double SvgPolygon::endY() const {
+    return attribute("end-y").toDouble();
 }
 
-void SvgPolygon::setStartX(double v)
-{
-	setAttribute("start-x", QString::number(v));
+void SvgPolygon::setStartX(double v) {
+    setAttribute("start-x", QString::number(v));
 }
 
-void SvgPolygon::setStartY(double v)
-{
-	setAttribute("start-y", QString::number(v));
+void SvgPolygon::setStartY(double v) {
+    setAttribute("start-y", QString::number(v));
 }
 
-void SvgPolygon::setEndX(double v)
-{
-	setAttribute("end-x", QString::number(v));
+void SvgPolygon::setEndX(double v) {
+    setAttribute("end-x", QString::number(v));
 }
 
-void SvgPolygon::setEndY(double v)
-{
-	setAttribute("end-y", QString::number(v));
+void SvgPolygon::setEndY(double v) {
+    setAttribute("end-y", QString::number(v));
 }
 
 QDomElement SvgPolygon::toXml(QDomDocument& doc) const {
-	return SvgElement::toXml(doc);
+    return SvgElement::toXml(doc);
 }
 
 void SvgPolygon::fromXml(const QDomElement& elem) {
-	SvgElement::fromXml(elem);
+    SvgElement::fromXml(elem);
 }

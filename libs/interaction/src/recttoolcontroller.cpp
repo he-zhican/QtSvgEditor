@@ -1,34 +1,33 @@
-#include <QGraphicsView>
-#include "recttoolcontroller.h"
-#include "commandmanager.h"
+ï»¿#include "recttoolcontroller.h"
 #include "addelementscommand.h"
+#include "commandmanager.h"
 #include "svgrect.h"
+#include <QGraphicsView>
 
 RectToolController::RectToolController(QObject* parent)
     : ToolController(parent) {}
 
 void RectToolController::onMousePress(QMouseEvent* event) {
-    // ÔÚ scene ¿Õ¼ä×ø±ê×ª»»
+    // åœ¨ scene ç©ºé—´åæ ‡è½¬æ¢
     m_startPos = m_view->mapToScene(event->pos());
-    // ´´½¨Ô¤ÀÀ¾ØĞÎ
+    // åˆ›å»ºé¢„è§ˆçŸ©å½¢
     m_previewItem = m_view->scene()->addRect(QRectF(m_startPos.x(), m_startPos.y(), 0, 0), QPen(Qt::DashLine));
 }
 
 void RectToolController::onMouseMove(QMouseEvent* event) {
-    if (!m_previewItem) return;
+    if (!m_previewItem)
+        return;
     QPointF currentPos = m_view->mapToScene(event->pos());
     m_previewItem->setRect(QRectF(m_startPos, currentPos).normalized());
-
-    // Ã¿´Î¸Ä±äºóÇëÇó¾Ö²¿ÖØ»æ
-    //m_view->scene()->invalidate(m_previewItem->rect(), QGraphicsScene::ForegroundLayer);
 }
 
 void RectToolController::onMouseRelease(QMouseEvent* event) {
-    if (!m_previewItem) return;
-    // ×îÖÕ¾ØĞÎ
+    if (!m_previewItem)
+        return;
+    // æœ€ç»ˆçŸ©å½¢
     QRectF finalRect(m_previewItem->rect());
 
-    // ÒÆ³ıÔ¤ÀÀ¾ØĞÎ
+    // ç§»é™¤é¢„è§ˆçŸ©å½¢
     m_view->scene()->removeItem(m_previewItem);
     delete m_previewItem;
     m_previewItem = nullptr;
@@ -38,15 +37,15 @@ void RectToolController::onMouseRelease(QMouseEvent* event) {
         return;
     }
 
-    // ´´½¨ SvgRect Êı¾İÄ£ĞÍ
+    // åˆ›å»º SvgRect æ•°æ®æ¨¡å‹
     auto rectElem = std::make_shared<SvgRect>();
     rectElem->setX(finalRect.x());
     rectElem->setY(finalRect.y());
     rectElem->setWidth(finalRect.width());
     rectElem->setHeight(finalRect.height());
 
-    // ´¥·¢ÃüÁîÌí¼Ó
+    // è§¦å‘å‘½ä»¤æ·»åŠ 
     auto addCmd = new AddElementsCommand(m_document, rectElem);
-    // Ö´ĞĞ²¢ÈëÕ»
+    // æ‰§è¡Œå¹¶å…¥æ ˆ
     CommandManager::instance().execute(addCmd);
 }

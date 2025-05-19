@@ -1,12 +1,12 @@
-#ifndef CLIPBOARD_H
+ï»¿#ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
+#include "svgelement.h"
 #include <QObject>
 #include <QVector>
 #include <memory>
-#include "svgelement.h"
 
-// ¼ôÌù°æ£ºµ¥ÀıÄ£Ê½
+// å‰ªè´´ç‰ˆï¼šå•ä¾‹æ¨¡å¼
 class Clipboard : public QObject {
     Q_OBJECT
 public:

@@ -1,10 +1,10 @@
-#ifndef SELECTIONMANAGER_H
+﻿#ifndef SELECTIONMANAGER_H
 #define SELECTIONMANAGER_H
 
+#include "svgelement.h"
 #include <QObject>
 #include <QVector>
 #include <memory>
-#include "svgelement.h"
 
 // 选区管理：单例模式
 class SelectionManager : public QObject {

@@ -1,47 +1,46 @@
-#ifndef POLYGONTOOLCONTROLLER_H
+ï»¿#ifndef POLYGONTOOLCONTROLLER_H
 #define POLYGONTOOLCONTROLLER_H
 
 #include "toolcontroller.h"
 #include <QGraphicsPolygonItem>
 #include <QVector>
 
-class PolygonToolController : public ToolController
-{
+class PolygonToolController : public ToolController {
     Q_OBJECT
-  public:
-    explicit PolygonToolController(QObject *parent = nullptr);
-    ToolId id() const override
-    {
+public:
+    explicit PolygonToolController(QObject* parent = nullptr);
+
+    ToolId id() const override {
         return m_toolId;
     }
 
     void setId(ToolId tid) override {
-        if(tid == ToolId::Pentagon || tid == ToolId::Hexagon || tid == ToolId::Star
+        if (tid == ToolId::Pentagon || tid == ToolId::Hexagon || tid == ToolId::Star 
             || tid == ToolId::Trapezium || tid == ToolId::Triangle || tid == ToolId::Parallelogram)
             m_toolId = tid;
     }
 
-    void onMousePress(QMouseEvent *event) override;
-    void onMouseMove(QMouseEvent *event) override;
-    void onMouseRelease(QMouseEvent *event) override;
+    void onMousePress(QMouseEvent* event) override;
+    void onMouseMove(QMouseEvent* event) override;
+    void onMouseRelease(QMouseEvent* event) override;
 
-  private:
+private:
     QPointF m_startPos;
     QPointF m_endPos;
     QVector<QPointF> m_points;
-    QGraphicsPolygonItem *m_previewItem = nullptr;
+    QGraphicsPolygonItem* m_previewItem = nullptr;
 
     ToolId m_toolId = ToolId::Pentagon;
 
     QMap<ToolId, std::function<void()>> m_tid2calcu;
 
-    // ¸ù¾İÊó±êµÄÆğÊ¼µãºÍÖÕµã ¼ÆËã¶à±ßĞÎµÄ¶¥µã×ø±ê
-    void calculatePentagonPoints(); // Îå±ßĞÎ
-    void calculateHexagonPoints(); // Áù±ßĞÎ
-    void calculateStarPoints(); // Îå½ÇĞÇ
-    void calculateTrapeziumPoints(); // ÌİĞÎ
-    void calculateTrianglePoints(); // Èı½ÇĞÎ
-    void calculateParallelogramPoints(); // Æ½ĞĞËÄ±ßĞÎ
+    // æ ¹æ®é¼ æ ‡çš„èµ·å§‹ç‚¹å’Œç»ˆç‚¹ è®¡ç®—å¤šè¾¹å½¢çš„é¡¶ç‚¹åæ ‡
+    void calculatePentagonPoints();      // äº”è¾¹å½¢
+    void calculateHexagonPoints();       // å…­è¾¹å½¢
+    void calculateStarPoints();          // äº”è§’æ˜Ÿ
+    void calculateTrapeziumPoints();     // æ¢¯å½¢
+    void calculateTrianglePoints();      // ä¸‰è§’å½¢
+    void calculateParallelogramPoints(); // å¹³è¡Œå››è¾¹å½¢
 };
 
 #endif // !POLYGONTOOLCONTROLLER_H

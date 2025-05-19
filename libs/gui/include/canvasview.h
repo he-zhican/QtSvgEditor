@@ -1,10 +1,10 @@
-#ifndef CANVASVIEW_H
+ï»¿#ifndef CANVASVIEW_H
 #define CANVASVIEW_H
 
-#include <QGraphicsView>
-#include <QMap>
 #include "canvascontroller.h"
 #include "svgdocument.h"
+#include <QGraphicsView>
+#include <QMap>
 #include <QRubberBand>
 
 class GraphicsSvgItem;
@@ -20,17 +20,17 @@ public:
     std::shared_ptr<SvgDocument> document();
 
 public slots:
-    void onToolSelected(ToolId toolId);  // ÇĞ»»¹¤¾ß
-    void onDocumentChanged();  // ÏìÓ¦Õû¸öÎÄµµ·¢Éú±ä»¯£¬ÀıÈçÍ¼²ã±ä»¯³·Ïú£¬É¾³ı³·Ïú£¬ÖØĞÂ¼ÓÔØÎÄµµ
-    void onAddElementsChanged(QVector<std::shared_ptr<SvgElement>> elems);  // ÎÄµµÌí¼ÓÔªËØ
-    void onRemoveElementsChanged(QVector<std::shared_ptr<SvgElement>> elems);  // É¾³ıÔªËØ
-    void onDocumentAttributeChanged(const QString& name);  // ÎÄµµÊôĞÔ·¢Éú±ä»¯£¨³¤£¬¿í£¬±³¾°ÑÕÉ«£©
+    void onToolSelected(ToolId toolId);                                       // åˆ‡æ¢å·¥å…·
+    void onDocumentChanged();                                                 // å“åº”æ•´ä¸ªæ–‡æ¡£å‘ç”Ÿå˜åŒ–ï¼Œä¾‹å¦‚å›¾å±‚å˜åŒ–æ’¤é”€ï¼Œåˆ é™¤æ’¤é”€ï¼Œé‡æ–°åŠ è½½æ–‡æ¡£
+    void onAddElementsChanged(QVector<std::shared_ptr<SvgElement>> elems);    // æ–‡æ¡£æ·»åŠ å…ƒç´ 
+    void onRemoveElementsChanged(QVector<std::shared_ptr<SvgElement>> elems); // åˆ é™¤å…ƒç´ 
+    void onDocumentAttributeChanged(const QString& name);                     // æ–‡æ¡£å±æ€§å‘ç”Ÿå˜åŒ–ï¼ˆé•¿ï¼Œå®½ï¼ŒèƒŒæ™¯é¢œè‰²ï¼‰
 
     void onSceneSelectionChanged();
     void onChangeTool();
 
 signals:
-    void changeToMoveTool(); // »Ö¸´µ½ÒÆ¶¯¹¤¾ß
+    void changeToMoveTool(); // æ¢å¤åˆ°ç§»åŠ¨å·¥å…·
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -46,9 +46,9 @@ private:
     std::shared_ptr<SvgDocument> m_document;
     QMap<std::shared_ptr<SvgElement>, GraphicsSvgItem*> m_itemMap;
 
-    // µ±Ç°Ëõ·Å£¨1.0 = 100%£©
+    // å½“å‰ç¼©æ”¾ï¼ˆ1.0 = 100%ï¼‰
     double m_currentScale = 1.0;
-    // Ëõ·ÅãĞÖµ
+    // ç¼©æ”¾é˜ˆå€¼
     const double m_minScale = 0.1;
     const double m_maxScale = 5.0;
 

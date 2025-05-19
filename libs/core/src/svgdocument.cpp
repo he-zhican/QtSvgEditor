@@ -1,29 +1,25 @@
-#include "svgdocument.h"
+ï»¿#include "svgdocument.h"
 #include "svgelement.h"
 #include "svgparser.h"
 #include "svgwriter.h"
 
-SvgDocument::SvgDocument(QObject *parent) : QObject(parent)
-{
+SvgDocument::SvgDocument(QObject* parent) : QObject(parent) {
 }
 
-SvgDocument::SvgDocument(double canvasWidth, double canvasHeight, QString &fill, QObject *parent)
-    : m_canvasWidth(canvasWidth), m_canvasHeight(canvasHeight), m_canvasFill(fill), QObject(parent)
-{
+SvgDocument::SvgDocument(double canvasWidth, double canvasHeight, QString& fill, QObject* parent)
+    : m_canvasWidth(canvasWidth), m_canvasHeight(canvasHeight), m_canvasFill(fill), QObject(parent) {
 }
 
-SvgDocument::~SvgDocument()
-{
+SvgDocument::~SvgDocument() {
     m_elements.clear();
 }
 
-bool SvgDocument::loadFromFile(const QString &filePath)
-{
+bool SvgDocument::loadFromFile(const QString& filePath) {
     SvgParser parser;
-    try
-    {
+    try {
         auto doc = parser.parse(filePath);
-        if (!doc) return false;
+        if (!doc)
+            return false;
         setCanvasWidth(doc->canvasWidth());
         setCanvasHeight(doc->canvasHeight());
         setCanvasFillColor(doc->canvasFill());
@@ -31,56 +27,45 @@ bool SvgDocument::loadFromFile(const QString &filePath)
         emit documentAttributeChanged("fill");
         emit documentChanged();
         return true;
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception& e) {
         return false;
     }
 }
 
-bool SvgDocument::saveToFile(const QString &filePath) const
-{
+bool SvgDocument::saveToFile(const QString& filePath) const {
     SvgWriter writer;
-    try
-    {
+    try {
         writer.write(filePath, *this);
         return true;
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception& e) {
         return false;
     }
 }
 
-void SvgDocument::addElements(QVector<std::shared_ptr<SvgElement>> elems)
-{
+void SvgDocument::addElements(QVector<std::shared_ptr<SvgElement>> elems) {
     for (auto elem : elems) {
         m_elements.append(elem);
     }
     emit addElementsChanged(elems);
 }
 
-void SvgDocument::removeElements(QVector <std::shared_ptr<SvgElement>> elems)
-{
+void SvgDocument::removeElements(QVector<std::shared_ptr<SvgElement>> elems) {
     for (auto elem : elems) {
         m_elements.removeAll(elem);
     }
     emit removeElementsChanged(elems);
 }
 
-QVector<std::shared_ptr<SvgElement>> SvgDocument::elements() const
-{
+QVector<std::shared_ptr<SvgElement>> SvgDocument::elements() const {
     return m_elements;
 }
 
-void SvgDocument::restoreOrder(const QVector<std::shared_ptr<SvgElement>>& newOrder)
-{
+void SvgDocument::restoreOrder(const QVector<std::shared_ptr<SvgElement>>& newOrder) {
     m_elements = newOrder;
     emit documentChanged();
 }
 
-void SvgDocument::reset()
-{
+void SvgDocument::reset() {
     m_elements.clear();
     m_canvasWidth = 750.0;
     m_canvasHeight = 500.0;
@@ -90,109 +75,101 @@ void SvgDocument::reset()
     emit documentAttributeChanged("fill");
 }
 
-int SvgDocument::elementCount() const
-{
+int SvgDocument::elementCount() const {
     return m_elements.size();
 }
 
-double SvgDocument::canvasWidth() const
-{
+double SvgDocument::canvasWidth() const {
     return m_canvasWidth;
 }
-double SvgDocument::canvasHeight() const
-{
+double SvgDocument::canvasHeight() const {
     return m_canvasHeight;
 }
-double SvgDocument::scale() const
-{
+double SvgDocument::scale() const {
     return m_scale;
 }
-QString SvgDocument::canvasFill() const
-{
+QString SvgDocument::canvasFill() const {
     return m_canvasFill;
 }
 
-void SvgDocument::setCanvasWidth(const double width)
-{
+void SvgDocument::setCanvasWidth(const double width) {
     m_canvasWidth = width;
     emit documentAttributeChanged("width");
 }
 
-void SvgDocument::setCanvasHeight(const double height)
-{
+void SvgDocument::setCanvasHeight(const double height) {
     m_canvasHeight = height;
     emit documentAttributeChanged("height");
 }
 
-void SvgDocument::setScale(const double scale)
-{
+void SvgDocument::setScale(const double scale) {
     m_scale = scale;
     emit documentAttributeChanged("scale");
 }
 
-void SvgDocument::setCanvasFillColor(const QString &fill)
-{
+void SvgDocument::setCanvasFillColor(const QString& fill) {
     m_canvasFill = fill;
     emit documentAttributeChanged("fill");
 }
 
-void SvgDocument::moveZ(const QVector<std::shared_ptr<SvgElement>>& elems, int delta)
-{
-    if (elems.isEmpty()) return;
+void SvgDocument::moveZ(const QVector<std::shared_ptr<SvgElement>>& elems, int delta) {
+    if (elems.isEmpty())
+        return;
     auto& list = m_elements;
     int n = list.size();
 
-    // 1) ÊÕ¼¯ <elem, oldIdx> ²¢°´ oldIdx ÉıĞòÅÅĞò
-    struct Pair { std::shared_ptr<SvgElement> e; int idx; };
+    // æ”¶é›† <elem, oldIdx> å¹¶æŒ‰ oldIdx å‡åºæ’åº
+    struct Pair {
+        std::shared_ptr<SvgElement> e;
+        int idx;
+    };
     QVector<Pair> pairs;
     pairs.reserve(elems.size());
     for (auto& e : elems) {
         int i = list.indexOf(e);
-        if (i >= 0) pairs.append({ e,i });
+        if (i >= 0)
+            pairs.append({e, i});
     }
     std::sort(pairs.begin(), pairs.end(),
-        [](auto& a, auto& b) { return a.idx < b.idx; });
+              [](auto& a, auto& b) { return a.idx < b.idx; });
 
-    // 2) ÏÈ°ÑÕâÅúÔªËØ¶¼´Ó list ÖĞÒÆ³ı£¨´ÓºóÍùÇ°É¾ÒÔÃâÓ°ÏìË÷Òı£©
+    // å…ˆæŠŠè¿™æ‰¹å…ƒç´ éƒ½ä» list ä¸­ç§»é™¤ï¼ˆä»åå¾€å‰åˆ ä»¥å…å½±å“ç´¢å¼•ï¼‰
     for (int i = int(pairs.size()) - 1; i >= 0; --i) {
         list.removeAt(pairs[i].idx);
     }
 
-    // 3) ¾ö¶¨²åÈë·½Ê½
+    // å†³å®šæ’å…¥æ–¹å¼
     if (delta >= n) {
-        // ÖÃ¶¥£ºappend£¬±£ÁôÉıĞò
+        // ç½®é¡¶ï¼šappendï¼Œä¿ç•™å‡åº
         for (auto& p : pairs) {
             list.append(p.e);
         }
-    }
-    else if (delta <= -n) {
-        // ÖÃµ×£ºprepend£¬µ¹Ğò²åÈëÒÔ±£ÁôÏà¶ÔÏÈºó
+    } else if (delta <= -n) {
+        // ç½®åº•ï¼šprependï¼Œå€’åºæ’å…¥ä»¥ä¿ç•™ç›¸å¯¹å…ˆå
         for (int i = pairs.size() - 1; i >= 0; --i) {
             list.insert(0, pairs[i].e);
         }
-    }
-    else {
-        // ÆÕÍ¨µÄ¡°ÉÏ/ÏÂÒÆ¡±¸÷×ÔÒ»¸ö delta
-        // ¼ÆËãĞÂµÄË÷Òı£¨ÒÔÒÆ³ıºóÁĞ±í³¤¶ÈÎª×¼£©
-        // ÕâÀï oldIdx ÒÑ¾­ÊÇÔ­ÁĞ±íµÄ idx£¬  
-        // ÒÆ³ıºó£¬ºóÃæ idx Ó¦¸Ã¼õÈ¥±»É¾µôµÄ¸öÊı£¨ËùÓĞ oldIdx < that idx µÄÊıÁ¿£©  
+    } else {
+        // æ™®é€šçš„â€œä¸Š/ä¸‹ç§»â€å„è‡ªä¸€ä¸ª delta
+        // è®¡ç®—æ–°çš„ç´¢å¼•ï¼ˆä»¥ç§»é™¤ååˆ—è¡¨é•¿åº¦ä¸ºå‡†ï¼‰
+        // è¿™é‡Œ oldIdx å·²ç»æ˜¯åŸåˆ—è¡¨çš„ idxï¼Œ
+        // ç§»é™¤åï¼Œåé¢ idx åº”è¯¥å‡å»è¢«åˆ æ‰çš„ä¸ªæ•°ï¼ˆæ‰€æœ‰ oldIdx < that idx çš„æ•°é‡ï¼‰
         QVector<int> newIdx;
         newIdx.reserve(pairs.size());
         for (auto& p : pairs) {
             int base = p.idx;
-            // ¼ÆËãÔÚÒÆ³ıºóÁĞ±íÖĞµÄ¡°Ô­Î»¡±£º
-            // ±»ÒÆ³ıµÄÔªËØÖĞÓĞ¶àÉÙÔ­Ê¼ idx < base£¿
+            // è®¡ç®—åœ¨ç§»é™¤ååˆ—è¡¨ä¸­çš„â€œåŸä½â€ï¼š
+            // è¢«ç§»é™¤çš„å…ƒç´ ä¸­æœ‰å¤šå°‘åŸå§‹ idx < baseï¼Ÿ
             int shift = std::count_if(pairs.begin(), pairs.end(),
-                [&](auto& q) { return q.idx < base; });
+                                      [&](auto& q) { return q.idx < base; });
             int pos = base - shift + delta;
             newIdx.append(qBound(0, pos, list.size()));
         }
-        // ×îºó°´ pairs ÉıĞò²å»Øµ½¸÷×Ô newIdx
+        // æœ€åæŒ‰ pairs å‡åºæ’å›åˆ°å„è‡ª newIdx
         for (int i = 0; i < pairs.size(); ++i) {
             list.insert(newIdx[i], pairs[i].e);
         }
     }
 
-    // 4) ·¢ĞÅºÅ
     emit documentChanged();
 }

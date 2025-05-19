@@ -1,8 +1,8 @@
 ﻿#ifndef SVGFREEHAND_H
 #define SVGFREEHAND_H
 
-#include <QPainterPath>
 #include "svgelement.h"
+#include <QPainterPath>
 
 class SvgFreehand : public SvgElement {
 public:
@@ -14,8 +14,6 @@ public:
 
     QPainterPath path() const;
     void setPath(const QPainterPath& p);
-
-    bool isClosed() const;
 
     QDomElement toXml(QDomDocument& doc) const override;
     void fromXml(const QDomElement& elem) override;

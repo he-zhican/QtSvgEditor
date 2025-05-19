@@ -1,15 +1,14 @@
-#include "mainwindow.h"
+ï»¿#include "mainwindow.h"
 #include <QApplication>
 #include <QFile>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
 
-    // Ó¦ÓÃÈ«¾ÖÑùÊ½±í
+    // åº”ç”¨å…¨å±€æ ·å¼è¡¨
     QFile qssFile(":/styles/style.qss");
     if (qssFile.open(QFile::ReadOnly)) {
-   
+
         a.setStyleSheet(qssFile.readAll());
     }
 

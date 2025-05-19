@@ -1,0 +1,6 @@
+BasedOnStyle: LLVM
+PointerAlignment: Left
+BreakBeforeBraces: Attach 
+IndentWidth: 4
+ColumnLimit: 0
+AccessModifierOffset: -4

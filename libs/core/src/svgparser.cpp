@@ -1,14 +1,14 @@
-#include "svgparser.h"
+﻿#include "svgparser.h"
 #include "svgelement.h"
-#include "svgrect.h"
 #include "svgellipse.h"
+#include "svgexception.h"
+#include "svgfreehand.h"
 #include "svgline.h"
 #include "svgpolygon.h"
-#include "svgfreehand.h"
+#include "svgrect.h"
 #include "svgtext.h"
-#include "svgexception.h"
-#include <QFile>
 #include <QDomDocument>
+#include <QFile>
 
 std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
     QFile file(filePath);
@@ -41,23 +41,32 @@ std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
     }
 
     QDomElement painterGroup = bgGroup.nextSiblingElement("g");
-    if (painterGroup.isNull()) painterGroup = root;
+    if (painterGroup.isNull())
+        painterGroup = root;
 
     QVector<std::shared_ptr<SvgElement>> elements;
     // 加载图形元素
     for (QDomNode node = painterGroup.firstChild(); !node.isNull(); node = node.nextSibling()) {
-        if (!node.isElement()) continue;
+        if (!node.isElement())
+            continue;
         QDomElement elem = node.toElement();
 
         std::shared_ptr<SvgElement> obj;
         QString tag = elem.tagName();
-        if (tag == "rect")        obj = std::make_shared<SvgRect>();
-        else if (tag == "ellipse")  obj = std::make_shared<SvgEllipse>();
-        else if (tag == "line")     obj = std::make_shared<SvgLine>();
-        else if (tag == "polygon")  obj = std::make_shared<SvgPolygon>();
-        else if (tag == "path")     obj = std::make_shared<SvgFreehand>();
-        else if (tag == "text")     obj = std::make_shared<SvgText>();
-        else continue; // 忽略其他元素
+        if (tag == "rect")
+            obj = std::make_shared<SvgRect>();
+        else if (tag == "ellipse")
+            obj = std::make_shared<SvgEllipse>();
+        else if (tag == "line")
+            obj = std::make_shared<SvgLine>();
+        else if (tag == "polygon")
+            obj = std::make_shared<SvgPolygon>();
+        else if (tag == "path")
+            obj = std::make_shared<SvgFreehand>();
+        else if (tag == "text")
+            obj = std::make_shared<SvgText>();
+        else
+            continue; // 忽略其他元素
 
         obj->fromXml(elem);
         elements << obj;

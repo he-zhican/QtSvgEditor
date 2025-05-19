@@ -1,25 +1,21 @@
 ﻿#include "texttoolcontroller.h"
-#include "svgtext.h"
 #include "addelementscommand.h"
 #include "commandmanager.h"
+#include "svgtext.h"
 #include <QTextCursor>
 #include <QTextDocument>
 
 TextToolController::TextToolController(QObject* parent)
     : ToolController(parent) {
-
 }
 
-void TextToolController::onMousePress(QMouseEvent* event)
-{
+void TextToolController::onMousePress(QMouseEvent* event) {
 }
 
-void TextToolController::onMouseMove(QMouseEvent* event)
-{
+void TextToolController::onMouseMove(QMouseEvent* event) {
 }
 
-void TextToolController::onMouseRelease(QMouseEvent* event)
-{
+void TextToolController::onMouseRelease(QMouseEvent* event) {
     if (!m_previewItem) {
         QPointF scenePos = m_view->mapToScene(event->pos());
 
@@ -39,8 +35,7 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
         cursor.select(QTextCursor::Document);
         m_previewItem->setTextCursor(cursor);
         m_previewItem->installEventFilter(this);
-    }
-    else {
+    } else {
         QString text = m_previewItem->toPlainText().trimmed();
         QPointF scenePos = m_previewItem->pos();
 
@@ -65,14 +60,12 @@ void TextToolController::onMouseRelease(QMouseEvent* event)
     }
 }
 
-bool TextToolController::eventFilter(QObject* obj, QEvent* event)
-{
+bool TextToolController::eventFilter(QObject* obj, QEvent* event) {
     if (auto* textItem = qobject_cast<QGraphicsTextItem*>(obj)) {
         bool commit = false;
         if (event->type() == QEvent::FocusOut) {
             commit = true;
-        }
-        else if (event->type() == QEvent::KeyPress) {
+        } else if (event->type() == QEvent::KeyPress) {
             auto* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
                 commit = true;
@@ -81,7 +74,7 @@ bool TextToolController::eventFilter(QObject* obj, QEvent* event)
         if (commit) {
             QString text = textItem->toPlainText().trimmed();
             QPointF scenePos = textItem->pos();
-            
+
             if (!text.isEmpty()) {
                 auto textElem = std::make_shared<SvgText>();
                 textElem->setText(text);

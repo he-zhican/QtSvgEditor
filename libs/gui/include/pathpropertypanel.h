@@ -1,4 +1,4 @@
-#ifndef PATHPROPERTYPANEL_H
+﻿#ifndef PATHPROPERTYPANEL_H
 #define PATHPROPERTYPANEL_H
 
 #include <QColor>
@@ -10,31 +10,29 @@
 
 class SvgElement;
 
-class PathPropertyPanel : public QWidget
-{
+class PathPropertyPanel : public QWidget {
     Q_OBJECT
-  public:
-    explicit PathPropertyPanel(QWidget *parent = nullptr);
+public:
+    explicit PathPropertyPanel(QWidget* parent = nullptr);
 
     void loadElement(std::shared_ptr<SvgElement> elem);
 
-  private slots:
+private slots:
     void onXChanged(int v);
     void onYChanged(int v);
     void onStrokeWidthChanged(int v);
-    void onStrokeStyleChanged(const QString &style);
+    void onStrokeStyleChanged(const QString& style);
     void onStrokeColorClicked();
     void onFillColorClicked();
 
-  private:
+private:
     std::shared_ptr<SvgElement> m_element;
     QLineEdit *m_xEdit, *m_yEdit, *m_swEdit;
-    QComboBox *m_styleCombo;
+    QComboBox* m_styleCombo;
     QPushButton *m_strokeColorBtn, *m_fillColorBtn;
     QColor m_strokeColor, m_fillColor;
 
-    int toInt(const QString &t) const
-    {
+    int toInt(const QString& t) const {
         bool ok;
         int v = t.toInt(&ok);
         return ok ? v : 0;

@@ -1,24 +1,20 @@
-#ifndef RESIZEELEMENTSCOMMAND_H
+﻿#ifndef RESIZEELEMENTSCOMMAND_H
 #define RESIZEELEMENTSCOMMAND_H
 
 #include "command.h"
 #include "svgelement.h"
 
-class ResizeElementCommand : public Command
-{
+class ResizeElementCommand : public Command {
 public:
     ResizeElementCommand(std::shared_ptr<SvgElement> elem, Handle handle, qreal dx, qreal dy, QUndoCommand* parent = nullptr)
-        : Command("RESIZE Element", parent), m_element(elem), m_handle(handle), m_dx(dx), m_dy(dy)
-    {
+        : Command("RESIZE Element", parent), m_element(elem), m_handle(handle), m_dx(dx), m_dy(dy) {
     }
 
 protected:
-    void execute() override
-    {
+    void execute() override {
         //m_element->resize(m_handle, m_dx, m_dy);
     }
-    void undoImpl() override
-    {
+    void undoImpl() override {
         m_element->resize(m_handle, -m_dx, -m_dy);
     }
 

@@ -1,19 +1,18 @@
-#include "propertypanelfactory.h"
+ï»¿#include "propertypanelfactory.h"
 
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 
 void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const QString& title,
-    const QStringList& names, QVector<QWidget*> editors)
-{
-    // Ö÷²¼¾Ö
+                                             const QStringList& names, QVector<QWidget*> editors) {
+    // ä¸»å¸ƒå±€
     auto* mainLayout = new QVBoxLayout(propertyPanelWidget);
     mainLayout->setContentsMargins(4, 4, 4, 4);
     QLabel* titleLabel = new QLabel(title, propertyPanelWidget);
     titleLabel->setObjectName("propertyPanelTitleLable");
     mainLayout->addWidget(titleLabel, 0, Qt::AlignLeft);
 
-    // ÊôÐÔÍø¸ñ£¬2ÁÐ¹Ì¶¨¿í¶È170
+    // å±žæ€§ç½‘æ ¼ï¼Œ2åˆ—å›ºå®šå®½åº¦170
     auto* grid = new QGridLayout;
     grid->setHorizontalSpacing(8);
     grid->setVerticalSpacing(8);
@@ -32,7 +31,7 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
         lbl->setAlignment(Qt::AlignCenter);
         v->addWidget(lbl);
 
-        // °ü¹ü±à¼­Æ÷ÒÔ¾ÓÖÐ¶ÔÆë
+        // åŒ…è£¹ç¼–è¾‘å™¨ä»¥å±…ä¸­å¯¹é½
         QWidget* editorWrapper = new QWidget(box);
         auto* h = new QHBoxLayout(editorWrapper);
         h->setContentsMargins(0, 0, 0, 0);
@@ -44,10 +43,11 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
 
         int col = (i % 2 == 0) ? 0 : 1;
         grid->addWidget(box, row, col, Qt::AlignHCenter);
-        if (col == 1) ++row;
+        if (col == 1)
+            ++row;
     }
 
-    // Èç¹û×îºóÖ»ÓÐÒ»ÁÐ£¬ÔòÈÃÆä×ó¶ÔÆëÕ¼Î»
+    // å¦‚æžœæœ€åŽåªæœ‰ä¸€åˆ—ï¼Œåˆ™è®©å…¶å·¦å¯¹é½å ä½
     if (names.size() % 2 != 0) {
         grid->setColumnStretch(1, 1);
     }

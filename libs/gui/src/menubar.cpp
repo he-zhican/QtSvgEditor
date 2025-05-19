@@ -1,20 +1,17 @@
 ﻿#include "menubar.h"
+#include "commandmanager.h"
 #include <QAction>
 #include <QMenu>
-#include "commandmanager.h"
 
 MenuBar::MenuBar(QWidget* parent)
-    : QMenuBar(parent)
-{
+    : QMenuBar(parent) {
     initMenus();
 }
 
-MenuBar::~MenuBar()
-{
+MenuBar::~MenuBar() {
 }
 
-void MenuBar::initMenus()
-{
+void MenuBar::initMenus() {
     // 添加一级菜单（如"文件"）
     QMenu* fileMenu = this->addMenu(tr("文件"));
 
@@ -28,10 +25,10 @@ void MenuBar::initMenus()
     fileMenu->addSeparator(); // 添加分隔线
     m_exportAction = fileMenu->addAction(tr("导出为PNG"));
 
-    connect(m_newAction, &QAction::triggered, this, [&] {emit newFileAction();});
-    connect(m_openAction, &QAction::triggered, this, [&] {emit openFileAction();});
-    connect(m_saveAction, &QAction::triggered, this, [&] {emit saveFileAction();});
-    connect(m_exportAction, &QAction::triggered, this, [&] {emit toPNGAction();});
+    connect(m_newAction, &QAction::triggered, this, [&] { emit newFileAction(); });
+    connect(m_openAction, &QAction::triggered, this, [&] { emit openFileAction(); });
+    connect(m_saveAction, &QAction::triggered, this, [&] { emit saveFileAction(); });
+    connect(m_exportAction, &QAction::triggered, this, [&] { emit toPNGAction(); });
 }
 
 void MenuBar::onLoadFile(bool enable) {

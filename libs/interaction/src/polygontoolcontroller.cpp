@@ -1,11 +1,11 @@
-﻿#include <QGraphicsView>
-#include "polygontoolcontroller.h"
-#include "commandmanager.h"
+﻿#include "polygontoolcontroller.h"
 #include "addelementscommand.h"
+#include "commandmanager.h"
 #include "svgpolygon.h"
+#include <QGraphicsView>
 
 PolygonToolController::PolygonToolController(QObject* parent)
-    :ToolController(parent){
+    : ToolController(parent) {
 
     m_tid2calcu[ToolId::Pentagon] = [this]() { calculatePentagonPoints(); };
     m_tid2calcu[ToolId::Hexagon] = [this]() { calculateHexagonPoints(); };
@@ -15,25 +15,24 @@ PolygonToolController::PolygonToolController(QObject* parent)
     m_tid2calcu[ToolId::Parallelogram] = [this]() { calculateParallelogramPoints(); };
 }
 
-void PolygonToolController::onMousePress(QMouseEvent* event)
-{
+void PolygonToolController::onMousePress(QMouseEvent* event) {
     m_startPos = event->pos();
     m_startPos = m_view->mapToScene(m_startPos.toPoint());
     m_previewItem = m_view->scene()->addPolygon(QPolygonF(), QPen(Qt::DashLine));
 }
 
-void PolygonToolController::onMouseMove(QMouseEvent* event)
-{
-    if (!m_previewItem) return;
+void PolygonToolController::onMouseMove(QMouseEvent* event) {
+    if (!m_previewItem)
+        return;
     m_endPos = m_view->mapToScene(event->pos());
     // 根据当前的工具类型调用相应的计算函数
     m_tid2calcu[m_toolId]();
     m_previewItem->setPolygon(QPolygonF(m_points));
 }
 
-void PolygonToolController::onMouseRelease(QMouseEvent* event)
-{
-    if (!m_previewItem) return;
+void PolygonToolController::onMouseRelease(QMouseEvent* event) {
+    if (!m_previewItem)
+        return;
 
     m_endPos = m_view->mapToScene(event->pos());
 
@@ -60,8 +59,7 @@ void PolygonToolController::onMouseRelease(QMouseEvent* event)
     CommandManager::instance().execute(addCmd);
 }
 
-void PolygonToolController::calculatePentagonPoints()
-{
+void PolygonToolController::calculatePentagonPoints() {
     m_points.clear();
 
     bool sXGreaterEX = m_startPos.x() > m_endPos.x();
@@ -73,12 +71,10 @@ void PolygonToolController::calculatePentagonPoints()
     QPointF p4(abs(m_startPos.x() - m_endPos.x()) / 5 * (sXGreaterEX ? 4 : 1) + std::min(m_startPos.x(), m_endPos.x()), m_endPos.y());
     QPointF p5(m_startPos.x(), abs(m_startPos.y() - m_endPos.y()) / 5 * (sYGreaterEY ? 3 : 2) + std::min(m_startPos.y(), m_endPos.y()));
 
-
     m_points << p1 << p2 << p3 << p4 << p5;
 }
 
-void PolygonToolController::calculateHexagonPoints()
-{
+void PolygonToolController::calculateHexagonPoints() {
     m_points.clear();
 
     bool sXGreaterEX = m_startPos.x() > m_endPos.x();
@@ -92,14 +88,12 @@ void PolygonToolController::calculateHexagonPoints()
 
     if (m_startPos.x() < m_endPos.x()) {
         m_points << p1 << p2 << p3 << p4 << p5 << p6;
-    }
-    else {
+    } else {
         m_points << p2 << p1 << p3 << p5 << p4 << p6;
     }
 }
 
-void PolygonToolController::calculateStarPoints()
-{
+void PolygonToolController::calculateStarPoints() {
     m_points.clear();
 
     bool sXGreaterEX = m_startPos.x() > m_endPos.x();
@@ -127,20 +121,18 @@ void PolygonToolController::calculateStarPoints()
     QPointF inP5;
 
     // 计算直线的交点得到内顶点
-    if (lineP1P3.intersect(lineP2P5, &inP1) != QLineF::BoundedIntersection ||
-        lineP1P3.intersect(lineP2P4, &inP2) != QLineF::BoundedIntersection ||
-        lineP3P5.intersect(lineP2P4, &inP3) != QLineF::BoundedIntersection ||
-        lineP1P4.intersect(lineP3P5, &inP4) != QLineF::BoundedIntersection ||
-        lineP1P4.intersect(lineP2P5, &inP5) != QLineF::BoundedIntersection)
-    {
+    if (lineP1P3.intersects(lineP2P5, &inP1) != QLineF::BoundedIntersection ||
+        lineP1P3.intersects(lineP2P4, &inP2) != QLineF::BoundedIntersection ||
+        lineP3P5.intersects(lineP2P4, &inP3) != QLineF::BoundedIntersection ||
+        lineP1P4.intersects(lineP3P5, &inP4) != QLineF::BoundedIntersection ||
+        lineP1P4.intersects(lineP2P5, &inP5) != QLineF::BoundedIntersection) {
         return;
     }
 
     m_points << outP1 << inP1 << outP2 << inP2 << outP3 << inP3 << outP4 << inP4 << outP5 << inP5;
 }
 
-void PolygonToolController::calculateTrapeziumPoints()
-{
+void PolygonToolController::calculateTrapeziumPoints() {
     m_points.clear();
 
     bool sXGreaterEX = m_startPos.x() > m_endPos.x();
@@ -151,23 +143,20 @@ void PolygonToolController::calculateTrapeziumPoints()
     QPointF p3(m_endPos.x(), m_endPos.y());
     QPointF p4(m_startPos.x(), m_endPos.y());
 
-
     m_points << p1 << p2 << p3 << p4;
 }
 
-void PolygonToolController::calculateTrianglePoints()
-{
+void PolygonToolController::calculateTrianglePoints() {
     m_points.clear();
 
-    QPointF p1((m_startPos.x() + m_endPos.x())/2, m_startPos.y());
+    QPointF p1((m_startPos.x() + m_endPos.x()) / 2, m_startPos.y());
     QPointF p2(m_startPos.x(), m_endPos.y());
     QPointF p3(m_endPos.x(), m_endPos.y());
 
     m_points << p1 << p2 << p3;
 }
 
-void PolygonToolController::calculateParallelogramPoints()
-{
+void PolygonToolController::calculateParallelogramPoints() {
     m_points.clear();
 
     bool sXGreaterEX = m_startPos.x() > m_endPos.x();

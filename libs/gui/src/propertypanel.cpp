@@ -1,7 +1,15 @@
-#include "propertypanel.h"
+﻿#include "propertypanel.h"
+#include "canvaspropertypanel.h"
+#include "ellipsepropertyPanel.h"
+#include "linepropertypanel.h"
+#include "multipropertypanel.h"
+#include "pathpropertypanel.h"
+#include "rectpropertypanel.h"
 #include "selectionmanager.h"
 #include "svgdocument.h"
 #include "svgpolygon.h"
+#include "textpropertypanel.h"
+
 #include <QColorDialog>
 #include <QComboBox>
 #include <QFormLayout>
@@ -11,16 +19,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#include "canvaspropertypanel.h"
-#include "ellipsepropertyPanel.h"
-#include "linepropertypanel.h"
-#include "multipropertypanel.h"
-#include "pathpropertypanel.h"
-#include "rectpropertypanel.h"
-#include "textpropertypanel.h"
-
-PropertyPanel::PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget *parent) : QWidget(parent)
-{
+PropertyPanel::PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget* parent) : QWidget(parent) {
     m_stack = new QStackedWidget(this);
     m_canvasPropertyPanel = new CanvasPropertyPanel(doc, this);
     m_rectPropertyPanel = new RectPropertyPanel(this);
@@ -38,7 +37,7 @@ PropertyPanel::PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget *parent) 
     m_stack->addWidget(m_textPropertyPanel);    // 5
     m_stack->addWidget(m_multiPropertyPanel);   // 6
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_stack);
     setLayout(mainLayout);
 
@@ -47,56 +46,38 @@ PropertyPanel::PropertyPanel(std::shared_ptr<SvgDocument> doc, QWidget *parent) 
             &PropertyPanel::onSelectionChanged);
 }
 
-void PropertyPanel::onSelectionChanged(const QVector<std::shared_ptr<SvgElement>> &sel)
-{
+void PropertyPanel::onSelectionChanged(const QVector<std::shared_ptr<SvgElement>>& sel) {
     int count = sel.size();
-    if (count == 0)
-    {
+    if (count == 0) {
         m_stack->setCurrentWidget(m_canvasPropertyPanel);
-    }
-    else if (count == 1)
-    {
+    } else if (count == 1) {
         auto elem = sel.first();
         QString tag = elem->tagName();
-        if (tag == QLatin1String("rect"))
-        {
+        if (tag == QLatin1String("rect")) {
             m_stack->setCurrentWidget(m_rectPropertyPanel);
             m_rectPropertyPanel->loadElement(elem);
-        }
-        else if (tag == QLatin1String("ellipse"))
-        {
+        } else if (tag == QLatin1String("ellipse")) {
             m_stack->setCurrentWidget(m_ellipsePropertyPanel);
             m_ellipsePropertyPanel->loadElement(elem);
-        }
-        else if (tag == QLatin1String("line"))
-        {
+        } else if (tag == QLatin1String("line")) {
             m_stack->setCurrentWidget(m_linePropertyPanel);
             m_linePropertyPanel->loadElement(elem);
-        }
-        else if (tag == QLatin1String("polygon") || tag == QLatin1String("path"))
-        {
+        } else if (tag == QLatin1String("polygon") || tag == QLatin1String("path")) {
             m_stack->setCurrentWidget(m_pathPropertyPanel);
             m_pathPropertyPanel->loadElement(elem);
-        }
-        else if (tag == QLatin1String("text"))
-        {
+        } else if (tag == QLatin1String("text")) {
             m_stack->setCurrentWidget(m_textPropertyPanel);
             m_textPropertyPanel->loadElement(elem);
-        }
-        else
-        {
+        } else {
             m_stack->setCurrentWidget(m_multiPropertyPanel);
             m_multiPropertyPanel->loadElements(sel);
         }
-    }
-    else
-    {
+    } else {
         m_stack->setCurrentWidget(m_multiPropertyPanel);
         m_multiPropertyPanel->loadElements(sel);
     }
 }
 
-void PropertyPanel::setDocument(std::shared_ptr<SvgDocument> doc)
-{
+void PropertyPanel::setDocument(std::shared_ptr<SvgDocument> doc) {
     m_canvasPropertyPanel->setDocument(doc);
 }

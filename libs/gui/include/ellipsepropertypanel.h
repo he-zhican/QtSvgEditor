@@ -1,11 +1,11 @@
 ﻿#ifndef ELLIPSEPROPERTYPANEL_H
 #define ELLIPSEPROPERTYPANEL_H
 
-#include <QWidget>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QPushButton>
 #include <QColor>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QWidget>
 #include <memory>
 
 class SvgElement;
@@ -29,13 +29,14 @@ private slots:
 
 private:
     std::shared_ptr<SvgElement> m_element;
-    QLineEdit* m_xEdit, * m_yEdit, * m_rxEdit, * m_ryEdit, * m_swEdit;
+    QLineEdit *m_xEdit, *m_yEdit, *m_rxEdit, *m_ryEdit, *m_swEdit;
     QComboBox* m_styleCombo;
-    QPushButton* m_strokeColorBtn, * m_fillColorBtn;
+    QPushButton *m_strokeColorBtn, *m_fillColorBtn;
     QColor m_strokeColor, m_fillColor;
 
     int toInt(const QString& txt) const {
-        bool ok; int v = txt.toInt(&ok);
+        bool ok;
+        int v = txt.toInt(&ok);
         return ok ? v : 0;
     }
     void updateControls();

@@ -1,63 +1,83 @@
-#include"svgfreehand.h"
-#include <QtNumeric>
+ï»¿#include "svgfreehand.h"
 #include <QTransform>
+#include <QtNumeric>
 
 SvgFreehand::SvgFreehand(QObject* parent)
     : SvgElement(parent) {
-    // ³õÊ¼»¯Ê±Ä¬ÈÏÌí¼ÓÑùÊ½ÊôĞÔ
-    setAttribute("stroke", "#000000");     // ±ß¿òÑÕÉ«£ººÚÉ«
-    setAttribute("stroke-width", "2");    // ±ß¿ò¿í¶È£º2ÏñËØ
-    setAttribute("stroke-dasharray", ""); // ±ß¿òÑùÊ½
-    setAttribute("fill", "none"); // Ìî³äÑÕÉ«
+    // åˆå§‹åŒ–æ—¶é»˜è®¤æ·»åŠ æ ·å¼å±æ€§
+    setAttribute("stroke", "#000000");    // è¾¹æ¡†é¢œè‰²ï¼šé»‘è‰²
+    setAttribute("stroke-width", "2");    // è¾¹æ¡†å®½åº¦ï¼š2åƒç´ 
+    setAttribute("stroke-dasharray", ""); // è¾¹æ¡†æ ·å¼
+    setAttribute("fill", "none");         // å¡«å……é¢œè‰²
 }
 
-void SvgFreehand::move(const QPointF& offset)
-{
+void SvgFreehand::move(const QPointF& offset) {
     QPainterPath originPath = path();
     originPath.translate(offset);
     setPath(originPath);
 }
 
-void SvgFreehand::resize(const Handle handle, const qreal dx, const qreal dy)
-{
-    // 1. ¾É°üÎ§ºĞ
+void SvgFreehand::resize(const Handle handle, const qreal dx, const qreal dy) {
+    // 1. æ—§åŒ…å›´ç›’
     QPainterPath orig = path();
     QRectF oldRect = orig.boundingRect();
     if (oldRect.width() < 1 || oldRect.height() < 1)
-        return;  // ·À»¤
+        return; // é˜²æŠ¤
 
-    // 2. ¼ÆËãĞÂ°üÎ§ºĞ
+    // 2. è®¡ç®—æ–°åŒ…å›´ç›’
     QRectF r = oldRect;
     switch (handle) {
-    case Handle::Left:        r.setLeft(r.left() + dx);               break;
-    case Handle::Right:       r.setRight(r.right() + dx);             break;
-    case Handle::Top:         r.setTop(r.top() + dy);                 break;
-    case Handle::Bottom:      r.setBottom(r.bottom() + dy);           break;
-    case Handle::TopLeft:     r.setLeft(r.left() + dx); r.setTop(r.top() + dy);       break;
-    case Handle::TopRight:    r.setRight(r.right() + dx); r.setTop(r.top() + dy);     break;
-    case Handle::BottomLeft:  r.setLeft(r.left() + dx);  r.setBottom(r.bottom() + dy); break;
-    case Handle::BottomRight: r.setRight(r.right() + dx); r.setBottom(r.bottom() + dy); break;
-    default: return;
+    case Handle::Left:
+        r.setLeft(r.left() + dx);
+        break;
+    case Handle::Right:
+        r.setRight(r.right() + dx);
+        break;
+    case Handle::Top:
+        r.setTop(r.top() + dy);
+        break;
+    case Handle::Bottom:
+        r.setBottom(r.bottom() + dy);
+        break;
+    case Handle::TopLeft:
+        r.setLeft(r.left() + dx);
+        r.setTop(r.top() + dy);
+        break;
+    case Handle::TopRight:
+        r.setRight(r.right() + dx);
+        r.setTop(r.top() + dy);
+        break;
+    case Handle::BottomLeft:
+        r.setLeft(r.left() + dx);
+        r.setBottom(r.bottom() + dy);
+        break;
+    case Handle::BottomRight:
+        r.setRight(r.right() + dx);
+        r.setBottom(r.bottom() + dy);
+        break;
+    default:
+        return;
     }
-    // ×îĞ¡³ß´ç±£»¤
-    if (r.width() < 1) r.setWidth(1);
-    if (r.height() < 1) r.setHeight(1);
+    // æœ€å°å°ºå¯¸ä¿æŠ¤
+    if (r.width() < 1)
+        r.setWidth(1);
+    if (r.height() < 1)
+        r.setHeight(1);
 
-    // 3. ¹¹Ôì·ÂÉä±ä»»£ºÏÈ½« oldRect Ó³µ½Ô­µã£¬ÔÙËõ·Å£¬ÔÙÒÆ»Øµ½ r ¶¥µã
+    // 3. æ„é€ ä»¿å°„å˜æ¢ï¼šå…ˆå°† oldRect æ˜ åˆ°åŸç‚¹ï¼Œå†ç¼©æ”¾ï¼Œå†ç§»å›åˆ° r é¡¶ç‚¹
     QTransform tr;
     tr.translate(r.left(), r.top());
     tr.scale(r.width() / oldRect.width(),
-        r.height() / oldRect.height());
+             r.height() / oldRect.height());
     tr.translate(-oldRect.left(), -oldRect.top());
 
     QPainterPath newPath = tr.map(orig);
 
-    // 4. ¸üĞÂÄ£ĞÍ
+    // 4. æ›´æ–°æ¨¡å‹
     setPath(newPath);
 }
 
-std::shared_ptr<SvgElement> SvgFreehand::clone() const
-{
+std::shared_ptr<SvgElement> SvgFreehand::clone() const {
     auto copy = std::make_shared<SvgFreehand>();
     for (auto it = m_attributes.constBegin(); it != m_attributes.constEnd(); ++it) {
         copy->setAttribute(it.key(), it.value());
@@ -66,10 +86,10 @@ std::shared_ptr<SvgElement> SvgFreehand::clone() const
 }
 
 QPainterPath SvgFreehand::path() const {
-    // ´Ó "d" ÊôĞÔ½âÎöÂ·¾¶
+    // ä» "d" å±æ€§è§£æè·¯å¾„
     QString d = attribute("d");
     QPainterPath p;
-    // ½âÎö MoveTo ºÍ LineTo
+    // è§£æ MoveTo å’Œ LineTo
     QStringList commands = d.split(' ', Qt::SkipEmptyParts);
     int i = 0;
     while (i < commands.size()) {
@@ -78,14 +98,12 @@ QPainterPath SvgFreehand::path() const {
             double x = commands[i++].toDouble();
             double y = commands[i++].toDouble();
             p.moveTo(x, y);
-        }
-        else if (cmd == "L" && i + 1 < commands.size()) {
+        } else if (cmd == "L" && i + 1 < commands.size()) {
             double x = commands[i++].toDouble();
             double y = commands[i++].toDouble();
             p.lineTo(x, y);
-        }
-        else {
-            // Ö§³Ö¸ü¶àÃüÁî¿ÉÀ©Õ¹
+        } else {
+            // æ”¯æŒæ›´å¤šå‘½ä»¤å¯æ‰©å±•
             break;
         }
     }
@@ -93,39 +111,19 @@ QPainterPath SvgFreehand::path() const {
 }
 
 void SvgFreehand::setPath(const QPainterPath& p) {
-    // ½« QPainterPath ĞòÁĞ»¯Îª d ÊôĞÔ
+    // å°† QPainterPath åºåˆ—åŒ–ä¸º d å±æ€§
     QStringList parts;
     int count = p.elementCount();
     for (int i = 0; i < count; ++i) {
         auto e = p.elementAt(i);
         if (e.isMoveTo()) {
             parts << "M" << QString::number(e.x) << QString::number(e.y);
-        }
-        else {
+        } else {
             parts << "L" << QString::number(e.x) << QString::number(e.y);
         }
     }
 
-    // ÅĞ¶Ï±ÕºÏ£ºÈç¹ûÊ×Î²µãÖØºÏ£¬ÔòÌí¼Ó Z ÃüÁî
-    if (count > 1) {
-        QPointF first = p.elementAt(0);
-        QPointF last = p.elementAt(count - 1);
-        if (qFuzzyCompare(first.x(), last.x()) && qFuzzyCompare(first.y(), last.y())) {
-            parts << "Z";
-        }
-    }
-
     setAttribute("d", parts.join(' '));
-}
-
-bool SvgFreehand::isClosed() const
-{
-    QPainterPath p = path();
-    if (p.elementCount() < 2) return false;
-    QPointF first = p.elementAt(0);
-    QPointF last = p.elementAt(p.elementCount() - 1);
-    // Èô×îºóÒ»¸öµãÓëµÚÒ»¸öµãÖØºÏ£¬ÊÓÎª±ÕºÏ
-    return qFuzzyCompare(first.x(), last.x()) && qFuzzyCompare(first.y(), last.y());
 }
 
 QDomElement SvgFreehand::toXml(QDomDocument& doc) const {

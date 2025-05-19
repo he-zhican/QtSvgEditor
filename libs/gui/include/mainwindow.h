@@ -1,24 +1,22 @@
-#ifndef MAINWINDOW_H
+ï»¿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
-namespace Ui
-{
+namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
-  public:
-    MainWindow(QWidget *parent = nullptr);
+public:
+    MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
 signals:
-    // µ±¼ÓÔØµÄ²»ÊÇ±¾³ÌĞò±£´æµÄsvgÎÄ¼şÊ±£¬·¢³ö¸ÃĞÅºÅ
+    // å½“åŠ è½½çš„ä¸æ˜¯æœ¬ç¨‹åºä¿å­˜çš„svgæ–‡ä»¶æ—¶ï¼Œå‘å‡ºè¯¥ä¿¡å·
     void loadFile(bool enable);
 
 protected:
@@ -30,8 +28,8 @@ public slots:
     void onOpenFileActTriggered();
     void onToPNGActTriggered();
 
-  private:
-    Ui::MainWindow *ui;
+private:
+    Ui::MainWindow* ui;
     QString m_filePath;
 
     void loadSettings();

@@ -1,15 +1,14 @@
 ﻿#include "ellipsepropertypanel.h"
-#include "propertypanelfactory.h"
 #include "changeattributecommand.h"
 #include "commandmanager.h"
+#include "propertypanelfactory.h"
 #include "svgelement.h"
-#include <QIntValidator>
 #include <QColorDialog>
+#include <QIntValidator>
 #include <QSignalBlocker>
 
 EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
-    : QWidget(parent)
-{
+    : QWidget(parent) {
     QStringList names;
     QVector<QWidget*> editors;
 
@@ -55,7 +54,7 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
 
     // Stroke style
     m_styleCombo = new QComboBox(this);
-    m_styleCombo->addItems({ tr("实线"), tr("虚线"), tr("点线"), tr("虚点") });
+    m_styleCombo->addItems({tr("实线"), tr("虚线"), tr("点线"), tr("虚点")});
     connect(m_styleCombo, &QComboBox::currentTextChanged, this, &EllipsePropertyPanel::onStrokeStyleChanged);
     names << tr("边框样式");
     editors << m_styleCombo;
@@ -79,19 +78,18 @@ EllipsePropertyPanel::EllipsePropertyPanel(QWidget* parent)
 }
 
 // 动态加载元素
-void EllipsePropertyPanel::loadElement(std::shared_ptr<SvgElement> elem)
-{
+void EllipsePropertyPanel::loadElement(std::shared_ptr<SvgElement> elem) {
     m_element = elem;
     // 监听属性变化，自动更新控件
     connect(m_element.get(), &SvgElement::attributeChanged, this, [&](const QString&, const QString&) {
         updateControls();
-        });
+    });
     updateControls();
 }
 
-void EllipsePropertyPanel::updateControls()
-{
-    if (!m_element) return;
+void EllipsePropertyPanel::updateControls() {
+    if (!m_element)
+        return;
 
     // 阻塞信号
     QSignalBlocker b1(m_xEdit), b2(m_yEdit), b3(m_rxEdit),
@@ -117,9 +115,12 @@ void EllipsePropertyPanel::updateControls()
     // stroke-dasharray → index
     QString dash = m_element->attribute("stroke-dasharray");
     int idx = 0;
-    if (dash == "5,5")       idx = 1;
-    else if (dash == "1,3")  idx = 2;
-    else if (dash == "5,3,1,3") idx = 3;
+    if (dash == "5,5")
+        idx = 1;
+    else if (dash == "1,3")
+        idx = 2;
+    else if (dash == "5,3,1,3")
+        idx = 3;
     m_styleCombo->setCurrentIndex(idx);
 
     // stroke color
@@ -138,40 +139,52 @@ void EllipsePropertyPanel::onXChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "cx", QString::number(v + m_element->attribute("rx").toDouble()));
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onYChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "cy", QString::number(v + m_element->attribute("ry").toDouble()));
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onRxChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "rx", QString::number(v));
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onRyChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "ry", QString::number(v));
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onStrokeWidthChanged(int v) {
     auto cmd = new ChangeAttributeCommand(m_element, "stroke-width", QString::number(v));
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onStrokeStyleChanged(const QString& style) {
     QString dash;
-    if (style == tr("虚线"))       dash = "5,5";
-    else if (style == tr("点线"))  dash = "1,3";
-    else if (style == tr("虚点"))  dash = "5,3,1,3";
+    if (style == tr("虚线"))
+        dash = "5,5";
+    else if (style == tr("点线"))
+        dash = "1,3";
+    else if (style == tr("虚点"))
+        dash = "5,3,1,3";
     auto cmd = new ChangeAttributeCommand(m_element, "stroke-dasharray", dash);
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onStrokeColorClicked() {
     QColor c = QColorDialog::getColor(m_strokeColor, this, tr("选择边框颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_strokeColor = c;
     auto cmd = new ChangeAttributeCommand(m_element, "stroke", c.name());
     CommandManager::instance().execute(cmd);
 }
+
 void EllipsePropertyPanel::onFillColorClicked() {
     QColor c = QColorDialog::getColor(m_fillColor, this, tr("选择填充颜色"));
-    if (!c.isValid()) return;
+    if (!c.isValid())
+        return;
     m_fillColor = c;
     auto cmd = new ChangeAttributeCommand(m_element, "fill", c.name());
     CommandManager::instance().execute(cmd);

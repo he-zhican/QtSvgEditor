@@ -1,9 +1,9 @@
 ﻿#include "svgwriter.h"
-#include "svgexception.h"
 #include "svgelement.h"
-#include <QFile>
-#include <QDomElement>
+#include "svgexception.h"
 #include <QDomDocument>
+#include <QDomElement>
+#include <QFile>
 
 void SvgWriter::write(const QString& filePath, const SvgDocument& doc) {
     QDomDocument dom;

@@ -18,5 +18,6 @@
         <file>icons/pen.png</file>
         <file>icons/zoom.png</file>
         <file>styles/style.qss</file>
+        <file>translations/app_en_US.qm</file>
     </qresource>
 </RCC>

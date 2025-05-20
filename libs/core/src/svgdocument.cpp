@@ -23,11 +23,11 @@ bool SvgDocument::loadFromFile(const QString& filePath) {
         setCanvasWidth(doc->canvasWidth());
         setCanvasHeight(doc->canvasHeight());
         setCanvasFillColor(doc->canvasFill());
+        setScale(doc->scale());
         m_elements = doc->elements();
-        emit documentAttributeChanged("fill");
         emit documentChanged();
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         return false;
     }
 }
@@ -37,7 +37,7 @@ bool SvgDocument::saveToFile(const QString& filePath) const {
     try {
         writer.write(filePath, *this);
         return true;
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         return false;
     }
 }

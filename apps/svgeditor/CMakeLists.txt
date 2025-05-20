@@ -1,5 +1,6 @@
 add_executable(svgeditor WIN32
     src/main.cpp
+    ${RCC_FILE}
 )
 
 target_include_directories(svgeditor PRIVATE ${PROJECT_SOURCE_DIR}/libs/gui/include)

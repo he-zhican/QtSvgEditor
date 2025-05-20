@@ -9,7 +9,7 @@ public:
     explicit SvgFreehand(QObject* parent = nullptr);
     QString tagName() const override { return "path"; }
     void move(const QPointF& offset) override;
-    void resize(const Handle handle, const qreal dx, const qreal dy) override;
+    void resize(Handle& handle, const qreal dx, const qreal dy) override;
     std::shared_ptr<SvgElement> clone() const override;
 
     QPainterPath path() const;

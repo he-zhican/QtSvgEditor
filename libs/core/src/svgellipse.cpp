@@ -3,9 +3,9 @@
 
 SvgEllipse::SvgEllipse(QObject* parent) : SvgElement(parent) {
     // 初始化时默认添加样式属性
-    setAttribute("stroke", "#000000"); // 边框颜色：黑色
-    setAttribute("stroke-width", "2"); // 边框宽度：2像素
-    setAttribute("fill", "#ffffff");   // 填充颜色：白色
+    setAttribute("stroke", "#000000");    // 边框颜色：黑色
+    setAttribute("stroke-width", "2");    // 边框宽度：2像素
+    setAttribute("fill", "#ffffff");      // 填充颜色：白色
     setAttribute("stroke-dasharray", ""); // 边框样式
 }
 
@@ -14,10 +14,14 @@ void SvgEllipse::move(const QPointF& offset) {
     setCenterY(centerY() + offset.y());
 }
 
-void SvgEllipse::resize(const Handle handle, const qreal dx, const qreal dy) {
-    QRectF r(centerX() - radiusX(), centerY() - radiusY(),
-             radiusX() * 2, radiusY() * 2);
+void SvgEllipse::resize(Handle& handle, const qreal dx, const qreal dy) {
+    // 构造原始矩形
+    QRectF r(centerX() - radiusX(),
+             centerY() - radiusY(),
+             radiusX() * 2,
+             radiusY() * 2);
 
+    // 根据当前把手移动对应边/角
     switch (handle) {
     case Handle::Left:
         r.setLeft(r.left() + dx);
@@ -50,16 +54,28 @@ void SvgEllipse::resize(const Handle handle, const qreal dx, const qreal dy) {
     default:
         return;
     }
-    r = r.normalized();
-    if (r.width() < 1)
-        r.setWidth(1);
-    if (r.height() < 1)
-        r.setHeight(1);
 
+    // 检测是否跨过中点（左右或上下翻转）
+    const bool flipH = (r.left() > r.right());
+    const bool flipV = (r.top() > r.bottom());
+
+    // 归一化矩形，保证 left<=right, top<=bottom
+    r = r.normalized();
+
+    // 最小尺寸保护
+    if (r.width() < 1.0)
+        r.setWidth(1.0);
+    if (r.height() < 1.0)
+        r.setHeight(1.0);
+
+    // 应用回 ellipse 属性
     setCenterX(r.center().x());
     setCenterY(r.center().y());
     setRadiusX(r.width() * 0.5);
     setRadiusY(r.height() * 0.5);
+
+    // 把手翻转
+    flipHandle(handle, flipH, flipV);
 }
 
 std::shared_ptr<SvgElement> SvgEllipse::clone() const {

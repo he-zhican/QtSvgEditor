@@ -1,5 +1,6 @@
 ﻿#include "svgpolygon.h"
 #include <QRectF>
+#include <QTransform>
 
 SvgPolygon::SvgPolygon(QObject* parent)
     : SvgElement(parent) {
@@ -24,79 +25,96 @@ void SvgPolygon::move(const QPointF& offset) {
     setEndY(endY() + offset.y());
 }
 
-void SvgPolygon::resize(const Handle handle, const qreal dx, const qreal dy) {
-    // 1) 原始包围盒
+void SvgPolygon::resize(Handle& handle, const qreal dx, const qreal dy) {
+    // 原始包围盒
     double x1 = startX(), y1 = startY();
     double x2 = endX(), y2 = endY();
-    // 保证 x1/y1 是左上，x2/y2 是右下
     double left = qMin(x1, x2);
     double top = qMin(y1, y2);
     double right = qMax(x1, x2);
     double bottom = qMax(y1, y2);
     double w = right - left;
     double h = bottom - top;
-    if (w < 1)
-        w = 1;
-    if (h < 1)
-        h = 1;
+    if (w == 0 || h == 0)
+        return; // 防护
 
-    // 2) 计算新的包围盒
-    QRectF newRect(left, top, w, h);
+    // 构造 rawRect，调整对应边
+    QRectF rawRect(left, top, w, h);
     switch (handle) {
     case Handle::Left:
-        newRect.setLeft(left + dx);
+        rawRect.setLeft(rawRect.left() + dx);
         break;
     case Handle::Right:
-        newRect.setRight(right + dx);
+        rawRect.setRight(rawRect.right() + dx);
         break;
     case Handle::Top:
-        newRect.setTop(top + dy);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::Bottom:
-        newRect.setBottom(bottom + dy);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     case Handle::TopLeft:
-        newRect.setLeft(left + dx);
-        newRect.setTop(top + dy);
+        rawRect.setLeft(rawRect.left() + dx);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::TopRight:
-        newRect.setRight(right + dx);
-        newRect.setTop(top + dy);
+        rawRect.setRight(rawRect.right() + dx);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::BottomLeft:
-        newRect.setLeft(left + dx);
-        newRect.setBottom(bottom + dy);
+        rawRect.setLeft(rawRect.left() + dx);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     case Handle::BottomRight:
-        newRect.setRight(right + dx);
-        newRect.setBottom(bottom + dy);
+        rawRect.setRight(rawRect.right() + dx);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     default:
         return;
     }
-    // 确保最小尺寸
-    if (newRect.width() < 1)
-        newRect.setWidth(1);
-    if (newRect.height() < 1)
-        newRect.setHeight(1);
 
-    // 3) 按新的矩形对所有点做仿射映射
+    // 阈值保护：避免宽高过小直接塌掉
+    const qreal minSize = 1.0;
+    qreal rawW = rawRect.width();
+    qreal rawH = rawRect.height();
+    if (qAbs(rawW) < minSize) {
+        // 保持符号，强制最小绝对宽度
+        rawW = (rawW < 0 ? -minSize : minSize);
+        rawRect.setRight(rawRect.left() + rawW);
+    }
+    if (qAbs(rawH) < minSize) {
+        rawH = (rawH < 0 ? -minSize : minSize);
+        rawRect.setBottom(rawRect.top() + rawH);
+    }
+
+    // 用 QTransform 做缩放与镜像
+    qreal scaleX = rawRect.width() / w;  // 负值代表水平镜像
+    qreal scaleY = rawRect.height() / h; // 负值代表垂直镜像
+
+    QTransform tr;
+    tr.translate(rawRect.left(), rawRect.top());
+    tr.scale(scaleX, scaleY);
+    tr.translate(-left, -top);
+
+    // 仿射映射每个顶点
     QVector<QPointF> pts = points();
     QVector<QPointF> out;
     out.reserve(pts.size());
-    for (auto& p : pts) {
-        double rx = (p.x() - left) / w;
-        double ry = (p.y() - top) / h;
-        double nx = newRect.left() + rx * newRect.width();
-        double ny = newRect.top() + ry * newRect.height();
-        out.append(QPointF(nx, ny));
+    for (const QPointF& p : pts) {
+        out.append(tr.map(p));
     }
-
     setPoints(out);
-    setStartX(newRect.left());
-    setStartY(newRect.top());
-    setEndX(newRect.right());
-    setEndY(newRect.bottom());
+
+    // 把手翻转
+    flipHandle(handle, scaleX < 0, scaleY < 0);
+
+    // 归一化并更新 start/end
+    QRectF finalRect = rawRect.normalized();
+
+    setStartX(finalRect.left());
+    setStartY(finalRect.top());
+    setEndX(finalRect.right());
+    setEndY(finalRect.bottom());
 }
 
 std::shared_ptr<SvgElement> SvgPolygon::clone() const {

@@ -99,10 +99,10 @@ void RectPropertyPanel::update() {
         b8(m_fillColorBtn);
 
     // 位置与尺寸
-    m_xEdit->setText(QString::number(m_element->attribute("x").toInt()));
-    m_yEdit->setText(QString::number(m_element->attribute("y").toInt()));
-    m_wEdit->setText(QString::number(m_element->attribute("width").toInt()));
-    m_hEdit->setText(QString::number(m_element->attribute("height").toInt()));
+    m_xEdit->setText(QString::number(static_cast<int>(m_element->attribute("x").toDouble())));
+    m_yEdit->setText(QString::number(static_cast<int>(m_element->attribute("y").toDouble())));
+    m_wEdit->setText(QString::number(static_cast<int>(m_element->attribute("width").toDouble())));
+    m_hEdit->setText(QString::number(static_cast<int>(m_element->attribute("height").toDouble())));
 
     // 边框宽度
     QString sw = m_element->attribute("stroke-width");

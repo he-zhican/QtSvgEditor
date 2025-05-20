@@ -24,15 +24,11 @@ CanvasView::CanvasView(QWidget* parent)
     setDragMode(QGraphicsView::RubberBandDrag);
     setMouseTracking(true);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    //setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     // 关闭 QGraphicsView 自带的滚动条
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    // 在 CanvasView 构造函数里（或初始化时）：
-    //connect(scene, &QGraphicsScene::selectionChanged, this, &CanvasView::onSceneSelectionChanged);
 
     initActions();
 }
@@ -163,6 +159,7 @@ void CanvasView::setDocument(std::shared_ptr<SvgDocument> doc) {
     // 一定要更新控制器里的文档，否则控制器画的元素依旧添加在原来的文档中
     if (m_controller)
         m_controller->setDocument(m_document);
+
     connect(m_document.get(), &SvgDocument::documentChanged, this, &CanvasView::onDocumentChanged);
     connect(m_document.get(), &SvgDocument::addElementsChanged, this, &CanvasView::onAddElementsChanged);
     connect(m_document.get(), &SvgDocument::removeElementsChanged, this, &CanvasView::onRemoveElementsChanged);
@@ -191,6 +188,7 @@ void CanvasView::onDocumentChanged() {
     m_itemMap.clear();
     for (auto& elem : m_document->elements()) {
         GraphicsSvgItem* item = new GraphicsSvgItem(elem);
+        item->setAcceptHoverEvents(m_toolId == ToolId::Move);
         scene()->addItem(item);
         m_itemMap[elem] = item;
     }
@@ -202,6 +200,7 @@ void CanvasView::onAddElementsChanged(QVector<std::shared_ptr<SvgElement>> elems
     scene()->clearSelection();
     for (auto elem : elems) {
         GraphicsSvgItem* item = new GraphicsSvgItem(elem);
+        item->setAcceptHoverEvents(m_toolId == ToolId::Move);
         item->setSelected(true);
         scene()->addItem(item);
         m_itemMap[elem] = item;
@@ -252,9 +251,11 @@ void CanvasView::onToolSelected(ToolId toolId) {
     m_toolId = toolId;
     scene()->clearSelection();
     onSceneSelectionChanged();
+
     // 设置光标样式
     if (m_toolId == ToolId::Move) {
         viewport()->setCursor(Qt::ArrowCursor); // 正常箭头
+
     } else if (m_toolId == ToolId::Freehand) {
         QPixmap pm(":/icons/pen.png");
         viewport()->setCursor(QCursor(pm, 1, 30));
@@ -272,7 +273,7 @@ void CanvasView::onToolSelected(ToolId toolId) {
     for (auto* gi : scene()->items()) {
         if (auto* svg = dynamic_cast<GraphicsSvgItem*>(gi)) {
             gi->setAcceptHoverEvents(isMoveTool);
-            gi->setCursor(viewport()->cursor());
+            gi->unsetCursor();
         }
     }
 }
@@ -285,8 +286,7 @@ void CanvasView::mousePressEvent(QMouseEvent* event) {
         return;
     }
     // 在MOVE工具下才执行父类的点击事件
-    if (viewport()->cursor() == Qt::ArrowCursor || viewport()->cursor() == Qt::SizeAllCursor)
-        QGraphicsView::mousePressEvent(event);
+    QGraphicsView::mousePressEvent(event);
     // 更新选区
     onSceneSelectionChanged();
 

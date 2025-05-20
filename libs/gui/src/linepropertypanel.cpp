@@ -85,10 +85,10 @@ void LinePropertyPanel::updateControls() {
         b4(m_y2Edit), b5(m_swEdit), b6(m_styleCombo), b7(m_strokeColorBtn);
 
     // x1,y1,x2,y2
-    m_x1Edit->setText(QString::number(m_element->attribute("x1").toInt()));
-    m_y1Edit->setText(QString::number(m_element->attribute("y1").toInt()));
-    m_x2Edit->setText(QString::number(m_element->attribute("x2").toInt()));
-    m_y2Edit->setText(QString::number(m_element->attribute("y2").toInt()));
+    m_x1Edit->setText(QString::number(static_cast<int>(m_element->attribute("x1").toDouble())));
+    m_y1Edit->setText(QString::number(static_cast<int>(m_element->attribute("y1").toDouble())));
+    m_x2Edit->setText(QString::number(static_cast<int>(m_element->attribute("x2").toDouble())));
+    m_y2Edit->setText(QString::number(static_cast<int>(m_element->attribute("y2").toDouble())));
 
     // stroke-width
     m_swEdit->setText(m_element->attribute("stroke-width"));

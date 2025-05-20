@@ -26,6 +26,7 @@ std::shared_ptr<SvgDocument> SvgParser::parse(const QString& filePath) {
     auto document = std::make_shared<SvgDocument>();
     QDomElement root = dom.documentElement();
 
+    // 判断文件是否是本程序导出的，若不是，则返回空指针，解析失败
     if (!root.hasAttribute("author") || root.attribute("author") != "WHUT_HZC")
         return nullptr;
 

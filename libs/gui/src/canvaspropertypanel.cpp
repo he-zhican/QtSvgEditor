@@ -57,7 +57,7 @@ CanvasPropertyPanel::CanvasPropertyPanel(std::shared_ptr<SvgDocument> doc, QWidg
     names.append(tr("背景颜色"));
     editors.append(m_bgColorBtn);
 
-    PropertyPanelFactory::makePropertyPanel(this, "画布", names, editors);
+    PropertyPanelFactory::makePropertyPanel(this, tr("画布"), names, editors);
 
     connect(doc.get(), &SvgDocument::documentAttributeChanged, this, &CanvasPropertyPanel::onDocAttributeChanged);
 }

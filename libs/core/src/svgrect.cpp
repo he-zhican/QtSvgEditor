@@ -1,4 +1,5 @@
 ﻿#include "svgrect.h"
+#include <QRectF>
 
 SvgRect::SvgRect(QObject* parent) : SvgElement(parent) {
     // 初始化时默认添加样式属性
@@ -13,73 +14,75 @@ void SvgRect::move(const QPointF& offset) {
     setY(y() + offset.y());
 }
 
-void SvgRect::resize(const Handle handle, const qreal dx, const qreal dy) {
-    qreal qx = x();
-    qreal qy = y();
-    qreal w = width();
-    qreal h = height();
+void SvgRect::resize(Handle& handle, const qreal dx, const qreal dy) {
+    QRectF rawRect(x(), y(), width(), height());
+    qreal left = rawRect.left();
+    qreal top = rawRect.top();
+    qreal right = rawRect.right();
+    qreal bottom = rawRect.bottom();
 
+    // 根据 handle 调整对应边
     switch (handle) {
     case Handle::Left:
-        qx += dx;
-        w -= dx;
+        rawRect.setLeft(left + dx);
         break;
     case Handle::Right:
-        w += dx;
+        rawRect.setRight(right + dx);
         break;
     case Handle::Top:
-        qy += dy;
-        h -= dy;
+        rawRect.setTop(top + dy);
         break;
     case Handle::Bottom:
-        h += dy;
+        rawRect.setBottom(bottom + dy);
         break;
     case Handle::TopLeft:
-        qx += dx;
-        w -= dx;
-        qy += dy;
-        h -= dy;
+        rawRect.setLeft(left + dx);
+        rawRect.setTop(top + dy);
         break;
     case Handle::TopRight:
-        // 保持右边不动，改变宽度；保持上边手柄
-        w += dx;
-        qy += dy;
-        h -= dy;
+        rawRect.setRight(right + dx);
+        rawRect.setTop(top + dy);
         break;
     case Handle::BottomLeft:
-        qx += dx;
-        w -= dx;
-        // 保持底边不动，高度增减由 h 处理
-        h += dy;
+        rawRect.setLeft(left + dx);
+        rawRect.setBottom(bottom + dy);
         break;
     case Handle::BottomRight:
-        // 底右角，宽高同时增减
-        w += dx;
-        h += dy;
+        rawRect.setRight(right + dx);
+        rawRect.setBottom(bottom + dy);
         break;
     default:
         return;
     }
 
-    // 强制最小尺寸为 1 像素（或根据需求改成更大）
-    if (w < 1.0) {
-        // 如果宽度被缩到 <0，需要修正 x
-        if (handle == Handle::Left || handle == Handle::TopLeft || handle == Handle::BottomLeft) {
-            qx -= (1.0 - w);
-        }
-        w = 1.0;
+    // 最小尺寸保护：避免宽或高归零
+    const qreal minSize = 1.0;
+    qreal w = rawRect.width();
+    qreal h = rawRect.height();
+
+    if (qAbs(w) < minSize) {
+        // 保留符号，防止 collapse
+        w = (w < 0 ? -minSize : minSize);
+        rawRect.setRight(rawRect.left() + w);
     }
-    if (h < 1.0) {
-        if (handle == Handle::Top || handle == Handle::TopLeft || handle == Handle::TopRight) {
-            qy -= (1.0 - h);
-        }
-        h = 1.0;
+    if (qAbs(h) < minSize) {
+        h = (h < 0 ? -minSize : minSize);
+        rawRect.setBottom(rawRect.top() + h);
     }
 
-    setX(qx);
-    setY(qy);
-    setWidth(w);
-    setHeight(h);
+    // 检测翻转：负宽度或负高度代表翻转
+    bool flipH = (rawRect.width() < 0);
+    bool flipV = (rawRect.height() < 0);
+
+    QRectF finalRect = rawRect.normalized();
+
+    setX(finalRect.left());
+    setY(finalRect.top());
+    setWidth(finalRect.width());
+    setHeight(finalRect.height());
+
+    // 翻转把手，使后续拖拽继续作用于用户意图的那一侧
+    flipHandle(handle, flipH, flipV);
 }
 
 std::shared_ptr<SvgElement> SvgRect::clone() const {

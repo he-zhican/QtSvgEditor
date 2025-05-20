@@ -8,7 +8,7 @@ public:
     explicit SvgEllipse(QObject* parent = nullptr);
     QString tagName() const override { return "ellipse"; }
     void move(const QPointF& offset) override;
-    void resize(const Handle handle, const qreal dx, const qreal dy) override;
+    void resize(Handle& handle, const qreal dx, const qreal dy) override;
     std::shared_ptr<SvgElement> clone() const override;
 
     double centerX() const; // 中心点横坐标

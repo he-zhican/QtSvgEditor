@@ -5,7 +5,7 @@ SvgElement::SvgElement(QObject* parent)
 
 SvgElement::~SvgElement() {}
 
-void SvgElement::resize(const Handle handle, qreal dx, qreal dy) {
+void SvgElement::resize(Handle& handle, qreal dx, qreal dy) {
 }
 
 void SvgElement::setAttribute(const QString& name, const QString& value) {
@@ -38,5 +38,56 @@ void SvgElement::fromXml(const QDomElement& elem) {
     for (int i = 0; i < map.count(); ++i) {
         QDomAttr attr = map.item(i).toAttr();
         m_attributes[attr.name()] = attr.value();
+    }
+}
+
+void SvgElement::flipHandle(Handle& handle, bool flipH, bool flipV) {
+    if (flipH) {
+        switch (handle) {
+        case Handle::Left:
+            handle = Handle::Right;
+            break;
+        case Handle::Right:
+            handle = Handle::Left;
+            break;
+        case Handle::TopLeft:
+            handle = Handle::TopRight;
+            break;
+        case Handle::TopRight:
+            handle = Handle::TopLeft;
+            break;
+        case Handle::BottomLeft:
+            handle = Handle::BottomRight;
+            break;
+        case Handle::BottomRight:
+            handle = Handle::BottomLeft;
+            break;
+        default: /*Top/Bottom 不变*/
+            break;
+        }
+    }
+    if (flipV) {
+        switch (handle) {
+        case Handle::Top:
+            handle = Handle::Bottom;
+            break;
+        case Handle::Bottom:
+            handle = Handle::Top;
+            break;
+        case Handle::TopLeft:
+            handle = Handle::BottomLeft;
+            break;
+        case Handle::TopRight:
+            handle = Handle::BottomRight;
+            break;
+        case Handle::BottomLeft:
+            handle = Handle::TopLeft;
+            break;
+        case Handle::BottomRight:
+            handle = Handle::TopRight;
+            break;
+        default: /*Left/Right 不变*/
+            break;
+        }
     }
 }

@@ -117,7 +117,7 @@ void GraphicsSvgItem::updateStyle() {
         m_font.setBold(m_element->attribute("font-weight") == "bold");
         m_font.setItalic(m_element->attribute("font-style") == "italic");
         m_font.setUnderline(m_element->attribute("text-decoration") == "underline");
-        m_font.setPointSize(m_element->attribute("font-size").toInt());
+        m_font.setPointSize(static_cast<int>(m_element->attribute("font-size").toDouble()));
         m_font.setFamily(m_element->attribute("font-family"));
         updateGeometry();
     }
@@ -172,9 +172,8 @@ void GraphicsSvgItem::updateGeometry() {
 }
 
 void GraphicsSvgItem::hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
-    // 未被选中，正常箭头鼠标
+    // 未被选中
     if (!isSelected()) {
-        setCursor(Qt::ArrowCursor);
         return;
     }
 

@@ -28,7 +28,7 @@ public:
 
     virtual QString tagName() const = 0;
     virtual void move(const QPointF& offset) = 0;
-    virtual void resize(const Handle handle, qreal dx, qreal dy);
+    virtual void resize(Handle& handle, qreal dx, qreal dy);
     virtual std::shared_ptr<SvgElement> clone() const = 0;
 
     void setAttribute(const QString& name, const QString& value);
@@ -38,6 +38,10 @@ public:
 
     virtual QDomElement toXml(QDomDocument& doc) const;
     virtual void fromXml(const QDomElement& elem);
+
+protected:
+    // 将 handle 根据水平/垂直翻转标志翻转到对侧
+    void flipHandle(Handle& handle, bool flipH, bool flipV);
 
 signals:
     void attributeChanged(const QString& name, const QString& value);

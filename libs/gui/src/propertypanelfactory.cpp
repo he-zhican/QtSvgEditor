@@ -20,8 +20,8 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
     int row = 0;
     for (int i = 0; i < names.size(); ++i) {
         QWidget* box = new QWidget(propertyPanelWidget);
-        box->setFixedWidth(70);
-        box->setMinimumHeight(70);
+        box->setFixedWidth(80);
+        box->setMinimumHeight(80);
         box->setObjectName("propertyBox");
         auto* v = new QVBoxLayout(box);
         v->setContentsMargins(4, 4, 4, 4);
@@ -29,6 +29,7 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
         //h->addStretch();
         QLabel* lbl = new QLabel(names[i], box);
         lbl->setAlignment(Qt::AlignCenter);
+        lbl->setWordWrap(true);
         v->addWidget(lbl);
 
         // 包裹编辑器以居中对齐

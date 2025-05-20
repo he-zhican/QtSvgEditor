@@ -11,16 +11,18 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     connect(ui->sideToolBar, &SideToolBar::toolSelected, ui->canvasView, &CanvasView::onToolSelected);
-    connect(this, &MainWindow::loadFile, ui->sideToolBar, &SideToolBar::onLoadFile);
     connect(ui->canvasView, &CanvasView::changeToMoveTool, ui->sideToolBar, &SideToolBar::onChangeToMoveTool);
+
     connect(ui->menubar, &MenuBar::newFileAction, this, &MainWindow::onNewFileActTriggered);
     connect(ui->menubar, &MenuBar::openFileAction, this, &MainWindow::onOpenFileActTriggered);
     connect(ui->menubar, &MenuBar::saveFileAction, this, &MainWindow::onSaveFileActTriggered);
     connect(ui->menubar, &MenuBar::toPNGAction, this, &MainWindow::onToPNGActTriggered);
+
     connect(this, &MainWindow::loadFile, ui->menubar, &MenuBar::onLoadFile);
+    connect(this, &MainWindow::loadFile, ui->sideToolBar, &SideToolBar::onLoadFile);
     //ui->canvasView->show();
 
-    // 这两项对应注册表路径：
+    // 注册表路径：
     // HKEY_CURRENT_USER\Software\WHUT_Hzc\SvgEditor
     QCoreApplication::setOrganizationName("WHUT_Hzc");
     QCoreApplication::setApplicationName("SvgEditor");
@@ -79,8 +81,11 @@ void MainWindow::onNewFileActTriggered() {
             return;
     }
     doc->reset();
+    ui->canvasView->resetTransform();
     CommandManager::instance().clear();
     m_filePath.clear();
+
+    emit loadFile(true);
 }
 
 void MainWindow::onOpenFileActTriggered() {
@@ -93,6 +98,7 @@ void MainWindow::onOpenFileActTriggered() {
         return;
 
     auto doc = ui->canvasView->document();
+    ui->canvasView->resetTransform();
     if (doc->loadFromFile(path)) {
         m_filePath = path;
         CommandManager::instance().clear();
@@ -109,6 +115,7 @@ void MainWindow::onOpenFileActTriggered() {
 
         // 添加到场景
         scene->addItem(svgItem);
+
         doc->setCanvasWidth(bounds.width());
         doc->setCanvasHeight(bounds.height());
 

@@ -48,6 +48,7 @@ TextPropertyPanel::TextPropertyPanel(QWidget* parent)
 
     // 字体
     m_fontCombo = new QFontComboBox(this);
+    m_fontCombo->setMinimumWidth(70);
     connect(m_fontCombo, &QFontComboBox::currentFontChanged,
             this, [=](const QFont& f) { onFontFamilyChanged(f.family()); });
     names << tr("字体");
@@ -87,8 +88,8 @@ void TextPropertyPanel::updateControls() {
         b6(m_fontCombo), b7(m_sizeSpin), b8(m_colorBtn);
 
     // 坐标
-    m_xEdit->setText(QString::number(m_element->attribute("x").toInt()));
-    m_yEdit->setText(QString::number(m_element->attribute("y").toInt()));
+    m_xEdit->setText(QString::number(static_cast<int>(m_element->attribute("x").toDouble())));
+    m_yEdit->setText(QString::number(static_cast<int>(m_element->attribute("y").toDouble())));
 
     // 字体样式
     QFont f;
@@ -103,7 +104,7 @@ void TextPropertyPanel::updateControls() {
     int idx = m_fontCombo->findText(fam);
     if (idx >= 0)
         m_fontCombo->setCurrentIndex(idx);
-    int size = m_element->attribute("font-size").toInt();
+    int size = static_cast<int>(m_element->attribute("font-size").toDouble());
     m_sizeSpin->setValue(size);
 
     // 颜色

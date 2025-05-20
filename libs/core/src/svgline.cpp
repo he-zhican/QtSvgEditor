@@ -15,55 +15,74 @@ void SvgLine::move(const QPointF& offset) {
     setY2(y2() + offset.y());
 }
 
-void SvgLine::resize(const Handle handle, const qreal dx, const qreal dy) {
-    double nx1 = x1(), ny1 = y1();
-    double nx2 = x2(), ny2 = y2();
+void SvgLine::resize(Handle& handle, const qreal dx, const qreal dy) {
+    double xA = x1(), yA = y1();
+    double xB = x2(), yB = y2();
 
+    // 拷贝到可变变量
+    double nxA = xA, nyA = yA;
+    double nxB = xB, nyB = yB;
+
+    // 判断哪一端在左/上
+    const bool A_isLeft = (xA < xB);
+    const bool A_isTop = (yA < yB);
+
+    // 通过引用绑定左右上下
+    double& nxLeft = (A_isLeft ? nxA : nxB);
+    double& nxRight = (A_isLeft ? nxB : nxA);
+    double& nyTop = (A_isTop ? nyA : nyB);
+    double& nyBottom = (A_isTop ? nyB : nyA);
+
+    // 根据 handle 调整对应坐标
     switch (handle) {
     case Handle::Left:
-        nx1 += dx;
+        nxLeft += dx;
         break;
     case Handle::Right:
-        nx2 += dx;
+        nxRight += dx;
         break;
     case Handle::Top:
-        ny1 += dy;
+        nyTop += dy;
         break;
     case Handle::Bottom:
-        ny2 += dy;
+        nyBottom += dy;
         break;
     case Handle::TopLeft:
-        nx1 += dx;
-        ny1 += dy;
-        break;
-    case Handle::BottomRight:
-        nx2 += dx;
-        ny2 += dy;
+        nxLeft += dx;
+        nyTop += dy;
         break;
     case Handle::TopRight:
-        nx2 += dx;
-        ny1 += dy;
+        nxRight += dx;
+        nyTop += dy;
         break;
     case Handle::BottomLeft:
-        nx1 += dx;
-        ny2 += dy;
+        nxLeft += dx;
+        nyBottom += dy;
+        break;
+    case Handle::BottomRight:
+        nxRight += dx;
+        nyBottom += dy;
         break;
     default:
         return;
     }
 
-    // 可选：保证线上两点不重合，最小距离 e.g. 1px
-    const double minDist = 1.0;
-    if (QLineF(QPointF(nx1, ny1), QPointF(nx2, ny2)).length() < minDist) {
-        // 如果距离太小，放弃本次调整
-        return;
-    }
+    // 计算翻转标志
+    bool flipH = (nxLeft > nxRight);
+    bool flipV = (nyTop > nyBottom);
 
-    // 应用回属性
-    setX1(nx1);
-    setY1(ny1);
-    setX2(nx2);
-    setY2(ny2);
+    // 更新 handle（翻转至对侧）
+    flipHandle(handle, flipH, flipV);
+
+    // 防止端点重合
+    const double minDist = 1.0;
+    if (QLineF(QPointF(nxA, nyA), QPointF(nxB, nyB)).length() < minDist)
+        return;
+
+    setX1(nxA);
+    setY1(nyA);
+    setX2(nxB);
+    setY2(nyB);
 }
 
 std::shared_ptr<SvgElement> SvgLine::clone() const {

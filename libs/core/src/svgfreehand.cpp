@@ -17,64 +17,76 @@ void SvgFreehand::move(const QPointF& offset) {
     setPath(originPath);
 }
 
-void SvgFreehand::resize(const Handle handle, const qreal dx, const qreal dy) {
-    // 1. 旧包围盒
+void SvgFreehand::resize(Handle& handle, const qreal dx, const qreal dy) {
+    // 原始路径及包围盒
     QPainterPath orig = path();
     QRectF oldRect = orig.boundingRect();
-    if (oldRect.width() < 1 || oldRect.height() < 1)
-        return; // 防护
+    if (oldRect.width() == 0 || oldRect.height() == 0)
+        return;
 
-    // 2. 计算新包围盒
-    QRectF r = oldRect;
+    // 构造带符号的 rawRect
+    QRectF rawRect = oldRect;
     switch (handle) {
     case Handle::Left:
-        r.setLeft(r.left() + dx);
+        rawRect.setLeft(rawRect.left() + dx);
         break;
     case Handle::Right:
-        r.setRight(r.right() + dx);
+        rawRect.setRight(rawRect.right() + dx);
         break;
     case Handle::Top:
-        r.setTop(r.top() + dy);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::Bottom:
-        r.setBottom(r.bottom() + dy);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     case Handle::TopLeft:
-        r.setLeft(r.left() + dx);
-        r.setTop(r.top() + dy);
+        rawRect.setLeft(rawRect.left() + dx);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::TopRight:
-        r.setRight(r.right() + dx);
-        r.setTop(r.top() + dy);
+        rawRect.setRight(rawRect.right() + dx);
+        rawRect.setTop(rawRect.top() + dy);
         break;
     case Handle::BottomLeft:
-        r.setLeft(r.left() + dx);
-        r.setBottom(r.bottom() + dy);
+        rawRect.setLeft(rawRect.left() + dx);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     case Handle::BottomRight:
-        r.setRight(r.right() + dx);
-        r.setBottom(r.bottom() + dy);
+        rawRect.setRight(rawRect.right() + dx);
+        rawRect.setBottom(rawRect.bottom() + dy);
         break;
     default:
         return;
     }
-    // 最小尺寸保护
-    if (r.width() < 1)
-        r.setWidth(1);
-    if (r.height() < 1)
-        r.setHeight(1);
 
-    // 3. 构造仿射变换：先将 oldRect 映到原点，再缩放，再移回到 r 顶点
+    // 最小尺寸保护：防止宽或高接近 0
+    const qreal minSize = 1.0; // 根据需要可以更大
+    qreal rw = rawRect.width();
+    qreal rh = rawRect.height();
+    if (qAbs(rw) < minSize) {
+        rw = (rw < 0 ? -minSize : minSize);
+        rawRect.setRight(rawRect.left() + rw);
+    }
+    if (qAbs(rh) < minSize) {
+        rh = (rh < 0 ? -minSize : minSize);
+        rawRect.setBottom(rawRect.top() + rh);
+    }
+
+    // 计算缩放因子（保留符号，实现镜像）
+    qreal scaleX = rawRect.width() / oldRect.width();
+    qreal scaleY = rawRect.height() / oldRect.height();
+
+    // 仿射变换：平移→缩放→平移回
     QTransform tr;
-    tr.translate(r.left(), r.top());
-    tr.scale(r.width() / oldRect.width(),
-             r.height() / oldRect.height());
+    tr.translate(rawRect.left(), rawRect.top());
+    tr.scale(scaleX, scaleY);
     tr.translate(-oldRect.left(), -oldRect.top());
 
     QPainterPath newPath = tr.map(orig);
-
-    // 4. 更新模型
     setPath(newPath);
+
+    // 把手翻转
+    flipHandle(handle, scaleX < 0, scaleY < 0);
 }
 
 std::shared_ptr<SvgElement> SvgFreehand::clone() const {

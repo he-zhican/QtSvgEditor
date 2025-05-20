@@ -84,8 +84,8 @@ void PathPropertyPanel::updateControls() {
         x = static_cast<int>(path.boundingRect().x());
         y = static_cast<int>(path.boundingRect().y());
     } else {
-        x = m_element->attribute("start-x").toInt();
-        y = m_element->attribute("start-y").toInt();
+        x = static_cast<int>(m_element->attribute("start-x").toDouble());
+        y = static_cast<int>(m_element->attribute("start-y").toDouble());
     }
 
     // x, y

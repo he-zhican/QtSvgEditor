@@ -25,8 +25,8 @@ public:
     void setupUi(QMainWindow* MainWindow) {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1000, 600);
-        MainWindow->setMinimumSize(1000, 600);
+        MainWindow->resize(1050, 600);
+        MainWindow->setMinimumSize(1050, 600);
 
         MainWindow->setWindowIcon(QIcon(":/icons/SVG.png"));
 
@@ -50,6 +50,7 @@ public:
         // 右侧属性面板
         auto* dock = new QDockWidget(MainWindow);
         dock->setTitleBarWidget(new QWidget(dock));
+        dock->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         propertyPanel = new PropertyPanel(canvasView->document(), dock);
         dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
         dock->setWidget(propertyPanel);

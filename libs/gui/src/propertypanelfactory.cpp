@@ -11,6 +11,7 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
     QLabel* titleLabel = new QLabel(title, propertyPanelWidget);
     titleLabel->setObjectName("propertyPanelTitleLable");
     mainLayout->addWidget(titleLabel, 0, Qt::AlignLeft);
+    mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     // 属性网格，2列固定宽度170
     auto* grid = new QGridLayout;
@@ -26,7 +27,6 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
         auto* v = new QVBoxLayout(box);
         v->setContentsMargins(4, 4, 4, 4);
         v->setSpacing(4);
-        //h->addStretch();
         QLabel* lbl = new QLabel(names[i], box);
         lbl->setAlignment(Qt::AlignCenter);
         lbl->setWordWrap(true);
@@ -40,17 +40,10 @@ void PropertyPanelFactory::makePropertyPanel(QWidget* propertyPanelWidget, const
         h->addWidget(editors[i]);
         v->addWidget(editorWrapper);
 
-        //h->addStretch();
-
         int col = (i % 2 == 0) ? 0 : 1;
         grid->addWidget(box, row, col, Qt::AlignHCenter);
         if (col == 1)
             ++row;
-    }
-
-    // 如果最后只有一列，则让其左对齐占位
-    if (names.size() % 2 != 0) {
-        grid->setColumnStretch(1, 1);
     }
 
     mainLayout->addLayout(grid);

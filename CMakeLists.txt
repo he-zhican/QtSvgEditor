@@ -29,26 +29,26 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 # set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core Widgets Gui Network Svg Xml LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Gui Network Svg Xml REQUIRED)
 
-# 收集应用源码（以 svgeditor 为例）
-file(GLOB_RECURSE LIB_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/gui/src/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/interaction/src/*.cpp
-)
+# # 收集需要被翻译的源码
+# file(GLOB_RECURSE LIB_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/libs/gui/src/*.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/libs/interaction/src/*.cpp
+# )
 
-# 定义翻译 TS 文件路径
-set(TS_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/translations/app_en_US.ts   # 中译英
-)
+# # 定义翻译 TS 文件路径
+# set(TS_FILES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/resources/translations/app_en_US.ts   # 中译英
+# )
 
-# 生成 .qm 翻译文件
-qt5_create_translation(QM_FILES
-    ${TS_FILES}
-    ${LIB_SOURCES}
-)
+# # 生成 .qm 翻译文件
+# qt5_create_translation(QM_FILES
+#     ${TS_FILES}
+#     ${LIB_SOURCES}
+# )
 
-add_custom_target(translations ALL DEPENDS ${QM_FILES})
+# add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 # 添加子目录
 add_subdirectory(libs)

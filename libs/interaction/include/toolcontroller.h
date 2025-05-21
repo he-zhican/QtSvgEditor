@@ -30,7 +30,7 @@ public:
     virtual void mouseDoubleClickEvent(QMouseEvent* event){};
 
     // 画图时，判断终点坐标和起始坐标是否一样
-    bool isSameEndPosStartPos(QPointF& start, QPointF& end) {
+    bool isSameEndPosStartPos(const QPointF& start, const QPointF& end) {
         QPointF delta = end - start;
         return (qFuzzyIsNull(delta.x()) && qFuzzyIsNull(delta.y()));
     }

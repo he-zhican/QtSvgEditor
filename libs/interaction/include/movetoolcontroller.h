@@ -30,7 +30,6 @@ private:
     bool m_isSelectElem = false;
     bool m_isTextEditing = false;
     Handle m_handle = Handle::None;
-    QRectF m_origBox;
 
     Handle resolveHandle(QGraphicsItem* gi, const QPointF& scenePt);
 };

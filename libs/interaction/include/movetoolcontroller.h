@@ -32,7 +32,7 @@ private:
     Handle m_handle = Handle::None;
     QRectF m_origBox;
 
-    Handle MoveToolController::resolveHandle(QGraphicsItem* gi, const QPointF& scenePt);
+    Handle resolveHandle(QGraphicsItem* gi, const QPointF& scenePt);
 };
 
 #endif // !MOVETOOLCONTROLLER_H

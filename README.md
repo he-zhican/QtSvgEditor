@@ -78,7 +78,6 @@ SvgElement (abstract)
 ├─ SvgLine
 ├─ SvgPolygon
 ├─ SvgFreehand
-├─ SvgStar
 └─ SvgText
 ```
 
@@ -87,14 +86,12 @@ SvgElement (abstract)
 ```txt
 QUndoCommand
 ├─ Command (abstract wrapper)
-   ├─ AddElementCommand
-   ├─ RemoveElementCommand
-   ├─ MoveElementCommand
+   ├─ AddElementsCommand
+   ├─ DeleteElementsCommand
+   ├─ MoveElementsCommand
    ├─ ResizeElementCommand
-   ├─ RotateElementCommand
    ├─ ChangeAttributeCommand
-   ├─ InsertTextCommand
-   └─ DeleteElementCommand
+   └─ ...
 ```
 
 * **`Command`** (可选抽象)或各命令直接继承自 `QUndoCommand`，实现 `redo()`/`undo()`。
@@ -108,13 +105,12 @@ QObject
    ├─ LineToolController
    ├─ PolygonToolController
    ├─ FreehandToolController
-   ├─ StarToolController
    ├─ TextToolController
    └─ ZoomToolController
 ```
 
 * **`ToolController`** 继承自 `QObject`，定义虚接口 `onMousePress/Move/Release`, `onKeyPress`。
-* **`CanvasController`** 监听 `SideToolBar::toolSelected`，切换当前 `ToolController` 并分发事件。
+* **`Cavasview`** 监听 `SideToolBar::toolSelected`，切换当前 `ToolController` ，并为`CanvasController`切换工具。
 
 ```txt
 QWidget
@@ -133,7 +129,7 @@ QWidget
 
 * **`SvgException`**
 
-  * 继承自 `std::exception` 或 `QException`，用于 XML 解析、文件 IO 错误。
+  * 继承自 `std::runtime_error`，用于 XML 解析、文件 IO 错误。
   * 在 `SvgParser`, `SvgWriter`中抛出并在顶层捕获，弹出错误对话框。
 
 # 六、功能设计

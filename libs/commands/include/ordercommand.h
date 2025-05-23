@@ -1,5 +1,4 @@
-﻿// ordercommand.h
-#ifndef ORDERCOMMAND_H
+﻿#ifndef ORDERCOMMAND_H
 #define ORDERCOMMAND_H
 
 #include "command.h"

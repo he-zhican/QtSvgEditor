@@ -184,7 +184,10 @@ std::shared_ptr<SvgDocument> CanvasView::document() {
 }
 
 void CanvasView::onDocumentChanged() {
-    scene()->clear();
+    for (auto* item : scene()->items()) {
+        scene()->removeItem(item);
+        delete item;
+    }
     m_itemMap.clear();
     for (auto& elem : m_document->elements()) {
         GraphicsSvgItem* item = new GraphicsSvgItem(elem);
